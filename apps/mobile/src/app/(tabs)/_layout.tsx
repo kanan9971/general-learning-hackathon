@@ -36,7 +36,7 @@ export default function TabsLayout() {
     >
       <Tabs.Screen
         name="index"
-        options={{ title: 'Today', tabBarIcon: tabIcon('today-outline', 'today') }}
+        options={{ title: 'Quiz', tabBarIcon: tabIcon('help-circle-outline', 'help-circle') }}
       />
       <Tabs.Screen
         name="portfolio"

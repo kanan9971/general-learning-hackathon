@@ -33,7 +33,8 @@ The product/scope plan lives in `PLAN.md`; this file is the structural contract.
 | `backend/app/market` | Fetch prices/yields, snapshot, fallback chain (live → cache → golden), rank moves. Produces `Fact`s. | facts |
 | `backend/app/news` | Parse RSS → article rows (headline/summary/url/time). Never fetches article bodies. | articles |
 | `backend/app/portfolio` | Deterministic attribution, sector exposure. Pure functions. | portfolio math |
-| `backend/app/learning` | Rubric scoring (overall score), mastery updates, Leitner scheduling. Pure functions. | learner math |
+| `backend/app/learning` | Rubric scoring (overall score), mastery updates, Leitner scheduling, adaptive quiz target selection, MCQ HMAC seals. Pure functions. | learner math |
+| `backend/app/services` | Request orchestration that spans db + learning + llm (quiz sessions, refill, grading). Called only by routers. | use-cases |
 | `backend/app/llm` | Grok client, prompts, structured-output parsing, audit log. No DB reads of its own. | AI calls |
 | `backend/app/rag` | Ingest (CLI), chunk, embed, hybrid retrieve, boost, build untrusted context, validate citations. | retrieval |
 | `backend/app/db` | Supabase client factories (`client.py`) and writes/queries (`knowledge.py`). The only code that talks to Supabase for data. | data access |
@@ -46,12 +47,13 @@ Allowed direction is **left → right** ("may import / call"). Anything not list
 
 | Layer | May depend on | Must NOT depend on |
 |---|---|---|
-| `routers` | schemas, deps, services (`market`, `portfolio`, `learning`, `llm`, `rag`, `db`) | other routers |
+| `routers` | schemas, deps, services (`market`, `portfolio`, `learning`, `llm`, `rag`, `db`, `services`) | other routers |
 | `llm` | schemas, config | `db`, `rag`, `market`, `routers` (callers pass data in) |
 | `rag` | schemas, config, `db`, `llm.embed` only (embedding call lives in `llm/embed.py`; `rag` never imports other `llm` modules, so retrieval never generates text) | `routers`, `learning` |
 | `market`, `news` | schemas, config, httpx | `llm`, `rag`, `db` writes except via cron entrypoint |
 | `portfolio`, `learning` | schemas only (pure functions) | network, DB, `llm` |
 | `db` | schemas, config | everything else |
+| `services` | schemas, config, `db`, `learning`, `llm`, `rag` (as needed) | `routers` |
 | `schemas` | pydantic only | anything else |
 | mobile `app/` | `components`, `api`, `constants` | Supabase tables directly (auth only), market/LLM providers |
 | mobile `components` | other components, `constants` | `api` (screens fetch, components render) |
@@ -73,8 +75,9 @@ Allowed direction is **left → right** ("may import / call"). Anything not list
 
 - **Daily brief (cron, post-close):** cron → `market` snapshot (fallback chain) + `news` RSS → `rag` ingest market chunks → `llm.explain_event` per top-ranked move → validated → `daily_briefs`. Request path only *reads* the stored brief.
 - **Onboarding diagnostic (mobile, current demo):** static MCQ fixture → client scores → persist plan (level + focus concepts) in AsyncStorage. Retake from Learn overwrites plan only; mastery history kept. (Server `POST /v1/onboarding` still planned for auth profiles later.)
-- **Daily case-study quiz (mobile, current demo):** MCQs from local fixture grounded in the brief event → mastery bumps in AsyncStorage → feedback → lesson fixture. Long-form `evaluate` route remains for a later P1 essay challenge.
-- **Teaching (live):** `POST /v1/tutor/lesson {concept_id, level, misconception?, question?}` in `routers/tutor.py`: `db.knowledge.get_concept` → `rag.retrieve` (foundation layer, concept-filtered, then unfiltered with a concept boost if thin) → `rag.context.build_context` (escaped `<source id=Sn>` blocks) → `llm.structured.generate(TutorLessonLLM, prompts/tutor)` → `rag.citations.validate_citations` → response with citations (chunk id, section, excerpt, URL). Below the similarity bar the lesson is flagged `insufficient_evidence` and cites nothing. If the LLM fails, an extractive fallback quotes the top sources verbatim. The mobile `lesson.tsx` calls this and falls back to the canned lesson if the API is unreachable. Mastery is not updated here; that belongs to the challenge/evaluation flow.
+- **Adaptive infinite quiz (Quiz tab):** silent anonymous Supabase Auth (no login UI) → `GET/PUT /v1/quiz/preferences` (formats + catalog/custom topics) → `POST /v1/quiz/sessions` creates a session and prepares up to **3** unanswered questions (current + ready). Selection is deterministic (`learning/adaptive`): due reviews, repeated mistakes, low mastery, preferred/custom topics. Generation uses `llm/structured` + `prompts/quiz_question` with template fallbacks; MCQ correctness is stored as an HMAC seal (never plaintext to the client). `POST .../answers` **saves the answer first**, grades (deterministic MCQ / structured eval for written), updates `concept_mastery` + `mastery_events` (linked via `quiz_attempt_id`), returns immediate feedback + next question. Client calls `POST .../refill` in the background to keep queue depth at 2–3. `POST .../end` closes voluntarily. `GET /v1/learn/progress` drives the Learn tab. RAG grounding for questions is deferred; questions are labelled hypothetical educational exercises. Local/dev without a JWT uses an in-memory store (`QUIZ_USE_MEMORY` / auth bypass).
+- **Daily case-study quiz (retired from P0 path):** previous fixture MCQ loop kept as offline reference only; long-form essay `evaluate` remains a later P1 challenge.
+- **Teaching (live):** `POST /v1/tutor/lesson {concept_id, level, misconception?, question?}` in `routers/tutor.py`: `db.knowledge.get_concept` → `rag.retrieve` (foundation layer, concept-filtered, then unfiltered with a concept boost if thin) → `rag.context.build_context` (escaped `<source id=Sn>` blocks) → `llm.structured.generate(TutorLessonLLM, prompts/tutor)` → `rag.citations.validate_citations` → response with citations (chunk id, section, excerpt, URL). Below the similarity bar the lesson is flagged `insufficient_evidence` and cites nothing. If the LLM fails, an extractive fallback quotes the top sources verbatim. The mobile `lesson.tsx` calls this and falls back to the canned lesson if the API is unreachable. Mastery is not updated here; that belongs to the quiz/evaluation flow.
 - **KB search / sources:** `POST /v1/kb/search` (debug + eval) and `GET /v1/sources/{chunk_id}` (citation drawer).
 - **Portfolio:** positions × snapshot → `portfolio.attribution` (deterministic) ; optional `llm.portfolio_narrative` labelled as interpretation.
 
@@ -101,12 +104,14 @@ Lessons: `python -m app.rag.ingest ../content/lessons --store` (Markdown with fr
 |---|---|
 | FastAPI app, config, typed errors (incl. 422 → `invalid_request`), JWT dependency (ES256 via Supabase JWKS; HS256 fallback; local dev bypass), `/health` | done, live-verified |
 | Pydantic API schemas + placeholder fixtures (`/v1/dev/fixtures/*` when `DEV_FIXTURES=true`) | done |
-| Supabase migrations 0001–0005 (core, rag, rls, research type, `match_chunks`) | **applied** to `apsojsuiginpuqljutyo`. RLS on all 17 tables. Advisories: `llm_calls` has no policy (intentional); `vector` in `public` (left as is). |
+| Supabase migrations 0001–0006 (core, rag, rls, research type, `match_chunks`, adaptive quiz) | **0001–0005 applied**; **0006 additive** (learner_preferences, quiz_sessions/questions/attempts, mastery_events.quiz_attempt_id) — apply before production quiz persistence |
 | Seed | `concepts` (29) + `concept_edges` (14) via `supabase/seed/concepts.sql` |
 | Knowledge base | 5 research papers (377 chunks) + 7 foundation lessons (49 chunks, `content/lessons/`, **`reviewed: false`, need finance-owner review**). Embeddings: Qwen `qwen3.7-text-embedding`, 1536-d. |
 | RAG retrieval (`match_chunks` hybrid vector+FTS+RRF, Python boosts, per-doc cap, sufficiency threshold 0.50) | done. Live eval (`pytest -m rag`): hit@3 10/10, beginners never get papers, off-topic → insufficient. |
 | RAG tutor (`/v1/tutor/lesson`), KB search, source lookup, citation validation, LLM audit to `llm_calls` | done, live-verified (~6s per lesson with Grok `grok-4.20-0309-non-reasoning`) |
-| Mobile: onboarding → Today / case study / daily quiz / feedback → **live lesson** / Portfolio / Learn | done (lesson screen calls the live tutor, offline fallback to fixture) |
-| Mobile auth (Supabase login) | not started: app relies on `AUTH_DEV_BYPASS` locally |
-| market / news / portfolio / learning (mastery math) / challenge evaluation | not started |
+| Adaptive quiz (`/v1/quiz/*`, `/v1/learn/progress`), mastery math, template fallbacks, HMAC MCQ seals | done (memory store for local bypass; Supabase RLS path with anonymous JWT) |
+| Mobile: onboarding → **Quiz** (formats/topics → infinite session) → Learn progress / Portfolio / live lesson | done |
+| Mobile auth | silent **anonymous** Supabase session (no login UI); email/password deferred |
+| market / news / portfolio / long-form challenge evaluation | not started |
+| RAG-grounded quiz generation | deferred (hook: pass retrieved foundation context into `quiz_question` prompt) |
 | Lesson persistence (`lessons` table needs an `evaluation_id`) | deferred until the evaluation flow exists |

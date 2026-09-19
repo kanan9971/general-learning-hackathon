@@ -1,168 +1,190 @@
-import { useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useCallback, useState } from 'react';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { useFocusEffect, useRouter } from 'expo-router';
 
-import { getFixture, getHealth, type DataMode, type Health } from '@/api/client';
-import { DataModeBadge } from '@/components/DataModeBadge';
+import {
+  getQuizPreferences,
+  updateQuizPreferences,
+  type QuizFormat,
+  type QuizPreferencesResponse,
+} from '@/api/client';
+import { Card } from '@/components/Card';
+import { Chip, ChipRow } from '@/components/Chip';
 import { Disclaimer } from '@/components/Disclaimer';
-import { EventCard } from '@/components/EventCard';
+import { FormatSelector } from '@/components/FormatSelector';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { Screen } from '@/components/Screen';
 import { SectionHeader } from '@/components/SectionHeader';
-import { getPlan, type LearnerPlan } from '@/lib/learner';
-import { Layout, Palette, Radius } from '@/constants/theme';
+import { ThemedText } from '@/components/themed-text';
+import { getPlan } from '@/lib/learner';
+import { Palette, Radius } from '@/constants/theme';
 
-type Fact = { fact_id: string; label?: string; symbol: string; value: number; unit: string };
-type Event = {
-  id: string;
-  title: string;
-  catalyst: string;
-  confidence?: string;
-};
-type Brief = {
-  as_of_date: string;
-  data_mode: DataMode;
-  strip: Fact[];
-  events: Event[];
-};
-
-const FALLBACK_BRIEF: Brief = {
-  as_of_date: '2000-01-01',
-  data_mode: 'demo',
-  strip: [
-    { fact_id: 'SPX.pct_change.1d', label: 'S&P 500', symbol: '^GSPC', value: 0, unit: '%' },
-    { fact_id: 'US10Y.bp_change.1d', label: 'US 10Y', symbol: '^TNX', value: 0, unit: 'bp' },
-  ],
-  events: [
-    {
-      id: 'evt-1',
-      title: 'Placeholder: inflation surprise lifts yields',
-      catalyst: 'Placeholder catalyst (likely, not certain)',
-      confidence: 'medium',
-    },
-  ],
-};
-
-export default function TodayScreen() {
+export default function QuizLauncherScreen() {
   const router = useRouter();
-  const [health, setHealth] = useState<Health | null>(null);
-  const [brief, setBrief] = useState<Brief | null>(null);
-  const [plan, setPlan] = useState<LearnerPlan | null>(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [prefs, setPrefs] = useState<QuizPreferencesResponse | null>(null);
+  const [formats, setFormats] = useState<QuizFormat[]>([]);
+  const [level, setLevel] = useState<'beginner' | 'intermediate' | 'advanced'>('beginner');
 
-  useEffect(() => {
-    getPlan().then(setPlan);
-    Promise.all([getHealth().catch(() => null), getFixture<Brief>('brief')])
-      .then(([h, b]) => {
-        setHealth(h);
-        setBrief(b);
-      })
-      .catch(() => {
-        setBrief(FALLBACK_BRIEF);
-        setError('API offline — showing local demo brief');
+  useFocusEffect(
+    useCallback(() => {
+      let cancelled = false;
+      (async () => {
+        setLoading(true);
+        setError(null);
+        try {
+          const plan = await getPlan();
+          const data = await getQuizPreferences();
+          if (cancelled) return;
+          setPrefs(data);
+          const saved = data.preferences.preferred_formats;
+          setFormats(saved.length ? saved : []);
+          setLevel(data.preferences.level || plan?.level || 'beginner');
+        } catch (e) {
+          if (!cancelled) {
+            setError(e instanceof Error ? e.message : 'Could not load quiz preferences');
+            // Local defaults so the UI still works if API is down briefly
+            setPrefs({
+              preferences: {
+                preferred_formats: [],
+                preferred_concept_ids: [],
+                custom_topics: [],
+                level: 'beginner',
+              },
+              available_formats: [
+                { id: 'mcq', label: 'Multiple choice' },
+                { id: 'case_study', label: 'Case study' },
+                { id: 'short_answer', label: 'Short answer' },
+                { id: 'analysis', label: 'Analysis' },
+              ],
+              available_topics: [],
+            });
+          }
+        } finally {
+          if (!cancelled) setLoading(false);
+        }
+      })();
+      return () => {
+        cancelled = true;
+      };
+    }, []),
+  );
+
+  const toggleFormat = (f: QuizFormat) => {
+    setFormats((prev) => (prev.includes(f) ? prev.filter((x) => x !== f) : [...prev, f]));
+  };
+
+  const onStart = async () => {
+    if (!formats.length) return;
+    setError(null);
+    try {
+      await updateQuizPreferences({
+        preferred_formats: formats,
+        preferred_concept_ids: prefs?.preferences.preferred_concept_ids ?? [],
+        custom_topics: prefs?.preferences.custom_topics ?? [],
+        level,
       });
-  }, []);
+    } catch {
+      // Preferences save is best-effort; session start still goes through.
+    }
+    router.push({
+      pathname: '/quiz',
+      params: {
+        formats: formats.join(','),
+        concepts: (prefs?.preferences.preferred_concept_ids ?? []).join(','),
+        customs: (prefs?.preferences.custom_topics ?? []).join('|'),
+        level,
+      },
+    });
+  };
 
-  if (!brief) {
+  if (loading) {
     return (
-      <Screen title="Today">
+      <Screen title="Quiz">
         <ActivityIndicator color={Palette.primary} />
       </Screen>
     );
   }
 
+  const topics = prefs?.preferences.preferred_concept_ids ?? [];
+  const customs = prefs?.preferences.custom_topics ?? [];
+  const topicNames = topics.map((id) => {
+    const hit = prefs?.available_topics.find((t) => t.id === id);
+    return hit?.name ?? id;
+  });
+
   return (
     <Screen
-      title="Today"
-      subtitle={plan ? `Plan tone: ${plan.level}` : undefined}
+      title="Quiz"
+      subtitle={`Adaptive practice · ${level}`}
       footer={
         <>
-          <PrimaryButton label="Start today's quiz" onPress={() => router.push('/quiz')} />
+          <PrimaryButton
+            label="Start quiz"
+            onPress={() => void onStart()}
+            disabled={!formats.length}
+          />
           <Disclaimer />
         </>
       }
     >
-      <View style={styles.statusRow}>
-        <DataModeBadge mode={brief.data_mode} asOf={brief.as_of_date} />
-        {health ? (
-          <Text style={styles.meta}>
-            API {health.status} · v{health.version}
-          </Text>
-        ) : null}
-      </View>
       {error ? (
-        <View style={styles.warnBanner}>
-          <Text style={styles.warn}>{error}</Text>
+        <View style={styles.warn}>
+          <Text style={styles.warnText}>{error}</Text>
         </View>
       ) : null}
 
-      <SectionHeader title="Cross-asset strip" meta="1-day change" />
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.strip}
-        style={styles.stripScroll}
-      >
-        {brief.strip.map((f) => (
-          <View key={f.fact_id} style={styles.stripCard}>
-            <Text style={styles.stripLabel}>{f.label ?? f.symbol}</Text>
-            <Text
-              style={[
-                styles.stripValue,
-                f.value > 0 && { color: Palette.success },
-                f.value < 0 && { color: Palette.error },
-              ]}
-            >
-              {f.value > 0 ? '+' : ''}
-              {f.value}
-              {f.unit}
-            </Text>
-          </View>
-        ))}
-      </ScrollView>
+      <Card tone="info">
+        <ThemedText type="kicker" style={{ color: Palette.secondary }}>
+          How it works
+        </ThemedText>
+        <ThemedText type="small" themeColor="textSecondary">
+          Questions adapt to your proficiency, weak topics, and recurring mistakes. Keep going as long
+          as you like — we only prepare the next 2–3 questions at a time.
+        </ThemedText>
+      </Card>
 
-      <SectionHeader title="Case studies" meta={`${brief.events.length} today`} />
-      {brief.events.map((e) => (
-        <EventCard
-          key={e.id}
-          title={e.title}
-          catalyst={e.catalyst}
-          confidence={e.confidence}
-          onPress={() => router.push(`/event/${e.id}`)}
+      <SectionHeader title="Question types" meta="pick at least one" />
+      <FormatSelector
+        formats={prefs?.available_formats ?? []}
+        selected={formats}
+        onToggle={toggleFormat}
+      />
+
+      <SectionHeader title="Topics" meta={topicNames.length || customs.length ? 'customised' : 'auto'} />
+      <Card>
+        {topicNames.length === 0 && customs.length === 0 ? (
+          <ThemedText type="small" themeColor="textSecondary">
+            No topics pinned yet — we will target weak and due concepts automatically.
+          </ThemedText>
+        ) : (
+          <ChipRow>
+            {topicNames.map((n) => (
+              <Chip key={n} label={n} tone="info" outlined />
+            ))}
+            {customs.map((c) => (
+              <Chip key={c} label={c} tone="accent" outlined />
+            ))}
+          </ChipRow>
+        )}
+        <PrimaryButton
+          label="Choose topics"
+          variant="secondary"
+          onPress={() => router.push('/topics' as '/quiz')}
+          style={{ marginTop: 8 }}
         />
-      ))}
+      </Card>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  statusRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 8,
-  },
-  meta: { color: Palette.muted, fontSize: 12 },
-  warnBanner: {
+  warn: {
     backgroundColor: Palette.softAccent,
     borderRadius: Radius.sm,
     paddingHorizontal: 12,
     paddingVertical: 8,
   },
-  warn: { color: Palette.warning, fontSize: 13, fontWeight: '600' },
-  // Bleed the strip to the screen edge so cards peek in and invite a swipe.
-  stripScroll: { marginHorizontal: -Layout.screenPadding },
-  strip: { gap: 8, paddingHorizontal: Layout.screenPadding },
-  stripCard: {
-    backgroundColor: Palette.surface,
-    borderColor: Palette.border,
-    borderWidth: 1,
-    borderRadius: Radius.md,
-    paddingHorizontal: Layout.cardPadding,
-    paddingVertical: 12,
-    minWidth: 112,
-    gap: 4,
-  },
-  stripLabel: { color: Palette.muted, fontSize: 12, fontWeight: '600' },
-  stripValue: { color: Palette.text, fontSize: 20, fontWeight: '700', fontVariant: ['tabular-nums'] },
+  warnText: { color: Palette.warning, fontSize: 13, fontWeight: '600' },
 });

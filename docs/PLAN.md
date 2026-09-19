@@ -305,13 +305,13 @@ All tables in `public`, UUID PKs unless noted, `created_at timestamptz default n
 | Onboarding welcome | What DeskReady is + Start diagnostic | — | — | Auth skipped |
 | Onboarding quiz | One MCQ at a time, progress dots, 6–8 Qs | `fixtures/onboarding-quiz.json` | — | Sets plan tone |
 | Plan reveal | Inferred level + focus chips → Continue | AsyncStorage plan | — | Retake returns to Learn |
-| **Today** | `DataModeBadge`, strip, `EventCard` case studies, quiz CTA | `GET /fixtures/brief` (+ local fallback) | API offline banner | DEMO DAY ok |
-| Case study | Fact / interpretation / causal chain / alternatives / Start quiz | brief fixture by id | — | explanation moment |
-| Daily quiz | 3–5 MCQs | `fixtures/daily-quiz.json` | — | updates mastery |
-| Feedback | Score, hits/misses, Teach me | quiz results params | — | |
-| Lesson | Sections + citations + check question | `GET /fixtures/lesson` | local fallback | |
+| **Quiz** (was Today) | Format multi-select, topics CTA, Start quiz (disabled until format picked) | `GET/PUT /v1/quiz/preferences` | API offline banner | anonymous JWT |
+| Topics picker | Search/select concepts + add custom finance topics | preferences | — | optional |
+| Infinite quiz | Multi-format Qs, immediate feedback, refill 2–3 | `/v1/quiz/sessions*` | retry / end | adaptive |
+| Feedback (legacy) | Kept for old deep links; session uses inline feedback | — | — | |
+| Lesson | Sections + citations + check question | `POST /v1/tutor/lesson` | local fallback | |
 | Portfolio | Day %, contributors, sectors, narrative | `GET /fixtures/portfolio_impact` | fallback | demo book |
-| Learn | Living plan + mastery bars + **Retake diagnostic** | AsyncStorage | empty mastery hint | retake only here |
+| Learn | Server mastery + recommendations + Retake diagnostic | `GET /v1/learn/progress` | plan-only fallback | |
 
 Design system (locked palette): page `#FAFAF7` · surface `#FFFFFF` · primary `#1E4E8C` · secondary `#087E8B` · accent `#F4B942` · success `#1F7A4D` · error `#B42318` · text `#1F2937` · muted `#596579` · borders `#D9E2EC` · soft info/success/accent backgrounds. `LabelledSection`: **Fact** (muted) · **Interpretation** (amber) · **Teaching** (teal) · **Your view** (primary). No confetti, no "win" language.
 

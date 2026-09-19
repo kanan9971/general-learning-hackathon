@@ -55,16 +55,30 @@ def _decode(token: str, settings: Settings) -> dict:
 DEV_USER_ID = "00000000-0000-0000-0000-000000000000"
 
 
+def get_bearer_token(
+    authorization: Annotated[str | None, Header()] = None,
+    settings: Settings = Depends(get_settings),
+) -> str | None:
+    """Raw JWT for user-scoped Supabase clients. None only under local AUTH_DEV_BYPASS."""
+    if not authorization or not authorization.lower().startswith("bearer "):
+        if settings.auth_dev_bypass and not settings.vercel:
+            return None
+        raise ApiError("unauthorized", "Missing bearer token", 401)
+    return authorization.split(" ", 1)[1]
+
+
 def get_user_id(
     authorization: Annotated[str | None, Header()] = None,
     settings: Settings = Depends(get_settings),
 ) -> str:
     """Verify the Supabase JWT and return the user id (`sub`)."""
-    if not authorization or not authorization.lower().startswith("bearer "):
-        if settings.auth_dev_bypass and not settings.vercel:
-            return DEV_USER_ID
+    token = None
+    if authorization and authorization.lower().startswith("bearer "):
+        token = authorization.split(" ", 1)[1]
+    elif settings.auth_dev_bypass and not settings.vercel:
+        return DEV_USER_ID
+    else:
         raise ApiError("unauthorized", "Missing bearer token", 401)
-    token = authorization.split(" ", 1)[1]
     try:
         return _decode(token, settings)["sub"]
     except ApiError:
@@ -74,3 +88,4 @@ def get_user_id(
 
 
 CurrentUser = Annotated[str, Depends(get_user_id)]
+BearerToken = Annotated[str | None, Depends(get_bearer_token)]

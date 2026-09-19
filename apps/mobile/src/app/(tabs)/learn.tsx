@@ -1,7 +1,8 @@
 import { useCallback, useState } from 'react';
-import { Alert, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Alert, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 
+import { getLearnProgress, type LearnProgress } from '@/api/client';
 import { Card } from '@/components/Card';
 import { Chip, ChipRow } from '@/components/Chip';
 import { Disclaimer } from '@/components/Disclaimer';
@@ -9,32 +10,45 @@ import { PrimaryButton } from '@/components/PrimaryButton';
 import { Screen } from '@/components/Screen';
 import { SectionHeader } from '@/components/SectionHeader';
 import { ThemedText } from '@/components/themed-text';
-import {
-  conceptLabel,
-  getMastery,
-  getPlan,
-  type LearnerPlan,
-  type MasteryMap,
-} from '@/lib/learner';
+import { conceptLabel, getPlan, type LearnerPlan } from '@/lib/learner';
 import { Palette, Radius } from '@/constants/theme';
 
 export default function LearnScreen() {
   const router = useRouter();
   const [plan, setPlan] = useState<LearnerPlan | null>(null);
-  const [mastery, setMastery] = useState<MasteryMap>({});
+  const [progress, setProgress] = useState<LearnProgress | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useFocusEffect(
     useCallback(() => {
-      Promise.all([getPlan(), getMastery()]).then(([p, m]) => {
-        setPlan(p);
-        setMastery(m);
-      });
+      let cancelled = false;
+      (async () => {
+        setLoading(true);
+        setError(null);
+        const p = await getPlan();
+        if (!cancelled) setPlan(p);
+        try {
+          const live = await getLearnProgress();
+          if (!cancelled) setProgress(live);
+        } catch (e) {
+          if (!cancelled) {
+            setError(e instanceof Error ? e.message : 'Could not load progress');
+            setProgress(null);
+          }
+        } finally {
+          if (!cancelled) setLoading(false);
+        }
+      })();
+      return () => {
+        cancelled = true;
+      };
     }, []),
   );
 
   const onRetake = () => {
     const go = () => router.push({ pathname: '/onboarding/quiz', params: { retake: '1' } });
-    const message = 'This refreshes your starting plan. Daily quiz progress is kept.';
+    const message = 'This refreshes your starting plan. Quiz progress on the server is kept.';
     if (typeof window !== 'undefined' && typeof window.confirm === 'function') {
       if (window.confirm(`Retake diagnostic?\n\n${message}`)) go();
       return;
@@ -45,100 +59,169 @@ export default function LearnScreen() {
     ]);
   };
 
-  const conceptIds = Array.from(
-    new Set([...(plan?.focusConceptIds ?? []), ...Object.keys(mastery)]),
-  );
+  const level = progress?.level ?? plan?.level ?? 'beginner';
+  const concepts = progress?.concepts ?? [];
+  const recommended = progress?.recommended_concept_ids ?? plan?.focusConceptIds ?? [];
 
   return (
     <Screen
       title="Learn"
-      subtitle="Living custom plan + mastery from daily quizzes"
+      subtitle="Living plan from your quiz performance"
       footer={
         <>
-          <PrimaryButton label="Go to Today" onPress={() => router.push('/(tabs)')} />
+          <PrimaryButton label="Go to Quiz" onPress={() => router.push('/(tabs)')} />
           <Disclaimer />
         </>
       }
     >
+      {loading ? <ActivityIndicator color={Palette.primary} /> : null}
+      {error ? (
+        <View style={styles.warn}>
+          <Text style={styles.warnText}>{error} — showing onboarding plan only.</Text>
+        </View>
+      ) : null}
+
       <Card tone="info">
         <ThemedText type="kicker" style={{ color: Palette.secondary }}>
           Your plan
         </ThemedText>
-        {plan ? (
+        <View style={styles.planHead}>
+          <Text style={styles.level}>{level}</Text>
+          {plan ? <Chip label={`${plan.percentCorrect}% diagnostic`} tone="neutral" size="sm" /> : null}
+        </View>
+        {progress?.custom_topics?.length ? (
+          <ChipRow>
+            {progress.custom_topics.map((t) => (
+              <Chip key={t} label={t} tone="accent" outlined />
+            ))}
+          </ChipRow>
+        ) : null}
+        {plan?.focusConceptIds?.length ? (
+          <ChipRow>
+            {plan.focusConceptIds.map((id) => (
+              <Chip key={id} label={conceptLabel(id)} tone="info" outlined />
+            ))}
+          </ChipRow>
+        ) : null}
+      </Card>
+
+      <SectionHeader
+        title="Recommended next"
+        meta={recommended.length ? `${recommended.length}` : undefined}
+      />
+      <Card tone="accent">
+        {recommended.length === 0 ? (
+          <ThemedText type="small" themeColor="textSecondary">
+            Take a quiz to unlock personalised recommendations.
+          </ThemedText>
+        ) : (
           <>
-            <View style={styles.planHead}>
-              <Text style={styles.level}>{plan.level}</Text>
-              <Chip label={`${plan.percentCorrect}% on diagnostic`} tone="neutral" size="sm" />
-            </View>
-            <ThemedText type="caption" themeColor="textSecondary">
-              Updated {new Date(plan.answeredAt).toLocaleDateString()}
-            </ThemedText>
             <ChipRow>
-              {plan.focusConceptIds.map((id) => (
-                <Chip key={id} label={conceptLabel(id)} tone="info" outlined />
+              {recommended.map((id) => (
+                <Chip key={id} label={conceptLabel(id)} tone="accent" />
               ))}
             </ChipRow>
+            <ThemedText type="small" themeColor="textSecondary">
+              Based on weak mastery, due reviews, and recent mistakes.
+            </ThemedText>
           </>
-        ) : (
-          <ThemedText type="small" themeColor="textSecondary">
-            Complete onboarding to seed your plan.
-          </ThemedText>
         )}
       </Card>
 
-      <SectionHeader title="Mastery" meta={conceptIds.length ? `${conceptIds.length} concepts` : undefined} />
-      {conceptIds.length === 0 ? (
+      <SectionHeader title="Mastery" meta={concepts.length ? `${concepts.length} concepts` : undefined} />
+      {concepts.length === 0 ? (
         <Card>
           <ThemedText type="small" themeColor="textSecondary">
-            Take today’s quiz to start updating mastery.
+            Quiz answers update these bars. Start from the Quiz tab.
           </ThemedText>
         </Card>
       ) : (
         <Card style={styles.table}>
-          {conceptIds.map((id, i) => {
-            const value = mastery[id] ?? (plan?.focusConceptIds.includes(id) ? 0.35 : 0);
-            const pct = Math.round(value * 100);
-            const isFocus = plan?.focusConceptIds.includes(id);
+          {concepts.map((c, i) => {
+            const pct = Math.round(c.mastery * 100);
             return (
-              <View key={id} style={[styles.masteryRow, i > 0 && styles.rowDivider]}>
+              <View key={c.concept_id} style={[styles.masteryRow, i > 0 && styles.rowDivider]}>
                 <View style={styles.masteryHead}>
-                  <Text style={styles.masteryName}>{conceptLabel(id)}</Text>
-                  {isFocus ? <Text style={styles.focusTag}>FOCUS</Text> : null}
+                  <Text style={styles.masteryName}>{c.name || conceptLabel(c.concept_id)}</Text>
+                  {c.is_focus ? <Text style={styles.focusTag}>FOCUS</Text> : null}
                   <Text style={styles.masteryPct}>{pct}%</Text>
                 </View>
                 <View style={styles.barTrack}>
                   <View style={[styles.barFill, { width: `${pct}%` }]} />
                 </View>
+                <ThemedText type="caption" themeColor="textSecondary">
+                  {c.attempts} attempt{c.attempts === 1 ? '' : 's'}
+                </ThemedText>
               </View>
             );
           })}
         </Card>
       )}
 
-      <SectionHeader title="Continue learning" />
-      <Card tone="accent">
-        <ThemedText type="sectionTitle" style={{ color: Palette.warning }}>
-          Next up: today’s case study
-        </ThemedText>
-        <ThemedText type="small" themeColor="textSecondary">
-          Open Today for the case study and the quiz that updates the bars above.
-        </ThemedText>
-      </Card>
+      {progress?.recent_attempts?.length ? (
+        <>
+          <SectionHeader title="Recent attempts" />
+          <Card style={styles.table}>
+            {progress.recent_attempts.slice(0, 6).map((a, i) => (
+              <View key={`${a.question_id}-${i}`} style={[styles.masteryRow, i > 0 && styles.rowDivider]}>
+                <View style={styles.masteryHead}>
+                  <Text style={styles.masteryName}>
+                    {a.concept_ids[0] ? conceptLabel(a.concept_ids[0]) : a.format}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.masteryPct,
+                      {
+                        color:
+                          a.observed === 'correct'
+                            ? Palette.success
+                            : a.observed === 'partial'
+                              ? Palette.warning
+                              : Palette.error,
+                      },
+                    ]}
+                  >
+                    {a.score}
+                  </Text>
+                </View>
+              </View>
+            ))}
+          </Card>
+        </>
+      ) : null}
 
       <SectionHeader title="Plan settings" />
       <Card>
         <ThemedText type="small" themeColor="textSecondary">
-          Retaking the diagnostic only refreshes your starting plan tone — daily quiz history is kept.
+          Retaking the diagnostic only refreshes your starting plan tone — quiz mastery history is kept.
         </ThemedText>
         <PrimaryButton label="Retake diagnostic" variant="secondary" onPress={onRetake} />
+        <PrimaryButton
+          label="Choose topics"
+          variant="ghost"
+          onPress={() => router.push('/topics' as '/quiz')}
+        />
       </Card>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
+  warn: {
+    backgroundColor: Palette.softAccent,
+    borderRadius: Radius.sm,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  warnText: { color: Palette.warning, fontSize: 13, fontWeight: '600' },
   planHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
-  level: { color: Palette.primary, fontSize: 28, lineHeight: 34, fontWeight: '800', textTransform: 'capitalize' },
+  level: {
+    color: Palette.primary,
+    fontSize: 28,
+    lineHeight: 34,
+    fontWeight: '800',
+    textTransform: 'capitalize',
+  },
   table: { paddingVertical: 4, gap: 0 },
   masteryRow: { paddingVertical: 12, gap: 8 },
   rowDivider: { borderTopWidth: 1, borderTopColor: Palette.border },

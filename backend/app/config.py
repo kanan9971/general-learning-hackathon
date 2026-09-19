@@ -37,6 +37,11 @@ class Settings(BaseSettings):
     # Ignored when running on Vercel (VERCEL env var is set there).
     auth_dev_bypass: bool = False
     vercel: str = ""
+    # HMAC key for MCQ answer seals (never returned to clients). Falls back to a
+    # deterministic local value so demos work; set QUIZ_HMAC_SECRET in production.
+    quiz_hmac_secret: str = "deskready-dev-quiz-hmac"
+    # Force in-memory quiz store (tests / offline). Auto-on when no JWT under bypass.
+    quiz_use_memory: bool = False
 
 
 @lru_cache

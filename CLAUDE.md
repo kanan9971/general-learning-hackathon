@@ -28,6 +28,8 @@ Feature freeze at H13. P0 = the "magic moment" loop in docs/PLAN.md §18.
 - Ingest lessons: `cd backend && .venv/bin/python -m app.rag.ingest ../content/lessons --store`
 - Live RAG eval (embeddings + Supabase): `cd backend && .venv/bin/pytest -m rag`
 - Try the tutor locally (needs `AUTH_DEV_BYPASS=true` in backend/.env): `curl -X POST localhost:8000/v1/tutor/lesson -H 'content-type: application/json' -d '{"concept_id":"real-yields","level":"beginner"}'`
+- Start an adaptive quiz session (memory store under bypass): `curl -X POST localhost:8000/v1/quiz/sessions -H 'content-type: application/json' -d '{"formats":["mcq"],"concept_ids":["bond-price-yield"]}'`
+- Learn progress: `curl localhost:8000/v1/learn/progress`
 - Live Supabase check (creates/deletes temp users): `cd backend && PYTHONPATH=. .venv/bin/python ../scripts/check_supabase.py`
 - Generate daily brief locally: `scripts/run_cron_local.sh --date YYYY-MM-DD`
 - Mobile: `cd apps/mobile && npm install && npx expo start` (press `w` for web on localhost:8081; `--tunnel` for phones). Routes live in `apps/mobile/src/app`
