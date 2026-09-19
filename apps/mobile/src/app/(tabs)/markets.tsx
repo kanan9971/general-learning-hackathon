@@ -1,25 +1,13 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
-import { useCallback, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
-import { useFocusEffect, useRouter } from 'expo-router';
+import { ActivityIndicator, Text, View, StyleSheet } from 'react-native';
+import { useRouter } from 'expo-router';
 
-import {
-  getMarketOverview,
-  getMarketsFeed,
-  type MarketGroup,
-  type MarketSection,
-  type MarketsFeed,
-  type OverviewResponse,
-} from '@/api/client';
+import type { MarketGroup, MarketSectionId } from '@/api/client';
 import { Card } from '@/components/Card';
-import { FlowDiagram } from '@/components/Diagrams';
-import { MarketMap } from '@/components/MarketMap';
 import { Chip, ChipRow } from '@/components/Chip';
 import { DataModeBadge } from '@/components/DataModeBadge';
 import { Disclaimer } from '@/components/Disclaimer';
-import { HeadlineItem } from '@/components/HeadlineItem';
+import { HubTile, TileGrid } from '@/components/HubTile';
 import { LabelledSection } from '@/components/LabelledSection';
-import { MarketOverviewCard } from '@/components/MarketOverviewCard';
 import { MoveRow } from '@/components/MoveRow';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { Screen } from '@/components/Screen';
@@ -27,62 +15,15 @@ import { SectionHeader } from '@/components/SectionHeader';
 import { ThemedText } from '@/components/themed-text';
 import { Palette, Radius } from '@/constants/theme';
 import { asOfLabel } from '@/lib/format';
-import { getInterests, type MarketInterests } from '@/lib/interests';
-import { getPlan } from '@/lib/learner';
+import { useMarketsFeed } from '@/lib/useMarketsFeed';
 
-const GROUPS: { id: MarketGroup; title: string; meta: string }[] = [
-  { id: 'macro', title: 'Macro', meta: 'top-down: economy → rates → FX → commodities → stocks' },
-  { id: 'micro', title: 'Micro', meta: 'industries & sectors' },
-  { id: 'company', title: 'Company', meta: 'single stocks' },
-  { id: 'portfolio', title: 'Your portfolio', meta: 'demo book' },
-  { id: 'foundations', title: 'Foundations', meta: 'what every S&T hire should know' },
-];
-
-export default function MarketsScreen() {
+/**
+ * The Markets hub: a short page of big buttons, each opening its own focused page.
+ * Nothing here scrolls past a screen or two; the depth lives one tap away.
+ */
+export default function MarketsHub() {
   const router = useRouter();
-  const [feed, setFeed] = useState<MarketsFeed | null>(null);
-  const [interests, setInterests] = useState<MarketInterests | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [showPrimer, setShowPrimer] = useState(false);
-  const [overview, setOverview] = useState<OverviewResponse | null>(null);
-  const [overviewLoading, setOverviewLoading] = useState(false);
-  const [overviewError, setOverviewError] = useState<string | null>(null);
-
-  const loadOverview = async () => {
-    setOverviewLoading(true);
-    setOverviewError(null);
-    try {
-      const [i, plan] = await Promise.all([getInterests(), getPlan()]);
-      setOverview(
-        await getMarketOverview({ level: plan?.level ?? 'beginner', interests: i.sections, watch: i.watch }),
-      );
-    } catch (e) {
-      setOverviewError(e instanceof Error ? e.message : 'The AI overview is unavailable');
-    } finally {
-      setOverviewLoading(false);
-    }
-  };
-
-  useFocusEffect(
-    useCallback(() => {
-      let cancelled = false;
-      (async () => {
-        setError(null);
-        const i = await getInterests();
-        if (cancelled) return;
-        setInterests(i);
-        try {
-          const f = await getMarketsFeed({ interests: i.sections, watch: i.watch });
-          if (!cancelled) setFeed(f);
-        } catch (e) {
-          if (!cancelled) setError(e instanceof Error ? e.message : 'Could not load markets');
-        }
-      })();
-      return () => {
-        cancelled = true;
-      };
-    }, []),
-  );
+  const { feed, interests, error, reload } = useMarketsFeed();
 
   if (!feed) {
     return (
@@ -93,6 +34,7 @@ export default function MarketsScreen() {
             <ThemedText type="small" themeColor="textSecondary">
               {error}. Is the backend running?
             </ThemedText>
+            <PrimaryButton label="Try again" variant="secondary" onPress={() => void reload()} />
           </Card>
         ) : (
           <ActivityIndicator color={Palette.primary} />
@@ -101,15 +43,14 @@ export default function MarketsScreen() {
     );
   }
 
+  const count = (g: MarketGroup) => feed.sections.filter((s) => s.group === g).length;
   const pinnedTitles = feed.sections.filter((s) => s.pinned).map((s) => s.title);
+  const openSection = (id: MarketSectionId) => router.push({ pathname: '/market/[section]', params: { section: id } });
+  const openGroup = (id: 'macro' | 'foundations') => router.push({ pathname: '/group/[id]', params: { id } });
   const pricesDown = feed.providers.prices === 'failed' && feed.data_mode !== 'demo';
 
   return (
-    <Screen
-      title="Markets"
-      subtitle="What moved, why, and how desks think about it"
-      footer={<Disclaimer />}
-    >
+    <Screen title="Markets" subtitle="Pick where to start" footer={<Disclaimer />}>
       <DataModeBadge mode={feed.data_mode} asOf={asOfLabel(feed.as_of)} />
       {pricesDown ? (
         <View style={styles.warn}>
@@ -117,6 +58,103 @@ export default function MarketsScreen() {
         </View>
       ) : null}
 
+      {/* 1 · The one-screen answer to "what happened today?" */}
+      <LabelledSection kind="fact" title="Today at a glance">
+        {feed.top_moves.slice(0, 3).map((m, i) => (
+          <MoveRow key={m.fact_id} move={m} divider={i > 0} />
+        ))}
+      </LabelledSection>
+
+      {/* 2 · Start here */}
+      <SectionHeader title="Start here" first />
+      <TileGrid>
+        <HubTile
+          wide
+          tone="accent"
+          icon="git-network-outline"
+          title="How it all connects"
+          subtitle="See how the Fed, rates, the dollar, oil and stocks move together, and which S&T desk trades what."
+          onPress={() => router.push('/connect')}
+        />
+        <HubTile
+          tone="teal"
+          icon="sparkles-outline"
+          title="AI market overview"
+          subtitle="What happened today and why, with the evidence."
+          onPress={() => router.push('/overview')}
+        />
+        <HubTile
+          tone="info"
+          icon="map-outline"
+          title="Market map"
+          subtitle="Today's moves on one diagram."
+          onPress={() => router.push({ pathname: '/connect', params: { tab: 'map' } })}
+        />
+      </TileGrid>
+
+      {/* 3 · Learn one area at a time */}
+      <SectionHeader title="Learn the markets" meta="one area per page" />
+      <TileGrid>
+        <HubTile
+          tone="info"
+          icon="globe-outline"
+          title="Macro analysis"
+          subtitle="Fed, rates, dollar, oil, stocks"
+          badge={`${count('macro')} topics`}
+          onPress={() => openGroup('macro')}
+        />
+        <HubTile
+          tone="success"
+          icon="business-outline"
+          title="Micro: sectors"
+          subtitle="Banks, tech, energy and more"
+          onPress={() => openSection('sectors')}
+        />
+        <HubTile
+          tone="accent"
+          icon="briefcase-outline"
+          title="Company analysis"
+          subtitle="Earnings, guidance, what's priced in"
+          onPress={() => openSection('companies')}
+        />
+        <HubTile
+          tone="teal"
+          icon="pie-chart-outline"
+          title="My portfolio"
+          subtitle="How today hit your holdings"
+          onPress={() => openSection('portfolio')}
+        />
+        <HubTile
+          wide
+          tone="info"
+          icon="school-outline"
+          title="S&T foundations"
+          subtitle="How a desk makes money, valuation basics, risk and sizing"
+          badge={`${count('foundations')} topics`}
+          onPress={() => openGroup('foundations')}
+        />
+      </TileGrid>
+
+      {/* 4 · Test yourself */}
+      <SectionHeader title="Test yourself" meta="on today's real data" />
+      <TileGrid>
+        <HubTile
+          tone="error"
+          icon="shuffle-outline"
+          title="What-if scenarios"
+          subtitle="What if the Fed did the opposite?"
+          onPress={() => router.push({ pathname: '/lab', params: { kinds: 'scenario' } })}
+        />
+        <HubTile
+          tone="info"
+          icon="flask-outline"
+          title="Market Lab"
+          subtitle="Predict, order, explain"
+          onPress={() => router.push('/lab')}
+        />
+      </TileGrid>
+
+      {/* 5 · Personalise */}
       <Card onPress={() => router.push('/interests')} accessibilityLabel="Customise interests">
         <View style={styles.rowBetween}>
           <ThemedText type="kicker" style={{ color: Palette.secondary }}>
@@ -133,160 +171,18 @@ export default function MarketsScreen() {
           ))}
           {!pinnedTitles.length && !interests?.watch.length ? (
             <ThemedText type="small" themeColor="textSecondary">
-              Pick the markets and companies you care about.
+              Pick the markets and companies you care about; they show first.
             </ThemedText>
           ) : null}
         </ChipRow>
       </Card>
-
-      <Card tone="info">
-        <ThemedText type="kicker" style={{ color: Palette.primary }}>
-          Market Lab
-        </ThemedText>
-        <ThemedText type="smallBold">Do you actually understand how markets work?</ThemedText>
-        <ThemedText type="small" themeColor="textSecondary">
-          Predict moves before you see them, and answer &quot;what if the Fed had done the opposite?&quot; scenarios that
-          test cause and effect. Built from today&apos;s real data; it updates your Learn progress.
-        </ThemedText>
-        <PrimaryButton label="Start a 6-question set" onPress={() => router.push('/lab')} />
-        <PrimaryButton
-          label="What-if scenarios only"
-          variant="secondary"
-          onPress={() => router.push({ pathname: '/lab', params: { kinds: 'scenario' } })}
-        />
-      </Card>
-
-      <SectionHeader title="AI market overview" meta="summary · explanation · evidence" />
-      {overview ? (
-        <>
-          <MarketOverviewCard
-            data={overview}
-            sectionTitles={Object.fromEntries(feed.sections.map((s) => [s.id, s.title]))}
-          />
-          <PrimaryButton label="Refresh overview" variant="ghost" onPress={() => void loadOverview()} />
-        </>
-      ) : (
-        <Card>
-          <ThemedText type="small" themeColor="textSecondary">
-            The AI reads today&apos;s numbers and the Fed, WSJ and Yahoo Finance headlines, then explains what
-            happened across markets. Every point shows the data and headlines it is based on.
-          </ThemedText>
-          {overviewError ? (
-            <ThemedText type="small" style={{ color: Palette.error }}>
-              {overviewError}
-            </ThemedText>
-          ) : null}
-          {overviewLoading ? (
-            <View style={styles.loadingRow}>
-              <ActivityIndicator color={Palette.primary} />
-              <ThemedText type="small" themeColor="textSecondary">
-                Reading the market… (~20s)
-              </ThemedText>
-            </View>
-          ) : (
-            <PrimaryButton label="Summarise today's market" onPress={() => void loadOverview()} />
-          )}
-        </Card>
-      )}
-
-      <SectionHeader title="Today's market map" meta="how news flows down the chain" />
-      <MarketMap
-        feed={feed}
-        onOpen={(id) => router.push({ pathname: '/market/[section]', params: { section: id } })}
-      />
-
-      <LabelledSection kind="teaching" title={feed.primer.title}>
-        <ThemedText type="small">{feed.primer.intro}</ThemedText>
-        {showPrimer ? (
-          <FlowDiagram
-            nodes={[
-              { label: feed.primer.steps[0].from_, tone: 'shock' },
-              ...feed.primer.steps.map((s, i) => ({
-                label: s.to,
-                tone: (i === feed.primer.steps.length - 1 ? 'goal' : 'neutral') as 'goal' | 'neutral',
-              })),
-            ]}
-            edges={feed.primer.steps.map((s) => s.why)}
-          />
-        ) : null}
-        <PrimaryButton
-          label={showPrimer ? 'Hide the chain' : 'Show how it connects'}
-          variant="ghost"
-          onPress={() => setShowPrimer((v) => !v)}
-        />
-      </LabelledSection>
-
-      {feed.top_moves.length ? (
-        <>
-          <SectionHeader title="Biggest moves" meta="vs a typical day" />
-          <LabelledSection kind="fact">
-            {feed.top_moves.map((m, i) => (
-              <MoveRow key={m.fact_id} move={m} divider={i > 0} />
-            ))}
-          </LabelledSection>
-        </>
-      ) : null}
-
-      {GROUPS.map((g) => {
-        const sections = feed.sections.filter((s) => s.group === g.id);
-        if (!sections.length) return null;
-        return (
-          <View key={g.id} style={{ gap: 12 }}>
-            <SectionHeader title={g.title} meta={g.meta} />
-            {sections.map((s) => (
-              <SectionCard key={s.id} section={s} onOpen={() => router.push({ pathname: '/market/[section]', params: { section: s.id } })} />
-            ))}
-          </View>
-        );
-      })}
     </Screen>
   );
 }
 
-function SectionCard({ section, onOpen }: { section: MarketSection; onOpen: () => void }) {
-  const pnl = section.attribution?.portfolio_return_pct;
-  return (
-    <Card onPress={onOpen} accessibilityLabel={`Open ${section.title}`}>
-      <View style={styles.rowBetween}>
-        <Text style={styles.title}>{section.title}</Text>
-        {section.pinned ? <Chip label="following" tone="info" size="sm" /> : null}
-      </View>
-      <ThemedText type="small" themeColor="textSecondary">
-        {section.tagline}
-      </ThemedText>
-      {pnl != null ? (
-        <Text style={[styles.pnl, { color: pnl > 0 ? Palette.success : pnl < 0 ? Palette.error : Palette.text }]}>
-          {pnl > 0 ? '+' : ''}
-          {pnl.toFixed(2)}% today
-        </Text>
-      ) : null}
-      {section.group === 'foundations' ? (
-        <ThemedText type="small">{section.guide.mental_model}</ThemedText>
-      ) : null}
-      {section.moves.slice(0, 3).map((m, i) => (
-        <MoveRow key={m.fact_id} move={m} divider={i > 0} />
-      ))}
-      {section.note && !section.moves.length ? (
-        <ThemedText type="caption" themeColor="textSecondary">
-          {section.note}
-        </ThemedText>
-      ) : null}
-      {section.headlines[0] ? <HeadlineItem item={section.headlines[0]} compact divider /> : null}
-      <View style={styles.cta}>
-        <Text style={styles.link}>{section.group === 'foundations' ? 'Learn it, then test yourself' : 'Learn it, see it today, test yourself'}</Text>
-        <Ionicons name="chevron-forward" size={16} color={Palette.primary} />
-      </View>
-    </Card>
-  );
-}
-
 const styles = StyleSheet.create({
-  loadingRow: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 8 },
-  rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 },
-  title: { color: Palette.text, fontSize: 18, fontWeight: '700', lineHeight: 24, flex: 1 },
-  pnl: { fontSize: 22, fontWeight: '700', fontVariant: ['tabular-nums'] },
+  rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   link: { color: Palette.primary, fontSize: 14, fontWeight: '700' },
-  cta: { flexDirection: 'row', alignItems: 'center', gap: 2, marginTop: 2 },
   warn: { backgroundColor: Palette.softAccent, borderRadius: Radius.sm, paddingHorizontal: 12, paddingVertical: 8 },
   warnText: { color: Palette.warning, fontSize: 13, fontWeight: '600' },
 });

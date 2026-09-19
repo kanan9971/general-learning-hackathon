@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView, type Edge } from 'react-native-safe-area-context';
 
@@ -20,6 +21,7 @@ export function Screen({
   footer,
   scroll = true,
   safeEdges = ['top'],
+  resetKey,
 }: {
   title?: string;
   subtitle?: string;
@@ -27,7 +29,14 @@ export function Screen({
   footer?: React.ReactNode;
   scroll?: boolean;
   safeEdges?: Edge[];
+  /** When this changes the page scrolls back to the top (e.g. switching tabs). */
+  resetKey?: string;
 }) {
+  const ref = useRef<ScrollView>(null);
+  useEffect(() => {
+    ref.current?.scrollTo({ y: 0, animated: false });
+  }, [resetKey]);
+
   const body = (
     <View style={styles.content}>
       {title || subtitle ? (
@@ -48,6 +57,7 @@ export function Screen({
     <SafeAreaView style={styles.root} edges={safeEdges}>
       {scroll ? (
         <ScrollView
+          ref={ref}
           style={styles.root}
           contentContainerStyle={styles.scroll}
           keyboardShouldPersistTaps="handled"

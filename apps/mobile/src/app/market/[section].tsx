@@ -4,14 +4,13 @@ import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 
 import {
   explainMarketSection,
-  getMarketsFeed,
   type ExplainSectionResponse,
   type Level,
   type MarketSection,
   type MarketSectionId,
-  type MarketsFeed,
   type Move,
 } from '@/api/client';
+import { Accordion } from '@/components/Accordion';
 import { Card } from '@/components/Card';
 import { StepsDiagram } from '@/components/Diagrams';
 import { Chip, ChipRow } from '@/components/Chip';
@@ -19,44 +18,37 @@ import { DataModeBadge } from '@/components/DataModeBadge';
 import { Disclaimer } from '@/components/Disclaimer';
 import { Evidence } from '@/components/Evidence';
 import { HeadlineItem } from '@/components/HeadlineItem';
+import { HubTile, TileGrid } from '@/components/HubTile';
 import { LabelledSection } from '@/components/LabelledSection';
 import { MoveRow } from '@/components/MoveRow';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { RuleCard } from '@/components/RuleCard';
 import { Screen } from '@/components/Screen';
-import { SectionHeader } from '@/components/SectionHeader';
-import { StepHeader } from '@/components/StepHeader';
+import { SegmentedTabs } from '@/components/SegmentedTabs';
 import { ThemedText } from '@/components/themed-text';
 import { Palette } from '@/constants/theme';
 import { asOfLabel, signed } from '@/lib/format';
-import { getInterests } from '@/lib/interests';
+import { useMarketsFeed } from '@/lib/useMarketsFeed';
 import { conceptLabel, getPlan } from '@/lib/learner';
+
+type Tab = 'learn' | 'today' | 'test' | 'desk';
 
 export default function MarketSectionScreen() {
   const { section: sectionId } = useLocalSearchParams<{ section: MarketSectionId }>();
   const router = useRouter();
-  const [feed, setFeed] = useState<MarketsFeed | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const { feed, interests, error } = useMarketsFeed();
   const [level, setLevel] = useState<Level>('beginner');
-  const [watch, setWatch] = useState<string[]>([]);
+  const [tab, setTab] = useState<Tab>('learn');
   const [note, setNote] = useState<ExplainSectionResponse | null>(null);
   const [noteLoading, setNoteLoading] = useState(false);
   const [noteError, setNoteError] = useState<string | null>(null);
 
   useEffect(() => {
-    (async () => {
-      const [i, plan] = await Promise.all([getInterests(), getPlan()]);
-      setWatch(i.watch);
-      setLevel(plan?.level ?? 'beginner');
-      try {
-        setFeed(await getMarketsFeed({ interests: i.sections, watch: i.watch }));
-      } catch (e) {
-        setError(e instanceof Error ? e.message : 'Could not load this section');
-      }
-    })();
+    getPlan().then((p) => setLevel(p?.level ?? 'beginner'));
   }, []);
 
   const section = feed?.sections.find((s) => s.id === sectionId);
+  const watch = interests?.watch ?? [];
 
   const loadNote = async () => {
     setNoteLoading(true);
@@ -80,230 +72,324 @@ export default function MarketSectionScreen() {
 
   const g = section.guide;
   const hasData = g.group !== 'foundations'; // foundations teach concepts; there are no prices to look at
-  let step = 1;
-  const openLab = () => router.push({ pathname: '/lab', params: { section: g.id } });
+  const tabs: { id: Tab; label: string }[] = hasData
+    ? [
+        { id: 'learn', label: 'Learn' },
+        { id: 'today', label: 'Today' },
+        { id: 'test', label: 'Test' },
+        { id: 'desk', label: 'Desk' },
+      ]
+    : [
+        { id: 'learn', label: 'Learn' },
+        { id: 'test', label: 'Test' },
+        { id: 'desk', label: 'Desk' },
+      ];
+  const lab = (kinds?: string) => router.push({ pathname: '/lab', params: kinds ? { section: g.id, kinds } : { section: g.id } });
 
   return (
     <Screen
       title={g.title}
       subtitle={g.tagline}
       safeEdges={['bottom']}
+      resetKey={tab}
       footer={
-        <>
-          <PrimaryButton label="Test my understanding" onPress={openLab} />
-          <PrimaryButton
-            label="Concept quiz"
-            variant="secondary"
-            onPress={() =>
-              router.push({
-                pathname: '/quiz',
-                params: { formats: 'mcq,case_study', concepts: g.concept_ids.join(','), customs: '', level },
-              })
-            }
-          />
-          <Disclaimer />
-        </>
+        tab === 'test' ? undefined : (
+          <>
+            <PrimaryButton label="Test my understanding" onPress={() => setTab('test')} />
+            <Disclaimer />
+          </>
+        )
       }
     >
       <Stack.Screen options={{ title: g.title }} />
-      {hasData ? <DataModeBadge mode={feed.data_mode} asOf={asOfLabel(feed.as_of)} /> : null}
+      <SegmentedTabs<Tab> tabs={tabs} value={tab} onChange={setTab} />
 
-      <LabelledSection kind="teaching" title="The big idea">
-        <Text style={styles.bigIdea}>{g.mental_model}</Text>
-        <ThemedText type="caption" themeColor="textSecondary">
-          Who works on this: {g.desk}
-        </ThemedText>
-      </LabelledSection>
-
-      {/* 1 · UNDERSTAND */}
-      <StepHeader n={step++} title="Understand" subtitle="How it works, and the rules traders carry in their heads" />
-      <LabelledSection kind="teaching">
-        {g.how_it_works.map((p, i) => (
-          <ThemedText key={i} type="small">
-            {p}
-          </ThemedText>
-        ))}
-      </LabelledSection>
-
-      <SectionHeader title="Rules of thumb" meta="if → then, and when they fail" />
-      {g.rules.map((r) => (
-        <RuleCard key={r.when} rule={r} />
-      ))}
-
-      <SectionHeader title="What moves it" />
-      <Card>
-        {g.key_drivers.map((d, i) => (
-          <View key={d.name} style={[styles.item, i > 0 && styles.divider]}>
-            <Text style={styles.itemTitle}>{d.name}</Text>
-            <Text style={styles.itemBody}>{d.why}</Text>
-          </View>
-        ))}
-      </Card>
-
-      <SectionHeader title="The chain reaction" meta="cause → effect, in order" />
-      <StepsDiagram steps={g.transmission.map((s) => ({ from: s.from_, to: s.to, why: s.why }))} />
-
-      {/* 2 · SEE IT TODAY */}
-      {hasData ? (
+      {tab === 'learn' ? (
         <>
-          <StepHeader n={step++} title="See it today" subtitle="Real numbers, an AI explanation with evidence, headlines" />
-          {section.id === 'portfolio' ? <PortfolioBlock section={section} source={feed.portfolio_source} /> : null}
-
-          <LabelledSection kind="fact" title="Today's numbers">
-            {section.moves.length ? (
-              section.moves.map((m, i) => <MoveRow key={m.fact_id} move={m} showFiveDay divider={i > 0} />)
-            ) : (
-              <ThemedText type="small" themeColor="textSecondary">
-                {section.note ?? 'No prices available.'}
-              </ThemedText>
-            )}
+          <LabelledSection kind="teaching" title="The big idea">
+            <Text style={styles.bigIdea}>{g.mental_model}</Text>
+            <ThemedText type="caption" themeColor="textSecondary">
+              Who works on this: {g.desk}
+            </ThemedText>
           </LabelledSection>
-
-          {note ? (
-            <DeskNote note={note} />
-          ) : (
-            <Card>
-              <ThemedText type="smallBold">Why did it move? Ask the desk note.</ThemedText>
-              <ThemedText type="small" themeColor="textSecondary">
-                An AI explanation of today&apos;s moves in this section, with the data and headlines it relies on. Read
-                the numbers above first and form your own view; then compare.
-              </ThemedText>
-              {noteError ? (
-                <ThemedText type="small" style={{ color: Palette.error }}>
-                  {noteError}
-                </ThemedText>
-              ) : null}
-              {noteLoading ? (
-                <View style={styles.loadingRow}>
-                  <ActivityIndicator color={Palette.primary} />
-                  <ThemedText type="small" themeColor="textSecondary">
-                    Reading today&apos;s headlines… (~10s)
-                  </ThemedText>
-                </View>
-              ) : (
-                <PrimaryButton label="Explain today" variant="secondary" onPress={() => void loadNote()} />
-              )}
-            </Card>
-          )}
-
-          <SectionHeader title="Headlines" meta="Fed · WSJ · Yahoo Finance" />
-          <Card style={{ paddingVertical: 4, gap: 0 }}>
-            {section.headlines.length ? (
-              section.headlines.map((h, i) => <HeadlineItem key={h.id} item={h} divider={i > 0} />)
-            ) : (
-              <ThemedText type="small" themeColor="textSecondary" style={{ paddingVertical: 12 }}>
-                No recent headlines for this section.
-              </ThemedText>
-            )}
-          </Card>
+          <Accordion
+            defaultOpen="how"
+            items={[
+              {
+                id: 'how',
+                title: 'How it works',
+                meta: 'the mechanics in plain language',
+                children: (
+                  <>
+                    {g.how_it_works.map((p, i) => (
+                      <ThemedText key={i} type="small">
+                        {p}
+                      </ThemedText>
+                    ))}
+                  </>
+                ),
+              },
+              {
+                id: 'rules',
+                title: 'Rules of thumb',
+                meta: `${g.rules.length} if → then rules, and when they fail`,
+                children: (
+                  <>
+                    {g.rules.map((r) => (
+                      <RuleCard key={r.when} rule={r} />
+                    ))}
+                  </>
+                ),
+              },
+              {
+                id: 'drivers',
+                title: 'What moves it',
+                meta: `${g.key_drivers.length} drivers`,
+                children: (
+                  <>
+                    {g.key_drivers.map((d) => (
+                      <View key={d.name} style={styles.item}>
+                        <Text style={styles.itemTitle}>{d.name}</Text>
+                        <Text style={styles.itemBody}>{d.why}</Text>
+                      </View>
+                    ))}
+                  </>
+                ),
+              },
+              {
+                id: 'chain',
+                title: 'The chain reaction',
+                meta: 'a diagram: cause → effect, in order',
+                children: <StepsDiagram steps={g.transmission.map((s) => ({ from: s.from_, to: s.to, why: s.why }))} />,
+              },
+            ]}
+          />
         </>
       ) : null}
 
-      {/* 3 · TEST YOURSELF */}
-      <StepHeader
-        n={step++}
-        title="Test yourself"
-        subtitle={hasData ? "Not recall: reasoning, on today's real data" : 'Check you can reason with it, not just recite it'}
-      />
-      <Card tone="info">
-        <ThemedText type="smallBold">The Market Lab checks you actually understand:</ThemedText>
-        {(hasData
-          ? [
-              ['What if?', 'change one thing (a Fed cut, an oil shock) and predict the ripple across assets'],
-              ['Predict', "call the direction before seeing what happened, then compare with today's real move"],
-              ['Pick the driver', 'tell real drivers from ones that belong to other markets'],
-              ['Order the chain', 'put a cause-and-effect chain back in sequence'],
-              ['Explain', 'write the mechanism in your own words; AI grades it against the evidence'],
-            ]
-          : [
-              ['What if?', 'change one thing and predict the ripple'],
-              ['Pick the driver', 'tell real drivers from lookalikes'],
-              ['Order the chain', 'put a cause-and-effect chain back in sequence'],
-              ['Explain', 'answer interview-style questions in your own words'],
-            ]
-        ).map(([k, v]) => (
-          <ThemedText key={k} type="small">
-            <Text style={styles.bold}>{k}</Text> · {v}
-          </ThemedText>
-        ))}
-        <PrimaryButton label="Start the Market Lab" onPress={openLab} />
-        <PrimaryButton
-          label="What-if scenarios only"
-          variant="secondary"
-          onPress={() => router.push({ pathname: '/lab', params: { section: g.id, kinds: 'scenario' } })}
-        />
-      </Card>
-
-      {/* 4 · THINK LIKE A DESK */}
-      <StepHeader n={step++} title="Think like a desk" subtitle="How professionals use this, and where beginners slip" />
-      <SectionHeader title="How desks trade it" meta="educational archetypes, not advice" first />
-      {g.strategies.map((s) => (
-        <Card key={s.name}>
-          <Text style={styles.stratTitle}>{s.name}</Text>
-          <ThemedText type="small">{s.idea}</ThemedText>
-          <View style={styles.kv}>
-            <Text style={styles.k}>How it&apos;s expressed</Text>
-            <Text style={styles.itemBody}>{s.how_expressed}</Text>
-          </View>
-          <View style={styles.kv}>
-            <Text style={[styles.k, { color: Palette.error }]}>What breaks it</Text>
-            <Text style={styles.itemBody}>{s.what_breaks_it}</Text>
-          </View>
-          <ChipRow>
-            {s.concept_ids.map((c) => (
-              <Chip key={c} label={conceptLabel(c)} tone="accent" size="sm" />
-            ))}
-          </ChipRow>
-        </Card>
-      ))}
-
-      {g.mistakes.length ? (
-        <Card tone="accent">
-          <ThemedText type="kicker" style={{ color: Palette.warning }}>
-            Classic beginner mistakes
-          </ThemedText>
-          {g.mistakes.map((m) => (
-            <ThemedText key={m} type="small">
-              • {m}
-            </ThemedText>
-          ))}
-        </Card>
-      ) : null}
-
-      {g.interview.length ? (
-        <Card tone="info">
-          <ThemedText type="kicker" style={{ color: Palette.primary }}>
-            Interview questions to practise out loud
-          </ThemedText>
-          {g.interview.map((m) => (
-            <ThemedText key={m} type="small">
-              • {m}
-            </ThemedText>
-          ))}
-        </Card>
-      ) : null}
-
-      <SectionHeader title="What to watch" />
-      <Card>
-        {g.watch.map((w) => (
-          <ThemedText key={w} type="small">
-            • {w}
-          </ThemedText>
-        ))}
-      </Card>
-
-      {Object.keys(g.glossary).length ? (
+      {tab === 'today' ? (
         <>
-          <SectionHeader title="Jargon buster" />
-          <Card>
-            {Object.entries(g.glossary).map(([term, def], i) => (
-              <View key={term} style={[styles.item, i > 0 && styles.divider]}>
-                <Text style={styles.itemTitle}>{term}</Text>
-                <Text style={styles.itemBody}>{def}</Text>
-              </View>
-            ))}
-          </Card>
+          <DataModeBadge mode={feed.data_mode} asOf={asOfLabel(feed.as_of)} />
+          <Accordion
+            defaultOpen="numbers"
+            items={[
+              {
+                id: 'numbers',
+                title: "Today's numbers",
+                meta: section.moves.length ? `${section.moves.length} instruments · 1-day and 5-day change` : 'no prices right now',
+                children: (
+                  <>
+                    {section.id === 'portfolio' ? <PortfolioBlock section={section} source={feed.portfolio_source} /> : null}
+                    {section.moves.length ? (
+                      section.moves.map((m, i) => <MoveRow key={m.fact_id} move={m} showFiveDay divider={i > 0} />)
+                    ) : (
+                      <ThemedText type="small" themeColor="textSecondary">
+                        {section.note ?? 'No prices available.'}
+                      </ThemedText>
+                    )}
+                  </>
+                ),
+              },
+              {
+                id: 'note',
+                title: 'Why did it move? (AI desk note)',
+                meta: 'with the data and headlines it relies on',
+                children: note ? (
+                  <DeskNote note={note} />
+                ) : (
+                  <>
+                    <ThemedText type="small" themeColor="textSecondary">
+                      Read the numbers first and form your own view; then compare with the AI explanation.
+                    </ThemedText>
+                    {noteError ? (
+                      <ThemedText type="small" style={{ color: Palette.error }}>
+                        {noteError}
+                      </ThemedText>
+                    ) : null}
+                    {noteLoading ? (
+                      <View style={styles.loadingRow}>
+                        <ActivityIndicator color={Palette.primary} />
+                        <ThemedText type="small" themeColor="textSecondary">
+                          Reading today&apos;s headlines… (~10s)
+                        </ThemedText>
+                      </View>
+                    ) : (
+                      <PrimaryButton label="Explain today" variant="secondary" onPress={() => void loadNote()} />
+                    )}
+                  </>
+                ),
+              },
+              {
+                id: 'news',
+                title: 'Headlines',
+                meta: 'Fed · WSJ · Yahoo Finance',
+                children: section.headlines.length ? (
+                  <Card style={{ paddingVertical: 4, gap: 0 }}>
+                    {section.headlines.map((h, i) => (
+                      <HeadlineItem key={h.id} item={h} divider={i > 0} />
+                    ))}
+                  </Card>
+                ) : (
+                  <ThemedText type="small" themeColor="textSecondary">
+                    No recent headlines for this section.
+                  </ThemedText>
+                ),
+              },
+            ]}
+          />
         </>
+      ) : null}
+
+      {tab === 'test' ? (
+        <>
+          <ThemedText type="small" themeColor="textSecondary">
+            Pick how you want to be tested. Each is built from {hasData ? "today's real data" : 'this topic'}, and your
+            answers update your Learn progress.
+          </ThemedText>
+          <TileGrid>
+            <HubTile
+              tone="error"
+              icon="shuffle-outline"
+              title="What-if scenarios"
+              subtitle="Change one thing, predict the ripple"
+              onPress={() => lab('scenario')}
+            />
+            {hasData ? (
+              <HubTile
+                tone="success"
+                icon="trending-up-outline"
+                title="Predict the move"
+                subtitle="Call it before you see it"
+                onPress={() => lab('predict')}
+              />
+            ) : null}
+            <HubTile
+              tone="info"
+              icon="flask-outline"
+              title="Mixed set"
+              subtitle="A bit of everything"
+              onPress={() => lab()}
+            />
+            <HubTile
+              tone="teal"
+              icon="chatbubble-ellipses-outline"
+              title="Explain it"
+              subtitle="Write it in your own words"
+              onPress={() => lab('explain')}
+            />
+            <HubTile
+              wide
+              tone="accent"
+              icon="help-circle-outline"
+              title="Concept quiz"
+              subtitle="Adaptive questions on the ideas in this topic"
+              onPress={() =>
+                router.push({
+                  pathname: '/quiz',
+                  params: { formats: 'mcq,case_study', concepts: g.concept_ids.join(','), customs: '', level },
+                })
+              }
+            />
+          </TileGrid>
+          <Disclaimer />
+        </>
+      ) : null}
+
+      {tab === 'desk' ? (
+        <Accordion
+          defaultOpen="strategies"
+          items={[
+            {
+              id: 'strategies',
+              title: 'How desks trade it',
+              meta: 'educational archetypes, not advice',
+              children: (
+                <>
+                  {g.strategies.map((st) => (
+                    <Card key={st.name}>
+                      <Text style={styles.stratTitle}>{st.name}</Text>
+                      <ThemedText type="small">{st.idea}</ThemedText>
+                      <View style={styles.kv}>
+                        <Text style={styles.k}>How it&apos;s expressed</Text>
+                        <Text style={styles.itemBody}>{st.how_expressed}</Text>
+                      </View>
+                      <View style={styles.kv}>
+                        <Text style={[styles.k, { color: Palette.error }]}>What breaks it</Text>
+                        <Text style={styles.itemBody}>{st.what_breaks_it}</Text>
+                      </View>
+                      <ChipRow>
+                        {st.concept_ids.map((c) => (
+                          <Chip key={c} label={conceptLabel(c)} tone="accent" size="sm" />
+                        ))}
+                      </ChipRow>
+                    </Card>
+                  ))}
+                </>
+              ),
+            },
+            {
+              id: 'mistakes',
+              title: 'Classic beginner mistakes',
+              meta: `${g.mistakes.length} to avoid`,
+              children: (
+                <>
+                  {g.mistakes.map((m) => (
+                    <ThemedText key={m} type="small">
+                      • {m}
+                    </ThemedText>
+                  ))}
+                </>
+              ),
+            },
+            {
+              id: 'interview',
+              title: 'Interview questions',
+              meta: 'practise answering out loud',
+              children: (
+                <>
+                  {g.interview.map((m) => (
+                    <ThemedText key={m} type="small">
+                      • {m}
+                    </ThemedText>
+                  ))}
+                  <PrimaryButton label="Practise in the Lab" variant="secondary" onPress={() => lab('explain')} />
+                </>
+              ),
+            },
+            {
+              id: 'watch',
+              title: 'What to watch',
+              children: (
+                <>
+                  {g.watch.map((w) => (
+                    <ThemedText key={w} type="small">
+                      • {w}
+                    </ThemedText>
+                  ))}
+                </>
+              ),
+            },
+            ...(Object.keys(g.glossary).length
+              ? [
+                  {
+                    id: 'gloss',
+                    title: 'Jargon buster',
+                    meta: `${Object.keys(g.glossary).length} terms`,
+                    children: (
+                      <>
+                        {Object.entries(g.glossary).map(([term, def]) => (
+                          <View key={term} style={styles.item}>
+                            <Text style={styles.itemTitle}>{term}</Text>
+                            <Text style={styles.itemBody}>{def}</Text>
+                          </View>
+                        ))}
+                      </>
+                    ),
+                  },
+                ]
+              : []),
+          ]}
+        />
       ) : null}
     </Screen>
   );

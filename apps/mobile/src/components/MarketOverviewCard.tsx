@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 
 import type { OverviewResponse } from '@/api/client';
-import { ChainList } from '@/components/ChainList';
+import { StepsDiagram } from '@/components/Diagrams';
 import { Chip } from '@/components/Chip';
 import { Evidence } from '@/components/Evidence';
 import { LabelledSection } from '@/components/LabelledSection';
@@ -9,13 +9,25 @@ import { ThemedText } from '@/components/themed-text';
 import { Palette } from '@/constants/theme';
 
 /** The AI cross-market overview. Every key point shows the evidence it rests on. */
-export function MarketOverviewCard({ data, sectionTitles }: { data: OverviewResponse; sectionTitles: Record<string, string> }) {
+export type OverviewView = 'story' | 'evidence' | 'desks';
+
+export function MarketOverviewCard({
+  data,
+  sectionTitles,
+  view = 'story',
+}: {
+  data: OverviewResponse;
+  sectionTitles: Record<string, string>;
+  view?: OverviewView;
+}) {
   const o = data.overview;
   const moves = new Map(data.moves.map((m) => [m.fact_id, m]));
   const headlines = new Map(data.headlines.map((h) => [h.id, h]));
 
   return (
     <>
+      {view === 'story' ? (
+        <>
       <LabelledSection kind="interpretation" title={o.headline}>
         <ThemedText>{o.summary}</ThemedText>
         <View style={styles.confRow}>
@@ -31,6 +43,12 @@ export function MarketOverviewCard({ data, sectionTitles }: { data: OverviewResp
         ) : null}
       </LabelledSection>
 
+      <ThemedText type="sectionTitle">How today connects</ThemedText>
+      <StepsDiagram steps={o.connections.map((c) => ({ from: c.from_, to: c.to, why: c.why }))} />
+        </>
+      ) : null}
+
+      {view === 'evidence' ? (
       <LabelledSection kind="interpretation" title="Key points & evidence">
         {o.key_points.map((p, i) => (
           <View key={i} style={[styles.point, i > 0 && styles.divider]}>
@@ -50,9 +68,10 @@ export function MarketOverviewCard({ data, sectionTitles }: { data: OverviewResp
         ))}
       </LabelledSection>
 
-      <ThemedText type="sectionTitle">How today connects</ThemedText>
-      <ChainList steps={o.connections.map((c) => ({ from: c.from_, to: c.to, why: c.why }))} />
+      ) : null}
 
+      {view === 'desks' ? (
+        <>
       <LabelledSection kind="interpretation" title="How desks might think about it">
         {o.desk_views.map((v, i) => (
           <View key={i} style={[styles.point, i > 0 && styles.divider]}>
@@ -77,6 +96,8 @@ export function MarketOverviewCard({ data, sectionTitles }: { data: OverviewResp
             </ThemedText>
           ))}
         </LabelledSection>
+      ) : null}
+        </>
       ) : null}
     </>
   );
