@@ -1,3 +1,5 @@
+"""Live Supabase smoke test: auth, backend JWT verification, RLS isolation. Creates and deletes temp users.
+Run: cd backend && PYTHONPATH=. .venv/bin/python ../scripts/check_supabase.py"""
 import uuid, httpx
 from app.config import get_settings
 from app.deps import get_user_id

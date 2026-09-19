@@ -96,9 +96,9 @@ Run: `python -m app.rag.ingest ../content/sources/research_papers.yaml` (dry run
 
 | Area | State |
 |---|---|
-| FastAPI app, config, typed errors, JWT dependency, `/health` | done (phase 0) |
+| FastAPI app, config, typed errors, JWT dependency (ES256 via Supabase JWKS fetched with httpx; HS256 legacy fallback), `/health` | done, live-verified |
 | Pydantic API schemas + placeholder fixtures (`app/fixtures`, served at `/v1/dev/fixtures/*` when `DEV_FIXTURES=true`) | done (phase 0) |
-| Supabase migrations 0001–0004 (core, rag, rls, research type) | **applied** to project `apsojsuiginpuqljutyo` on 2026-09-19 via MCP; 17 tables, RLS on all. Known advisories: `llm_calls` has no policy (intentional, service-role only); `vector` extension sits in `public` (leave, moving it means recreating `chunks.embedding`). Tables are empty (no seed yet). |
+| Supabase migrations 0001–0004 (core, rag, rls, research type) | **applied** to project `apsojsuiginpuqljutyo` on 2026-09-19 via MCP; 17 tables, RLS on all. Known advisories: `llm_calls` has no policy (intentional, service-role only); `vector` extension sits in `public` (leave, moving it means recreating `chunks.embedding`). Seeded `concepts` (29) + `concept_edges` (14) via `supabase/seed/concepts.sql`. Live-verified 2026-09-19 (`scripts/check_supabase.py`, 12/12): signup/login, backend verifies ES256 tokens via JWKS, RLS isolation between users, reference tables read-only, KB store path (pgvector insert + re-ingest replace). |
 | Expo app: onboarding MCQ → plan → Today / case study / daily quiz / feedback / lesson / Portfolio / Learn (palette + AsyncStorage gate; auth skipped) | done (mobile loop UI) |
 | RAG ingest pipeline (extract, clean, chunk, embed, store) + 5 momentum papers (~300 chunks, dry-run verified; **not yet embedded/stored**: needs embedding key + Supabase) | done except store step |
 | market / news / portfolio / learning / llm prompts | empty packages (later phases) |
