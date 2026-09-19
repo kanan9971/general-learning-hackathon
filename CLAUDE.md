@@ -16,8 +16,8 @@ Feature freeze at H13. P0 = the "magic moment" loop in docs/PLAN.md §18.
 - supabase — Postgres + pgvector + Auth (email/password) + RLS; SQL migrations in supabase/migrations
 - LLM: xAI Grok via `openai` SDK (base_url https://api.x.ai/v1); model IDs from env (`XAI_MODEL_FAST`, `XAI_MODEL_REASONING`)
 - Embeddings: Alibaba Qwen `qwen3.7-text-embedding` via DashScope OpenAI-compatible API, 1536-d (OpenAI is blocked in Hong Kong; provider is swappable via `EMBEDDING_*` env vars, but dims must match `vector(1536)`)
-- Market data: Yahoo Finance chart endpoint via httpx (prices; no `yfinance` on Vercel) + FRED (2Y yield, curve, macro)
-- News: WSJ public RSS + Yahoo Finance ticker RSS — headline, summary, URL, timestamp only; never scrape WSJ article bodies
+- Market data: Yahoo Finance chart endpoint via httpx (prices) with `yfinance` as a local-only fallback (never in requirements.txt: pandas is too heavy for Vercel) + Treasury.gov daily yield curve (2Y, curve; keyless)
+- News: Federal Reserve RSS + WSJ public RSS (`feeds.content.dowjones.io`; the old `feeds.a.dj.com` is frozen) + Yahoo Finance ticker RSS — headline, summary, URL, timestamp only; never scrape WSJ article bodies
 - Fallback chain: live → cached snapshot → golden demo day
 
 ## Commands
@@ -32,6 +32,8 @@ Feature freeze at H13. P0 = the "magic moment" loop in docs/PLAN.md §18.
 - Learn progress: `curl localhost:8000/v1/learn/progress`
 - Live Supabase check (creates/deletes temp users): `cd backend && PYTHONPATH=. .venv/bin/python ../scripts/check_supabase.py`
 - Generate daily brief locally: `scripts/run_cron_local.sh --date YYYY-MM-DD`
+- Markets feed / AI overview (dev bypass): `curl 'localhost:8000/v1/markets/feed?interests=macro,rates&watch=TSLA'` · `curl -X POST localhost:8000/v1/markets/overview -H 'content-type: application/json' -d '{"level":"beginner"}'` (set `DATA_MODE=live` for real-time data)
+- Re-capture the golden demo day from live providers (real numbers only): `cd backend && .venv/bin/python -m app.market.capture --replace`
 - Mobile: `cd apps/mobile && npm install && npx expo start` (press `w` for web on localhost:8081; `--tunnel` for phones). Routes live in `apps/mobile/src/app`
 - Regenerate API types after changing backend schemas: `scripts/gen_types.sh`
 

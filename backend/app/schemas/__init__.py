@@ -4,3 +4,4 @@ from .market import *  # noqa: F401,F403
 from .onboarding import *  # noqa: F401,F403
 from .portfolio import *  # noqa: F401,F403
 from .quiz import *  # noqa: F401,F403
+from .markets import *  # noqa: F401,F403

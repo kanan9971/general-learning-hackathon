@@ -234,3 +234,163 @@ export const endQuizSession = (sessionId: string) =>
   }>(`/v1/quiz/sessions/${sessionId}/end`, {});
 
 export const getLearnProgress = () => request<LearnProgress>('/v1/learn/progress');
+
+// ---- Markets feed ----
+export type MarketSectionId =
+  | 'macro'
+  | 'rates'
+  | 'fx'
+  | 'commodities'
+  | 'equities'
+  | 'sectors'
+  | 'companies'
+  | 'portfolio';
+export type MarketGroup = 'macro' | 'micro' | 'company' | 'portfolio';
+export type ProviderStatus = 'ok' | 'partial' | 'failed' | 'skipped';
+
+export type Move = {
+  fact_id: string;
+  symbol: string;
+  label: string;
+  section: MarketSectionId;
+  asset_class: string;
+  level: number;
+  level_unit: string;
+  change: number;
+  change_unit: '%' | 'bp';
+  change_5d?: number | null;
+  source: 'yahoo' | 'treasury' | 'golden';
+  as_of: string;
+  unusual: boolean;
+  score: number;
+};
+
+export type Headline = {
+  id: string;
+  title: string;
+  summary: string;
+  url: string;
+  publisher: string;
+  published_at?: string | null;
+  sections: MarketSectionId[];
+  tickers: string[];
+  concept_ids: string[];
+  is_official: boolean;
+};
+
+export type GuideStep = { from_: string; to: string; why: string };
+
+export type SectionGuide = {
+  id: MarketSectionId;
+  group: MarketGroup;
+  title: string;
+  tagline: string;
+  desk: string;
+  how_it_works: string[];
+  key_drivers: { name: string; why: string }[];
+  transmission: GuideStep[];
+  strategies: {
+    name: string;
+    idea: string;
+    how_expressed: string;
+    what_breaks_it: string;
+    concept_ids: string[];
+  }[];
+  watch: string[];
+  glossary: Record<string, string>;
+  concept_ids: string[];
+};
+
+export type MarketSection = {
+  id: MarketSectionId;
+  group: MarketGroup;
+  title: string;
+  tagline: string;
+  pinned: boolean;
+  moves: Move[];
+  headlines: Headline[];
+  guide: SectionGuide;
+  attribution?: {
+    portfolio_return_pct: number;
+    contributions: { symbol: string; weight: number; return_pct: number; contribution_pct: number }[];
+    sectors: Record<string, number>;
+  } | null;
+  note?: string | null;
+};
+
+export type MarketsFeed = {
+  as_of: string | null;
+  data_mode: DataMode;
+  generated_at: string;
+  providers: Record<'prices' | 'treasury' | 'fed_news' | 'wsj_news' | 'ticker_news', ProviderStatus>;
+  primer: { title: string; intro: string; steps: GuideStep[] };
+  top_moves: Move[];
+  sections: MarketSection[];
+  interest_options: { id: MarketSectionId; group: MarketGroup; title: string; tagline: string }[];
+  portfolio_source: string;
+};
+
+export type SectionExplanation = {
+  summary: string;
+  drivers: { explanation: string; fact_ids: string[]; headline_ids: string[] }[];
+  chain: GuideStep[];
+  desk_views: { strategy: string; rationale: string; risk: string }[];
+  watch_next: string[];
+  confidence: 'low' | 'medium' | 'high';
+  confidence_reason: string;
+  concept_ids: string[];
+};
+
+export type ExplainSectionResponse = {
+  section_id: MarketSectionId;
+  as_of: string | null;
+  data_mode: DataMode;
+  explanation: SectionExplanation;
+  moves: Move[];
+  headlines: Headline[];
+  generated_by: 'llm' | 'fallback';
+};
+
+export const getMarketsFeed = (params: { interests: string[]; watch: string[] }) => {
+  const q = new URLSearchParams();
+  if (params.interests.length) q.set('interests', params.interests.join(','));
+  if (params.watch.length) q.set('watch', params.watch.join(','));
+  const qs = q.toString();
+  return request<MarketsFeed>(`/v1/markets/feed${qs ? `?${qs}` : ''}`);
+};
+
+export const explainMarketSection = (
+  sectionId: MarketSectionId,
+  body: { level: Level; watch: string[] },
+) => request<ExplainSectionResponse>(`/v1/markets/sections/${sectionId}/explain`, body);
+
+export type MarketOverview = {
+  headline: string;
+  summary: string;
+  key_points: {
+    section_id: MarketSectionId;
+    point: string;
+    explanation: string;
+    evidence: { fact_ids: string[]; headline_ids: string[] };
+    supported: boolean;
+  }[];
+  connections: { from_: string; to: string; why: string; fact_ids: string[] }[];
+  desk_views: { desk: string; strategy: string; rationale: string; risk: string; fact_ids: string[] }[];
+  watch_next: string[];
+  confidence: 'low' | 'medium' | 'high';
+  confidence_reason: string;
+  concept_ids: string[];
+};
+
+export type OverviewResponse = {
+  as_of: string | null;
+  data_mode: DataMode;
+  overview: MarketOverview;
+  moves: Move[];
+  headlines: Headline[];
+  generated_by: 'llm' | 'fallback';
+  generated_at: string;
+};
+
+export const getMarketOverview = (body: { level: Level; interests: MarketSectionId[]; watch: string[] }) =>
+  request<OverviewResponse>('/v1/markets/overview', body);

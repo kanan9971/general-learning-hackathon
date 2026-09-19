@@ -47,3 +47,69 @@ class QuizEvalLLM(BaseModel):
     strengths: list[str] = Field(default_factory=list, max_length=4)
     gaps: list[str] = Field(default_factory=list, max_length=4)
     review_concept_ids: list[str] = Field(default_factory=list, max_length=3)
+
+
+class MarketStepLLM(BaseModel):
+    from_: str = Field(max_length=120)
+    to: str = Field(max_length=120)
+    why: str = Field(max_length=300)
+
+
+class MarketDriverLLM(BaseModel):
+    explanation: str = Field(max_length=500)
+    fact_ids: list[str] = Field(default_factory=list, max_length=4, description="Only fact_ids from <facts>")
+    headline_ids: list[str] = Field(default_factory=list, max_length=4, description="Only IDs like H1 from the headlines")
+
+
+class DeskViewLLM(BaseModel):
+    strategy: str = Field(max_length=160, description="Short name of a trade archetype (a few words), framed hypothetically")
+    rationale: str = Field(max_length=400)
+    risk: str = Field(max_length=300, description="What would make this view wrong")
+
+
+class MarketSectionLLM(BaseModel):
+    """Desk-note style explanation of one market section. References facts by id; never restates numbers."""
+    summary: str = Field(max_length=700)
+    drivers: list[MarketDriverLLM] = Field(min_length=1, max_length=4)
+    chain: list[MarketStepLLM] = Field(min_length=2, max_length=5)
+    desk_views: list[DeskViewLLM] = Field(min_length=1, max_length=3)
+    watch_next: list[str] = Field(default_factory=list, max_length=3)
+    confidence: Literal["low", "medium", "high"]
+    confidence_reason: str = Field(max_length=300)
+    concept_ids: list[str] = Field(default_factory=list, max_length=4)
+
+
+class OverviewPointLLM(BaseModel):
+    section_id: Literal["macro", "rates", "fx", "commodities", "equities", "sectors", "companies", "portfolio"]
+    point: str = Field(max_length=220, description="One-line claim, e.g. 'Short-dated yields led a rates sell-off'")
+    explanation: str = Field(max_length=800, description="2-3 sentences: why it happened / why it matters, in plain words")
+    fact_ids: list[str] = Field(default_factory=list, max_length=5, description="Evidence: fact_ids from <facts>")
+    headline_ids: list[str] = Field(default_factory=list, max_length=3, description="Evidence: IDs like H3")
+
+
+class OverviewLinkLLM(BaseModel):
+    from_: str = Field(max_length=120)
+    to: str = Field(max_length=120)
+    why: str = Field(max_length=300)
+    fact_ids: list[str] = Field(default_factory=list, max_length=3)
+
+
+class OverviewDeskLLM(BaseModel):
+    desk: str = Field(max_length=60, description="Rates | FX | Commodities | Equities | Macro")
+    strategy: str = Field(max_length=160, description="Short name of a trade archetype (a few words)")
+    rationale: str = Field(max_length=600)
+    risk: str = Field(max_length=400)
+    fact_ids: list[str] = Field(default_factory=list, max_length=3)
+
+
+class MarketOverviewLLM(BaseModel):
+    """Cross-market morning note. Every key point must cite facts and/or headlines as evidence."""
+    headline: str = Field(max_length=200, description="The story of the day in one line")
+    summary: str = Field(max_length=1400)
+    key_points: list[OverviewPointLLM] = Field(min_length=3, max_length=6)
+    connections: list[OverviewLinkLLM] = Field(min_length=2, max_length=5)
+    desk_views: list[OverviewDeskLLM] = Field(min_length=1, max_length=3)
+    watch_next: list[str] = Field(default_factory=list, max_length=4)
+    confidence: Literal["low", "medium", "high"]
+    confidence_reason: str = Field(max_length=300)
+    concept_ids: list[str] = Field(default_factory=list, max_length=5)

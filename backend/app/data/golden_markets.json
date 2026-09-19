@@ -1,0 +1,2378 @@
+{
+ "_note": "Real data captured from live providers by app.market.capture. Do not hand-edit numbers.",
+ "captured_at": "2026-09-19T13:29:37.006681+00:00",
+ "moves": [
+  {
+   "fact_id": "TLT.chg.1d",
+   "symbol": "TLT",
+   "label": "Long bond ETF (TLT)",
+   "section": "rates",
+   "asset_class": "stock",
+   "level": 81.25,
+   "level_unit": "usd",
+   "change": -0.65,
+   "change_unit": "%",
+   "change_5d": 0.47,
+   "source": "yahoo",
+   "as_of": "2026-09-18T13:30:00+00:00",
+   "unusual": false,
+   "score": 0.0
+  },
+  {
+   "fact_id": "DX-Y.NYB.chg.1d",
+   "symbol": "DX-Y.NYB",
+   "label": "US Dollar Index",
+   "section": "fx",
+   "asset_class": "fx",
+   "level": 100.22,
+   "level_unit": "",
+   "change": 0.0,
+   "change_unit": "%",
+   "change_5d": 1.11,
+   "source": "yahoo",
+   "as_of": "2026-09-18T04:00:00+00:00",
+   "unusual": false,
+   "score": 0.0
+  },
+  {
+   "fact_id": "EURUSD=X.chg.1d",
+   "symbol": "EURUSD=X",
+   "label": "EUR/USD",
+   "section": "fx",
+   "asset_class": "fx",
+   "level": 1.149,
+   "level_unit": "",
+   "change": 0.12,
+   "change_unit": "%",
+   "change_5d": -0.89,
+   "source": "yahoo",
+   "as_of": "2026-09-18T21:29:10+00:00",
+   "unusual": false,
+   "score": 0.0
+  },
+  {
+   "fact_id": "USDJPY=X.chg.1d",
+   "symbol": "USDJPY=X",
+   "label": "USD/JPY",
+   "section": "fx",
+   "asset_class": "fx",
+   "level": 156.855,
+   "level_unit": "",
+   "change": 0.46,
+   "change_unit": "%",
+   "change_5d": 2.24,
+   "source": "yahoo",
+   "as_of": "2026-09-19T07:52:14+00:00",
+   "unusual": false,
+   "score": 0.0
+  },
+  {
+   "fact_id": "GBPUSD=X.chg.1d",
+   "symbol": "GBPUSD=X",
+   "label": "GBP/USD",
+   "section": "fx",
+   "asset_class": "fx",
+   "level": 1.3393,
+   "level_unit": "",
+   "change": 0.26,
+   "change_unit": "%",
+   "change_5d": -0.98,
+   "source": "yahoo",
+   "as_of": "2026-09-19T09:56:07+00:00",
+   "unusual": false,
+   "score": 0.0
+  },
+  {
+   "fact_id": "CL=F.chg.1d",
+   "symbol": "CL=F",
+   "label": "WTI crude oil",
+   "section": "commodities",
+   "asset_class": "commodity",
+   "level": 100.3,
+   "level_unit": "usd",
+   "change": -1.58,
+   "change_unit": "%",
+   "change_5d": 0.25,
+   "source": "yahoo",
+   "as_of": "2026-09-18T04:00:00+00:00",
+   "unusual": false,
+   "score": 0.0
+  },
+  {
+   "fact_id": "BZ=F.chg.1d",
+   "symbol": "BZ=F",
+   "label": "Brent crude oil",
+   "section": "commodities",
+   "asset_class": "commodity",
+   "level": 103.87,
+   "level_unit": "usd",
+   "change": -0.91,
+   "change_unit": "%",
+   "change_5d": -0.71,
+   "source": "yahoo",
+   "as_of": "2026-09-18T04:00:00+00:00",
+   "unusual": false,
+   "score": 0.0
+  },
+  {
+   "fact_id": "NG=F.chg.1d",
+   "symbol": "NG=F",
+   "label": "Natural gas",
+   "section": "commodities",
+   "asset_class": "commodity",
+   "level": 2.91,
+   "level_unit": "usd",
+   "change": 0.38,
+   "change_unit": "%",
+   "change_5d": 2.86,
+   "source": "yahoo",
+   "as_of": "2026-09-18T04:00:00+00:00",
+   "unusual": false,
+   "score": 0.0
+  },
+  {
+   "fact_id": "GC=F.chg.1d",
+   "symbol": "GC=F",
+   "label": "Gold",
+   "section": "commodities",
+   "asset_class": "commodity",
+   "level": 4424.9,
+   "level_unit": "usd",
+   "change": 0.57,
+   "change_unit": "%",
+   "change_5d": 0.36,
+   "source": "yahoo",
+   "as_of": "2026-09-18T04:00:00+00:00",
+   "unusual": false,
+   "score": 0.0
+  },
+  {
+   "fact_id": "HG=F.chg.1d",
+   "symbol": "HG=F",
+   "label": "Copper",
+   "section": "commodities",
+   "asset_class": "commodity",
+   "level": 6.61,
+   "level_unit": "usd",
+   "change": 0.43,
+   "change_unit": "%",
+   "change_5d": 2.25,
+   "source": "yahoo",
+   "as_of": "2026-09-18T04:00:00+00:00",
+   "unusual": false,
+   "score": 0.0
+  },
+  {
+   "fact_id": "^GSPC.chg.1d",
+   "symbol": "^GSPC",
+   "label": "S&P 500",
+   "section": "equities",
+   "asset_class": "equity_index",
+   "level": 7650.5,
+   "level_unit": "pts",
+   "change": 0.17,
+   "change_unit": "%",
+   "change_5d": -0.08,
+   "source": "yahoo",
+   "as_of": "2026-09-18T13:30:00+00:00",
+   "unusual": false,
+   "score": 0.0
+  },
+  {
+   "fact_id": "^IXIC.chg.1d",
+   "symbol": "^IXIC",
+   "label": "Nasdaq Composite",
+   "section": "equities",
+   "asset_class": "equity_index",
+   "level": 26522.54,
+   "level_unit": "pts",
+   "change": 0.39,
+   "change_unit": "%",
+   "change_5d": 0.72,
+   "source": "yahoo",
+   "as_of": "2026-09-18T13:30:00+00:00",
+   "unusual": false,
+   "score": 0.0
+  },
+  {
+   "fact_id": "^DJI.chg.1d",
+   "symbol": "^DJI",
+   "label": "Dow Jones",
+   "section": "equities",
+   "asset_class": "equity_index",
+   "level": 51682.64,
+   "level_unit": "pts",
+   "change": -0.18,
+   "change_unit": "%",
+   "change_5d": -1.69,
+   "source": "yahoo",
+   "as_of": "2026-09-18T13:30:00+00:00",
+   "unusual": false,
+   "score": 0.0
+  },
+  {
+   "fact_id": "^RUT.chg.1d",
+   "symbol": "^RUT",
+   "label": "Russell 2000 (small caps)",
+   "section": "equities",
+   "asset_class": "equity_index",
+   "level": 2860.4,
+   "level_unit": "pts",
+   "change": -0.5,
+   "change_unit": "%",
+   "change_5d": -1.5,
+   "source": "yahoo",
+   "as_of": "2026-09-18T13:30:00+00:00",
+   "unusual": false,
+   "score": 0.0
+  },
+  {
+   "fact_id": "^VIX.chg.1d",
+   "symbol": "^VIX",
+   "label": "VIX (fear gauge)",
+   "section": "equities",
+   "asset_class": "vol",
+   "level": 14.81,
+   "level_unit": "pts",
+   "change": -4.08,
+   "change_unit": "%",
+   "change_5d": -6.5,
+   "source": "yahoo",
+   "as_of": "2026-09-18T07:00:00+00:00",
+   "unusual": false,
+   "score": 0.0
+  },
+  {
+   "fact_id": "XLK.chg.1d",
+   "symbol": "XLK",
+   "label": "Technology",
+   "section": "sectors",
+   "asset_class": "sector_etf",
+   "level": 189.6,
+   "level_unit": "usd",
+   "change": 0.82,
+   "change_unit": "%",
+   "change_5d": 1.03,
+   "source": "yahoo",
+   "as_of": "2026-09-18T13:30:00+00:00",
+   "unusual": false,
+   "score": 0.0
+  },
+  {
+   "fact_id": "SMH.chg.1d",
+   "symbol": "SMH",
+   "label": "Semiconductors",
+   "section": "sectors",
+   "asset_class": "sector_etf",
+   "level": 573.0,
+   "level_unit": "usd",
+   "change": 2.21,
+   "change_unit": "%",
+   "change_5d": 0.79,
+   "source": "yahoo",
+   "as_of": "2026-09-18T13:30:00+00:00",
+   "unusual": false,
+   "score": 0.0
+  },
+  {
+   "fact_id": "XLF.chg.1d",
+   "symbol": "XLF",
+   "label": "Financials",
+   "section": "sectors",
+   "asset_class": "sector_etf",
+   "level": 55.86,
+   "level_unit": "usd",
+   "change": -0.04,
+   "change_unit": "%",
+   "change_5d": -2.43,
+   "source": "yahoo",
+   "as_of": "2026-09-18T13:30:00+00:00",
+   "unusual": false,
+   "score": 0.0
+  },
+  {
+   "fact_id": "XLE.chg.1d",
+   "symbol": "XLE",
+   "label": "Energy",
+   "section": "sectors",
+   "asset_class": "sector_etf",
+   "level": 64.31,
+   "level_unit": "usd",
+   "change": -0.26,
+   "change_unit": "%",
+   "change_5d": -1.27,
+   "source": "yahoo",
+   "as_of": "2026-09-18T13:30:00+00:00",
+   "unusual": false,
+   "score": 0.0
+  },
+  {
+   "fact_id": "XLV.chg.1d",
+   "symbol": "XLV",
+   "label": "Health care",
+   "section": "sectors",
+   "asset_class": "sector_etf",
+   "level": 168.39,
+   "level_unit": "usd",
+   "change": -0.25,
+   "change_unit": "%",
+   "change_5d": 1.83,
+   "source": "yahoo",
+   "as_of": "2026-09-18T13:30:00+00:00",
+   "unusual": false,
+   "score": 0.0
+  },
+  {
+   "fact_id": "XLY.chg.1d",
+   "symbol": "XLY",
+   "label": "Consumer discretionary",
+   "section": "sectors",
+   "asset_class": "sector_etf",
+   "level": 111.03,
+   "level_unit": "usd",
+   "change": -0.32,
+   "change_unit": "%",
+   "change_5d": -1.71,
+   "source": "yahoo",
+   "as_of": "2026-09-18T13:30:00+00:00",
+   "unusual": false,
+   "score": 0.0
+  },
+  {
+   "fact_id": "XLP.chg.1d",
+   "symbol": "XLP",
+   "label": "Consumer staples",
+   "section": "sectors",
+   "asset_class": "sector_etf",
+   "level": 82.8,
+   "level_unit": "usd",
+   "change": -0.83,
+   "change_unit": "%",
+   "change_5d": -0.7,
+   "source": "yahoo",
+   "as_of": "2026-09-18T13:30:00+00:00",
+   "unusual": false,
+   "score": 0.0
+  },
+  {
+   "fact_id": "XLI.chg.1d",
+   "symbol": "XLI",
+   "label": "Industrials",
+   "section": "sectors",
+   "asset_class": "sector_etf",
+   "level": 169.75,
+   "level_unit": "usd",
+   "change": 0.44,
+   "change_unit": "%",
+   "change_5d": -1.52,
+   "source": "yahoo",
+   "as_of": "2026-09-18T13:30:00+00:00",
+   "unusual": false,
+   "score": 0.0
+  },
+  {
+   "fact_id": "XLU.chg.1d",
+   "symbol": "XLU",
+   "label": "Utilities",
+   "section": "sectors",
+   "asset_class": "sector_etf",
+   "level": 41.1,
+   "level_unit": "usd",
+   "change": -1.42,
+   "change_unit": "%",
+   "change_5d": -3.04,
+   "source": "yahoo",
+   "as_of": "2026-09-18T13:30:00+00:00",
+   "unusual": false,
+   "score": 0.0
+  },
+  {
+   "fact_id": "XLRE.chg.1d",
+   "symbol": "XLRE",
+   "label": "Real estate",
+   "section": "sectors",
+   "asset_class": "sector_etf",
+   "level": 42.53,
+   "level_unit": "usd",
+   "change": -0.95,
+   "change_unit": "%",
+   "change_5d": -2.05,
+   "source": "yahoo",
+   "as_of": "2026-09-18T13:30:00+00:00",
+   "unusual": false,
+   "score": 0.0
+  },
+  {
+   "fact_id": "XLC.chg.1d",
+   "symbol": "XLC",
+   "label": "Communication services",
+   "section": "sectors",
+   "asset_class": "sector_etf",
+   "level": 110.81,
+   "level_unit": "usd",
+   "change": -1.37,
+   "change_unit": "%",
+   "change_5d": -1.59,
+   "source": "yahoo",
+   "as_of": "2026-09-18T13:30:00+00:00",
+   "unusual": false,
+   "score": 0.0
+  },
+  {
+   "fact_id": "AAPL.chg.1d",
+   "symbol": "AAPL",
+   "label": "Apple",
+   "section": "companies",
+   "asset_class": "stock",
+   "level": 336.13,
+   "level_unit": "usd",
+   "change": -0.26,
+   "change_unit": "%",
+   "change_5d": 1.16,
+   "source": "yahoo",
+   "as_of": "2026-09-18T13:30:00+00:00",
+   "unusual": false,
+   "score": 0.0
+  },
+  {
+   "fact_id": "MSFT.chg.1d",
+   "symbol": "MSFT",
+   "label": "Microsoft",
+   "section": "companies",
+   "asset_class": "stock",
+   "level": 493.78,
+   "level_unit": "usd",
+   "change": -0.8,
+   "change_unit": "%",
+   "change_5d": -0.37,
+   "source": "yahoo",
+   "as_of": "2026-09-18T13:30:00+00:00",
+   "unusual": false,
+   "score": 0.0
+  },
+  {
+   "fact_id": "NVDA.chg.1d",
+   "symbol": "NVDA",
+   "label": "Nvidia",
+   "section": "companies",
+   "asset_class": "stock",
+   "level": 222.27,
+   "level_unit": "usd",
+   "change": 1.34,
+   "change_unit": "%",
+   "change_5d": 1.82,
+   "source": "yahoo",
+   "as_of": "2026-09-18T13:30:00+00:00",
+   "unusual": false,
+   "score": 0.0
+  },
+  {
+   "fact_id": "AMZN.chg.1d",
+   "symbol": "AMZN",
+   "label": "Amazon",
+   "section": "companies",
+   "asset_class": "stock",
+   "level": 253.71,
+   "level_unit": "usd",
+   "change": 1.0,
+   "change_unit": "%",
+   "change_5d": -1.2,
+   "source": "yahoo",
+   "as_of": "2026-09-18T13:30:00+00:00",
+   "unusual": false,
+   "score": 0.0
+  },
+  {
+   "fact_id": "GOOGL.chg.1d",
+   "symbol": "GOOGL",
+   "label": "Alphabet",
+   "section": "companies",
+   "asset_class": "stock",
+   "level": 349.54,
+   "level_unit": "usd",
+   "change": 0.64,
+   "change_unit": "%",
+   "change_5d": 3.26,
+   "source": "yahoo",
+   "as_of": "2026-09-18T13:30:00+00:00",
+   "unusual": false,
+   "score": 0.0
+  },
+  {
+   "fact_id": "META.chg.1d",
+   "symbol": "META",
+   "label": "Meta Platforms",
+   "section": "companies",
+   "asset_class": "stock",
+   "level": 665.75,
+   "level_unit": "usd",
+   "change": -2.43,
+   "change_unit": "%",
+   "change_5d": 2.73,
+   "source": "yahoo",
+   "as_of": "2026-09-18T13:30:00+00:00",
+   "unusual": false,
+   "score": 0.0
+  },
+  {
+   "fact_id": "TSLA.chg.1d",
+   "symbol": "TSLA",
+   "label": "Tesla",
+   "section": "companies",
+   "asset_class": "stock",
+   "level": 364.27,
+   "level_unit": "usd",
+   "change": -0.53,
+   "change_unit": "%",
+   "change_5d": -0.32,
+   "source": "yahoo",
+   "as_of": "2026-09-18T13:30:00+00:00",
+   "unusual": false,
+   "score": 0.0
+  },
+  {
+   "fact_id": "JPM.chg.1d",
+   "symbol": "JPM",
+   "label": "JPMorgan Chase",
+   "section": "companies",
+   "asset_class": "stock",
+   "level": 349.67,
+   "level_unit": "usd",
+   "change": 0.1,
+   "change_unit": "%",
+   "change_5d": -1.84,
+   "source": "yahoo",
+   "as_of": "2026-09-18T13:30:00+00:00",
+   "unusual": false,
+   "score": 0.0
+  },
+  {
+   "fact_id": "GS.chg.1d",
+   "symbol": "GS",
+   "label": "Goldman Sachs",
+   "section": "companies",
+   "asset_class": "stock",
+   "level": 942.0,
+   "level_unit": "usd",
+   "change": -1.0,
+   "change_unit": "%",
+   "change_5d": -8.47,
+   "source": "yahoo",
+   "as_of": "2026-09-18T13:30:00+00:00",
+   "unusual": false,
+   "score": 0.0
+  },
+  {
+   "fact_id": "XOM.chg.1d",
+   "symbol": "XOM",
+   "label": "Exxon Mobil",
+   "section": "companies",
+   "asset_class": "stock",
+   "level": 163.54,
+   "level_unit": "usd",
+   "change": 0.17,
+   "change_unit": "%",
+   "change_5d": -1.48,
+   "source": "yahoo",
+   "as_of": "2026-09-18T13:30:00+00:00",
+   "unusual": false,
+   "score": 0.0
+  },
+  {
+   "fact_id": "DAL.chg.1d",
+   "symbol": "DAL",
+   "label": "Delta Air Lines",
+   "section": "companies",
+   "asset_class": "stock",
+   "level": 79.62,
+   "level_unit": "usd",
+   "change": 0.24,
+   "change_unit": "%",
+   "change_5d": -0.36,
+   "source": "yahoo",
+   "as_of": "2026-09-18T13:30:00+00:00",
+   "unusual": false,
+   "score": 0.0
+  },
+  {
+   "fact_id": "GLD.chg.1d",
+   "symbol": "GLD",
+   "label": "SPDR Gold ETF",
+   "section": "companies",
+   "asset_class": "stock",
+   "level": 401.17,
+   "level_unit": "usd",
+   "change": 0.71,
+   "change_unit": "%",
+   "change_5d": 0.6,
+   "source": "yahoo",
+   "as_of": "2026-09-18T13:30:00+00:00",
+   "unusual": false,
+   "score": 0.0
+  },
+  {
+   "fact_id": "UST3M.chg.1d",
+   "symbol": "UST3M",
+   "label": "3M T-bill (Fed proxy)",
+   "section": "macro",
+   "asset_class": "yield",
+   "level": 4.14,
+   "level_unit": "%",
+   "change": 2.0,
+   "change_unit": "bp",
+   "change_5d": 7.0,
+   "source": "treasury",
+   "as_of": "2026-09-18",
+   "unusual": false,
+   "score": 0.0
+  },
+  {
+   "fact_id": "UST2Y.chg.1d",
+   "symbol": "UST2Y",
+   "label": "2Y Treasury (Fed expectations)",
+   "section": "macro",
+   "asset_class": "yield",
+   "level": 4.76,
+   "level_unit": "%",
+   "change": 9.0,
+   "change_unit": "bp",
+   "change_5d": 13.0,
+   "source": "treasury",
+   "as_of": "2026-09-18",
+   "unusual": false,
+   "score": 0.0
+  },
+  {
+   "fact_id": "UST5Y.chg.1d",
+   "symbol": "UST5Y",
+   "label": "5Y Treasury",
+   "section": "rates",
+   "asset_class": "yield",
+   "level": 4.86,
+   "level_unit": "%",
+   "change": 8.0,
+   "change_unit": "bp",
+   "change_5d": 8.0,
+   "source": "treasury",
+   "as_of": "2026-09-18",
+   "unusual": false,
+   "score": 0.0
+  },
+  {
+   "fact_id": "UST10Y.chg.1d",
+   "symbol": "UST10Y",
+   "label": "10Y Treasury",
+   "section": "rates",
+   "asset_class": "yield",
+   "level": 5.01,
+   "level_unit": "%",
+   "change": 7.0,
+   "change_unit": "bp",
+   "change_5d": 5.0,
+   "source": "treasury",
+   "as_of": "2026-09-18",
+   "unusual": false,
+   "score": 0.0
+  },
+  {
+   "fact_id": "UST30Y.chg.1d",
+   "symbol": "UST30Y",
+   "label": "30Y Treasury",
+   "section": "rates",
+   "asset_class": "yield",
+   "level": 5.34,
+   "level_unit": "%",
+   "change": 5.0,
+   "change_unit": "bp",
+   "change_5d": -1.0,
+   "source": "treasury",
+   "as_of": "2026-09-18",
+   "unusual": false,
+   "score": 0.0
+  },
+  {
+   "fact_id": "US2S10S.chg.1d",
+   "symbol": "US2S10S",
+   "label": "2s10s curve",
+   "section": "rates",
+   "asset_class": "spread",
+   "level": 25.0,
+   "level_unit": "bp",
+   "change": -2.0,
+   "change_unit": "bp",
+   "change_5d": -8.0,
+   "source": "treasury",
+   "as_of": "2026-09-18",
+   "unusual": false,
+   "score": 0.0
+  }
+ ],
+ "headlines": [
+  {
+   "id": "n6745f8033330",
+   "title": "John Ternus's First iPhone Launch Prompted a Bank of America Price Target Cut. Is Apple Stock a Buy?",
+   "summary": "Apple stock just got a price target cut due to the memory processor crunch.",
+   "url": "https://www.fool.com/investing/2026/09/19/john-ternuss-first-iphone-launch-prompted-a-bank-o/?.tsrc=rss",
+   "publisher": "Yahoo Finance",
+   "published_at": "2026-09-19T12:50:00+00:00",
+   "sections": [
+    "companies"
+   ],
+   "tickers": [
+    "AAPL"
+   ],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "ncd62534b18cf",
+   "title": "Editor\u2019s Letter: Ari Emanuel Wrote This Fall\u2019s Must-Read Dealmaking Memoir",
+   "summary": "Plus, a guide to modern behavior, featuring tips for spoiler alerts, phones in restaurants, concert etiquette and more.",
+   "url": "https://www.wsj.com/style/editors-letter-ari-emanuel-wrote-this-falls-must-read-dealmaking-memoir-bd1151e7?mod=rss_Technology",
+   "publisher": "WSJ",
+   "published_at": "2026-09-19T12:25:00+00:00",
+   "sections": [],
+   "tickers": [],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "nad2801463a96",
+   "title": "Could IonQ (IONQ) AI Written Quantum Circuits Unlock More Real World Workloads?",
+   "summary": "IonQ (NYSE: IONQ) and partners Oak Ridge National Laboratory, NVIDIA, and the University of Tennessee built a generative AI system that writes quantum optimization circuits. The joint team reports that the AI driven circuit synthesis cuts out manual trial and error tuning for complex quantum optimization tasks. The research, benchmarked at scale, received a best paper award at a major industry con",
+   "url": "https://finance.yahoo.com/technology/ai/articles/could-ionq-ionq-ai-written-121108000.html?.tsrc=rss",
+   "publisher": "Yahoo Finance",
+   "published_at": "2026-09-19T12:11:08+00:00",
+   "sections": [
+    "companies"
+   ],
+   "tickers": [
+    "NVDA"
+   ],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "n91bccc388a17",
+   "title": "Dario Says AI Should Slow Down. Jensen Wants to Go Full Steam Ahead.",
+   "summary": "The Nvidia chief makes the case for engineering solutions\u2014not new laws or industry speed bumps\u2014to address AI safety concerns.",
+   "url": "https://www.wsj.com/tech/ai/nvidia-jensen-huang-resists-ai-slowdown-334a24e1?mod=rss_Technology",
+   "publisher": "WSJ",
+   "published_at": "2026-09-19T12:00:00+00:00",
+   "sections": [
+    "companies"
+   ],
+   "tickers": [
+    "NVDA"
+   ],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "n175d2bc66427",
+   "title": "He\u2019s the Face of AI Doomsday Fears",
+   "summary": "Plus, Apple\u2019s Siri gets smarter, how to contest airline-seat downgrades and what readers love and hate about patient portals.",
+   "url": "https://www.wsj.com/articles/hes-the-face-of-ai-doomsday-fears-8084f30a?mod=rss_Technology",
+   "publisher": "WSJ",
+   "published_at": "2026-09-19T11:50:00+00:00",
+   "sections": [
+    "companies"
+   ],
+   "tickers": [
+    "AAPL"
+   ],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "n0c849b5fdaad",
+   "title": "History Says You Should Know These 3 Things Before Buying Apple Stock (AAPL)",
+   "summary": "The pride of Cupertino continues its winning ways, and investors are eager to jump on the bandwagon.",
+   "url": "https://www.fool.com/investing/2026/09/19/history-says-3-things-before-buy-apple-stock-aapl/?.tsrc=rss",
+   "publisher": "Yahoo Finance",
+   "published_at": "2026-09-19T11:22:00+00:00",
+   "sections": [
+    "companies"
+   ],
+   "tickers": [
+    "AAPL"
+   ],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "nd9ad003bfea4",
+   "title": "If You'd Invested $1,000 in Nvidia's 1999 IPO, Here's How Much You'd Have Today",
+   "summary": "Despite Nvidia's growth, the return on such a modest investment may be surprising.",
+   "url": "https://www.fool.com/investing/2026/09/19/if-youd-invested-1000-in-nvidias-1999-ipo-heres-ho/?.tsrc=rss",
+   "publisher": "Yahoo Finance",
+   "published_at": "2026-09-19T11:05:00+00:00",
+   "sections": [
+    "companies"
+   ],
+   "tickers": [
+    "NVDA"
+   ],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "n6d0eadda3431",
+   "title": "Howie Buffett Steps In to Preserve What His Father Built",
+   "summary": "Plus, our interview with Mar\u00eda Corina Machado on her plans to return to Venezuela, and a closer look at Apple\u2019s newest iPhones and watches.",
+   "url": "https://www.wsj.com/tech/howie-buffett-steps-in-to-preserve-what-his-father-built-5271efb3?mod=rss_Technology",
+   "publisher": "WSJ",
+   "published_at": "2026-09-19T11:03:00+00:00",
+   "sections": [
+    "companies"
+   ],
+   "tickers": [
+    "AAPL"
+   ],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "n528577b62da0",
+   "title": "Apple\u2019s Newest iPhones and Watches Just Hit Stores. Should You Upgrade?",
+   "summary": "Our columnist\u2019s take on the Apple products that just hit store shelves this week, focusing on how they compare to your existing gear.",
+   "url": "https://www.wsj.com/tech/personal-tech/apple-iphone-18-pro-review-watch-2cfebb8e?mod=rss_Technology",
+   "publisher": "WSJ",
+   "published_at": "2026-09-19T11:00:00+00:00",
+   "sections": [
+    "companies"
+   ],
+   "tickers": [
+    "AAPL"
+   ],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "n64b2ae8210b1",
+   "title": "\u2018Sketchy AF\u2019: What to Know About How OpenAI Staff Discussed Book-Pirating",
+   "summary": "Documents recently unsealed in a copyright case show employees weighing the cost of buying books to train early ChatGPT models.",
+   "url": "https://www.wsj.com/tech/ai/sketchy-af-what-to-know-about-how-openai-staff-discussed-book-pirating-fdc788a1?mod=rss_Technology",
+   "publisher": "WSJ",
+   "published_at": "2026-09-19T11:00:00+00:00",
+   "sections": [],
+   "tickers": [],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "n924755ee64ba",
+   "title": "News Quiz for September 19, 2026",
+   "summary": "",
+   "url": "https://www.wsj.com/articles/news-quiz-for-september-19-2026-07e49139?mod=pls_whats_news_us_business_f",
+   "publisher": "WSJ",
+   "published_at": "2026-09-19T10:00:00+00:00",
+   "sections": [],
+   "tickers": [],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "nf431e7d6dc61",
+   "title": "Don\u2019t Count Out Corporate Bonds Just Because the Fed Is Raising Rates",
+   "summary": "A healthy economy and reduced issuance by tech companies could support corporate debt.",
+   "url": "https://www.wsj.com/finance/investing/dont-count-out-corporate-bonds-just-because-the-fed-is-raising-rates-de2e787a?mod=rss_markets_main",
+   "publisher": "WSJ",
+   "published_at": "2026-09-19T09:30:00+00:00",
+   "sections": [
+    "macro",
+    "rates"
+   ],
+   "tickers": [],
+   "concept_ids": [
+    "rate-expectations",
+    "bond-price-yield"
+   ],
+   "is_official": false
+  },
+  {
+   "id": "nc1566a4f4b16",
+   "title": "Sam Altman Admits the AI Industry Has Done \"a Terrible Job\" Explaining Its Benefits Amid Growing Backlash. Should That Worry Nvidia and Microsoft Investors?",
+   "summary": "The assessment isn't a permanent indictment. Indeed, if anything, it's a clarion call.",
+   "url": "https://www.fool.com/investing/2026/09/19/sam-altman-ai-industry-worry-nvidia-microsoft/?.tsrc=rss",
+   "publisher": "Yahoo Finance",
+   "published_at": "2026-09-19T08:50:00+00:00",
+   "sections": [
+    "companies"
+   ],
+   "tickers": [
+    "MSFT",
+    "NVDA"
+   ],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "n96453569cc49",
+   "title": "These 15 Words From Amazon\u2019s Andy Jassy May Eliminate Nvidia\u2019s Biggest Risk",
+   "summary": "Investors often worry about competition in the chip market.",
+   "url": "https://www.fool.com/investing/2026/09/19/these-15-words-from-amazon-s-andy-jassy-may-eliminate-nvidia-s-biggest-risk/?.tsrc=rss",
+   "publisher": "Yahoo Finance",
+   "published_at": "2026-09-19T08:28:01+00:00",
+   "sections": [
+    "companies",
+    "sectors"
+   ],
+   "tickers": [
+    "AMZN",
+    "NVDA"
+   ],
+   "concept_ids": [
+    "risk-on-off"
+   ],
+   "is_official": false
+  },
+  {
+   "id": "n24af70888e8c",
+   "title": "Intel Corporation (INTC)\u2019s Terafab Partnership Could Give Its AI Foundry Ambitions a Major Boost",
+   "summary": "Intel Corporation (NASDAQ:INTC) is targeting a potentially significant opportunity through its strategic Terafab partnership with companies associated with Elon Musk, including SpaceX, Tesla, and xAI. The initiative is part of an ambitious semiconductor manufacturing project focused on producing advanced chips for artificial intelligence (AI), robotics, autonomous vehicles, and other compute-inten",
+   "url": "https://finance.yahoo.com/technology/ai/articles/intel-corporation-intc-terafab-partnership-081341477.html?.tsrc=rss",
+   "publisher": "Yahoo Finance",
+   "published_at": "2026-09-19T08:13:41+00:00",
+   "sections": [
+    "companies",
+    "equities",
+    "sectors"
+   ],
+   "tickers": [
+    "TSLA"
+   ],
+   "concept_ids": [
+    "sector-rotation"
+   ],
+   "is_official": false
+  },
+  {
+   "id": "n5cb60478b945",
+   "title": "Is Affirm Holdings, Inc. (AFRM) Stock a Buy After Goldman Sachs Raised Its Price Target?",
+   "summary": "Affirm Holdings, Inc. (NASDAQ:AFRM) has underperformed the broader market year to date, but the tide is slowly turning. Robust growth in interest-bearing loans, a strategic partnership with Shopify in Australia, and accelerating volumes at Amazon provide multiple avenues for continued growth. On September 12, Goldman Sachs raised its price target to $115 from $106, citing [\u2026]",
+   "url": "https://finance.yahoo.com/markets/stocks/articles/affirm-holdings-inc-afrm-stock-080841812.html?.tsrc=rss",
+   "publisher": "Yahoo Finance",
+   "published_at": "2026-09-19T08:08:41+00:00",
+   "sections": [
+    "companies",
+    "equities"
+   ],
+   "tickers": [
+    "AMZN",
+    "GS"
+   ],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "n2979fc950e81",
+   "title": "Meta (META)\u2019s Stilla.ai Deal Could Turn Business Agent Into a New Monetization Engine",
+   "summary": "Meta Platforms, Inc. (NASDAQ:META) is taking another step toward monetizing artificial intelligence beyond its core advertising business. On September 9, the company acquired AI startup Stilla.ai. The acquisition will strengthen the company\u2019s agentic AI capabilities as it moves to capitalize on growing demand for AI agents that can handle business transactions. Plans are underway to [\u2026]",
+   "url": "https://finance.yahoo.com/technology/ai/articles/meta-meta-stilla-ai-deal-075756581.html?.tsrc=rss",
+   "publisher": "Yahoo Finance",
+   "published_at": "2026-09-19T07:57:56+00:00",
+   "sections": [
+    "companies",
+    "equities"
+   ],
+   "tickers": [
+    "META"
+   ],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "n366a6d4186df",
+   "title": "3 AI Security Stocks Retail Investors May Want On Their Watchlist",
+   "summary": "When Google\u2019s Gemini AI quietly hacked real companies during testing, it turned abstract AI risk into something concrete and uncomfortable. That kind of failure can rattle confidence in big tech; yet it can also shine a spotlight on smaller AI security and governance stocks exposed to the same story from a very different angle. This article walks through three such stocks from our screener, and wh",
+   "url": "https://finance.yahoo.com/technology/ai/articles/3-ai-security-stocks-retail-071752305.html?.tsrc=rss",
+   "publisher": "Yahoo Finance",
+   "published_at": "2026-09-19T07:17:52+00:00",
+   "sections": [
+    "companies",
+    "equities"
+   ],
+   "tickers": [
+    "GOOGL"
+   ],
+   "concept_ids": [
+    "risk-on-off"
+   ],
+   "is_official": false
+  },
+  {
+   "id": "n5efe1c1e31b9",
+   "title": "Why Tesla's Robotaxi/Cybercab Bet Just Got Complicated. What It Means to Investors.",
+   "summary": "The robotaxi/Cybercab rollout is on track, but investors need to be patient and understand there are regulatory and operational hurdles to cross.",
+   "url": "https://www.fool.com/investing/2026/09/19/why-teslas-robotaxicybercab-bet-just-got-complicat/?.tsrc=rss",
+   "publisher": "Yahoo Finance",
+   "published_at": "2026-09-19T06:50:00+00:00",
+   "sections": [
+    "companies"
+   ],
+   "tickers": [
+    "TSLA"
+   ],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "nc3a6814b0aab",
+   "title": "3 Cyber Insurance Stocks Retail Investors May Want To Watch After Gemini Hacking News",
+   "summary": "When news breaks that Google\u2019s Gemini can autonomously hack real companies, the story quickly shifts from science fiction to balance sheet risk. Cyber insurance and tech liability insurers suddenly move from background players to potential shock absorbers or pressure points for the AI era. This article walks through three stocks from our cyber-focused screener that appear most exposed to this news",
+   "url": "https://finance.yahoo.com/markets/stocks/articles/3-cyber-insurance-stocks-retail-051413327.html?.tsrc=rss",
+   "publisher": "Yahoo Finance",
+   "published_at": "2026-09-19T05:14:13+00:00",
+   "sections": [
+    "companies",
+    "equities"
+   ],
+   "tickers": [
+    "GOOGL"
+   ],
+   "concept_ids": [
+    "risk-on-off"
+   ],
+   "is_official": false
+  },
+  {
+   "id": "n53bd80cfc614",
+   "title": "Amazon (AMZN) Is Reworking Its Air Fleet With 30 A330 Freighters By 2027",
+   "summary": "Amazon.com (NasdaqGS:AMZN) plans to transition its air cargo fleet from Boeing 767 aircraft to Airbus A330 freighters. Air Transport Services Group will acquire and convert 30 Airbus A330 jets into freighters to support Amazon's air network. ATSG expects to begin operating the Airbus A330 cargo aircraft for Amazon in 2027 as part of the refreshed fleet. Amazon's move to Airbus A330 freighters is a",
+   "url": "https://finance.yahoo.com/markets/stocks/articles/amazon-amzn-reworking-air-fleet-041803486.html?.tsrc=rss",
+   "publisher": "Yahoo Finance",
+   "published_at": "2026-09-19T04:18:03+00:00",
+   "sections": [
+    "companies"
+   ],
+   "tickers": [
+    "AMZN"
+   ],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "nafafb1ab9818",
+   "title": "Germany\u2019s Military Rebuild Is Making Its Neighbors Nervous",
+   "summary": "The country\u2019s fast-paced rearmament is rekindling a century-old debate about how much hard power Berlin should have.",
+   "url": "https://www.wsj.com/world/europe/germanys-military-rebuild-is-making-its-neighbors-nervous-f7c0091e?mod=rss_worldnews",
+   "publisher": "WSJ",
+   "published_at": "2026-09-19T02:00:00+00:00",
+   "sections": [],
+   "tickers": [],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "nda940b07fa2f",
+   "title": "JPMorgan sends stark warning on $100 oil",
+   "summary": "The bank\u2019s latest warning exposes a fragile balance beneath prices.",
+   "url": "https://www.thestreet.com/latest-news/jpmorgan-oil-supply-warning?.tsrc=rss",
+   "publisher": "Yahoo Finance",
+   "published_at": "2026-09-19T01:17:00+00:00",
+   "sections": [
+    "companies",
+    "commodities"
+   ],
+   "tickers": [
+    "JPM"
+   ],
+   "concept_ids": [
+    "oil-drivers"
+   ],
+   "is_official": false
+  },
+  {
+   "id": "n964eb5027a80",
+   "title": "Law Firms Have a Big Problem: Senior Partners Aren\u2019t Retiring",
+   "summary": "It\u2019s not uncommon for lawyers to work well into their 80s. Firms are finding ways to get them to exit and make way for the next generation.",
+   "url": "https://www.wsj.com/business/law-firms-retirement-incentives-packages-1e9bccbd?mod=pls_whats_news_us_business_f",
+   "publisher": "WSJ",
+   "published_at": "2026-09-19T01:00:00+00:00",
+   "sections": [],
+   "tickers": [],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "n941bacc3552a",
+   "title": "Why Warren Buffett\u2019s Son Howie, Berkshire\u2019s New Chairman, Is Also Its Guardian",
+   "summary": "A new Buffett is taking on the task of preserving the storied conglomerate\u2019s culture.",
+   "url": "https://www.wsj.com/finance/a-new-buffett-takes-on-the-task-of-preserving-berkshire-hathaways-culture-bdb9cc30?mod=pls_whats_news_us_business_f",
+   "publisher": "WSJ",
+   "published_at": "2026-09-19T00:34:00+00:00",
+   "sections": [],
+   "tickers": [],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "n5743b4c03d9c",
+   "title": "Alphabet's Ad Business Got a Lift From a Key Antitrust Ruling, Helping End Google's Worst Losing Streak in Over a Decade. Is Sundar Pichai's Alphabet Stock a Buy Now?",
+   "summary": "Whether investors realize it or not, the ruling is huge for Google's parent company and its stock.",
+   "url": "https://www.fool.com/investing/2026/09/18/alphabets-ad-business-got-a-lift-from-a-key-antitr/?.tsrc=rss",
+   "publisher": "Yahoo Finance",
+   "published_at": "2026-09-19T00:20:00+00:00",
+   "sections": [
+    "companies"
+   ],
+   "tickers": [
+    "GOOGL"
+   ],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "n9c8720d3286b",
+   "title": "Inside Machado\u2019s Plan to Return to Venezuela and Revive Its Democracy",
+   "summary": "The Nobel laureate is planning her comeback from exile in Panama, setting up a clash with the U.S.-backed interim government.",
+   "url": "https://www.wsj.com/world/americas/inside-machados-plan-to-return-to-venezuela-and-revive-its-democracy-5951dc98?mod=rss_worldnews",
+   "publisher": "WSJ",
+   "published_at": "2026-09-19T00:12:00+00:00",
+   "sections": [],
+   "tickers": [],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "n6d112aeac12f",
+   "title": "U.S. Reaches Greenland Security Agreement",
+   "summary": "The deal, which will enhance American military presence on the Arctic island, falls short of the president\u2019s stated takeover ambitions.",
+   "url": "https://www.wsj.com/politics/national-security/trump-says-u-s-has-reached-greenland-security-agreement-with-denmark-61a7ffcd?mod=rss_worldnews",
+   "publisher": "WSJ",
+   "published_at": "2026-09-18T23:41:00+00:00",
+   "sections": [],
+   "tickers": [],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "nc15a8f2614ba",
+   "title": "Dow Drops To Record Worst Week In Six Months Amid Elevated Yields, Oil \u2014 NVDA, TSLA, SPCX, ONON In Focus",
+   "summary": "An interest rate hike amid soaring energy costs and rising inflation concerns has weighed on the Dow.",
+   "url": "https://stocktwits.com/news-articles/markets/equity/dow-drops-to-record-worst-week-in-six-months-amid-elevated-yields-oil-nvda-tsla-spcx-onon-in-focus/cZtHOYsRBEK?.tsrc=rss",
+   "publisher": "Yahoo Finance",
+   "published_at": "2026-09-18T23:35:58+00:00",
+   "sections": [
+    "companies",
+    "macro",
+    "rates",
+    "commodities",
+    "equities"
+   ],
+   "tickers": [
+    "TSLA"
+   ],
+   "concept_ids": [
+    "rate-expectations",
+    "cpi-surprise",
+    "bond-price-yield",
+    "oil-drivers"
+   ],
+   "is_official": false
+  },
+  {
+   "id": "n5e7201f935b9",
+   "title": "Lakers Buyers Lay Out Plans to Reach $30 Billion Valuation in Pitch to Investors",
+   "summary": "A group led by Bob Iger and Joshua Kushner estimate team revenue will more than double to at least $1.6 billion in a decade.",
+   "url": "https://www.wsj.com/finance/lakers-buyers-lay-out-plans-to-reach-30-billion-valuation-in-pitch-to-investors-66945709?mod=pls_whats_news_us_business_f",
+   "publisher": "WSJ",
+   "published_at": "2026-09-18T23:30:00+00:00",
+   "sections": [
+    "companies"
+   ],
+   "tickers": [],
+   "concept_ids": [
+    "discount-rates-equities"
+   ],
+   "is_official": false
+  },
+  {
+   "id": "n1c08e2f54a4e",
+   "title": "Here\u2019s A Stock That Jim Cramer Like Before But Now He Just Doesn\u2019t Want To Buy It",
+   "summary": "Glass technology products manufacturer Corning Incorporated (NYSE:GLW) has had an interesting relationship with Jim Cramer\u2019s radar. Late last year, the CNBC TV host was one of the firm\u2019s strongest supporters as he praised it for its partnership with Apple to bring manufacturing back to the US under President Trump\u2019s initiatives. However, more recently, he has [\u2026]",
+   "url": "https://finance.yahoo.com/markets/stocks/articles/stock-jim-cramer-now-just-231218503.html?.tsrc=rss",
+   "publisher": "Yahoo Finance",
+   "published_at": "2026-09-18T23:12:18+00:00",
+   "sections": [
+    "companies"
+   ],
+   "tickers": [
+    "AAPL"
+   ],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "n13b0abe7289a",
+   "title": "RFK Jr. Got Free Flights to Fiji and Greece From a Top Donor",
+   "summary": "The health secretary disclosed over $250,000 in gifts from security specialist Gavin de Becker.",
+   "url": "https://www.wsj.com/politics/rfk-jr-got-free-flights-to-fiji-and-greece-from-a-top-donor-e4b8d525?mod=pls_whats_news_us_business_f",
+   "publisher": "WSJ",
+   "published_at": "2026-09-18T23:03:00+00:00",
+   "sections": [],
+   "tickers": [],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "n786b3a35f2d3",
+   "title": "Xi Jinping Skipped One Dinner\u2014and Sparked a Flurry of Questions About His Health",
+   "summary": "The Chinese leader felt unwell at the recent Brics event in India, reviving worries over who would succeed him.",
+   "url": "https://www.wsj.com/world/china/xi-jinping-skipped-one-dinnerand-sparked-a-flurry-of-questions-about-his-health-348b55b7?mod=rss_worldnews",
+   "publisher": "WSJ",
+   "published_at": "2026-09-18T23:00:00+00:00",
+   "sections": [],
+   "tickers": [],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "n3b53a254a7e7",
+   "title": "Bitcoin\u2019s Production Cost Is $78,000. What Happens When Miners Lose Money?",
+   "summary": "JPMorgan pegs Bitcoin's production cost above its current market price, and miners have already broken records to stay afloat. What built-in network forces determine whether this becomes a prolonged bleed or a setup for recovery?",
+   "url": "https://247wallst.com/investing/cryptocurrency/2026/09/18/bitcoins-production-cost-is-78000-what-happens-when-miners-lose-money/?.tsrc=rss",
+   "publisher": "Yahoo Finance",
+   "published_at": "2026-09-18T22:59:46+00:00",
+   "sections": [
+    "companies"
+   ],
+   "tickers": [
+    "JPM"
+   ],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "nd6ea64d84033",
+   "title": "Tesla, Inc. (TSLA) Eyes Europe\u2019s Electric Truck Boom With Semi Expansion",
+   "summary": "Tesla, Inc. (NASDAQ:TSLA) is expanding beyond passenger electric vehicles. On September 11, Reuters reported that the company is preparing to enter the European electric truck market, marking another step in its efforts to diversify its revenue base. The company has brought the European Semi to the IAA Transportation trade fair in Hanover, Germany, after publishing [\u2026]",
+   "url": "https://finance.yahoo.com/technology/articles/tesla-inc-tsla-eyes-europe-224919901.html?.tsrc=rss",
+   "publisher": "Yahoo Finance",
+   "published_at": "2026-09-18T22:49:19+00:00",
+   "sections": [
+    "companies",
+    "equities"
+   ],
+   "tickers": [
+    "TSLA"
+   ],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "n61a9fbc62003",
+   "title": "Gemini Hacked Three Companies in First Known Breakout by Google\u2019s AI",
+   "summary": "The episode resembled similar hacks by other AI models, but Google said it did not consider it an instance of model misalignment.",
+   "url": "https://www.wsj.com/tech/ai/gemini-hacked-three-companies-in-first-known-breakout-by-googles-ai-5c0baba2?mod=rss_Technology",
+   "publisher": "WSJ",
+   "published_at": "2026-09-18T22:10:00+00:00",
+   "sections": [
+    "companies"
+   ],
+   "tickers": [
+    "GOOGL"
+   ],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "n9ca260f5fce2",
+   "title": "Paramount in Advanced Settlement Talks With California\u2019s Attorney General",
+   "summary": "California and 11 other states sued in July to block the $81 billion merger between Paramount and Warner Bros. Discovery.",
+   "url": "https://www.wsj.com/business/media/paramount-in-advanced-settlement-talks-with-californias-attorney-general-aab8fd3d?mod=pls_whats_news_us_business_f",
+   "publisher": "WSJ",
+   "published_at": "2026-09-18T22:10:00+00:00",
+   "sections": [
+    "companies"
+   ],
+   "tickers": [],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "n0bd938dca8f7",
+   "title": "John Ternus has the 'Apple DNA' that will push company to the 'next level'",
+   "summary": "CFRA Research senior vice president Angelo Zino discusses why new Apple (AAPL) CEO John Ternus may be the right man for the job, especially after the release of the new iPhone 18 Pro and unveiling of the foldable iPhone Duo.",
+   "url": "https://finance.yahoo.com/video/john-ternus-apple-dna-push-220000814.html?.tsrc=rss",
+   "publisher": "Yahoo Finance",
+   "published_at": "2026-09-18T22:00:00+00:00",
+   "sections": [
+    "companies"
+   ],
+   "tickers": [
+    "AAPL"
+   ],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "nfa741f70e815",
+   "title": "Opinion | The Tariff Gift to Abdul El-Sayed",
+   "summary": "Michigan voters oppose Trump\u2019s trade war with Canada, which is helping the radical Democrat.",
+   "url": "https://www.wsj.com/opinion/donald-trump-tariffs-michigan-canada-abdul-el-sayed-93ff5f22?mod=rss_worldnews",
+   "publisher": "WSJ",
+   "published_at": "2026-09-18T21:45:00+00:00",
+   "sections": [
+    "macro"
+   ],
+   "tickers": [],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "na840ec3d5f55",
+   "title": "AI juggernaut Anthropic\u2019s IPO is coming later than expected, Trump pushed out major media outlets from the White House and Warren Buffett announced his retirement. Read more in today\u2019s What\u2019s News newsletter:",
+   "summary": "Plus, Howard Buffett steps into his father\u2019s shoes and Trump bans certain news media from the White House.",
+   "url": "https://www.wsj.com/tech/ai/anthropics-ipo-will-happen-a-month-later-than-expected-a334b10e?mod=rss_socialeconomyfeed",
+   "publisher": "WSJ",
+   "published_at": "2026-09-18T21:43:00+00:00",
+   "sections": [
+    "companies"
+   ],
+   "tickers": [],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "nb9862fdaf551",
+   "title": "Anthropic\u2019s IPO Will Happen a Month Later Than Expected",
+   "summary": "Plus, Howard Buffett steps into his father\u2019s shoes and Trump bans certain news media from the White House.",
+   "url": "https://www.wsj.com/tech/ai/anthropics-ipo-will-happen-a-month-later-than-expected-a334b10e?mod=rss_Technology",
+   "publisher": "WSJ",
+   "published_at": "2026-09-18T21:43:00+00:00",
+   "sections": [
+    "companies"
+   ],
+   "tickers": [],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "nfa262ff1270d",
+   "title": "Opinion | The Saudis, the Houthis, and Israel",
+   "summary": "A new challenge requires Riyadh to work with Abu Dhabi and Jerusalem.",
+   "url": "https://www.wsj.com/opinion/saudi-arabia-houthis-iran-israel-u-a-e-centcom-f910504e?mod=rss_worldnews",
+   "publisher": "WSJ",
+   "published_at": "2026-09-18T21:40:00+00:00",
+   "sections": [],
+   "tickers": [],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "n0cded8cd771f",
+   "title": "Donald Trump Jr. Repaid Russian Businessman Who Funded Wedding Afterparty, President Says",
+   "summary": "The two-day post-wedding celebrations in the Bahamas were financed by Umar Kremlev, a businessman with ties to Russian President Putin.",
+   "url": "https://www.wsj.com/politics/trump-says-his-son-repaid-russian-businessman-who-funded-wedding-afterparty-e051c552?mod=rss_worldnews",
+   "publisher": "WSJ",
+   "published_at": "2026-09-18T21:39:00+00:00",
+   "sections": [],
+   "tickers": [],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "n2385af8ef67c",
+   "title": "Opinion | The Staring Contest Over the Dollar and the Yen",
+   "summary": "Or is it a circular firing squad among Bessent, Tokyo and investors?",
+   "url": "https://www.wsj.com/opinion/bank-of-japan-interest-rate-yen-scott-bessent-07bd6b74?mod=rss_worldnews",
+   "publisher": "WSJ",
+   "published_at": "2026-09-18T21:38:00+00:00",
+   "sections": [
+    "fx"
+   ],
+   "tickers": [],
+   "concept_ids": [
+    "usd-rate-differentials"
+   ],
+   "is_official": false
+  },
+  {
+   "id": "n4cbc91281adb",
+   "title": "Wall Street Ends Volatile Week with Quiet Finish",
+   "summary": "The Dow Industrials fell for a third-straight week, while the Nasdaq composite eked out a small gain.",
+   "url": "https://www.wsj.com/finance/stocks/wall-street-ends-volatile-week-with-quiet-finish-8aa4d4f2?mod=rss_markets_main",
+   "publisher": "WSJ",
+   "published_at": "2026-09-18T21:36:00+00:00",
+   "sections": [
+    "equities"
+   ],
+   "tickers": [],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "nd06bdb9e0841",
+   "title": "Anthropic Shifts Planned IPO to November",
+   "summary": "Investors had expected the Claude maker to debut in October. The AI industry has been grappling with calls to slow down its pace of development.",
+   "url": "https://www.wsj.com/tech/ai/anthropic-shifts-planned-ipo-to-november-8874dffc?mod=rss_Technology",
+   "publisher": "WSJ",
+   "published_at": "2026-09-18T21:24:00+00:00",
+   "sections": [
+    "companies"
+   ],
+   "tickers": [],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "n0160793e99c7",
+   "title": "U.S. Stocks Mixed as Inflation Trepidation Offsets AI Optimism",
+   "summary": "U.S. stocks ended mixed as inflation and Middle East war trepidation offset optimism about the artificial-intelligence boom.",
+   "url": "https://www.wsj.com/finance/stocks/u-s-stocks-mixed-as-inflation-trepidation-offsets-ai-optimism-36053264?mod=rss_markets_main",
+   "publisher": "WSJ",
+   "published_at": "2026-09-18T21:15:00+00:00",
+   "sections": [
+    "macro",
+    "equities"
+   ],
+   "tickers": [],
+   "concept_ids": [
+    "cpi-surprise"
+   ],
+   "is_official": false
+  },
+  {
+   "id": "ne45d96cda73f",
+   "title": "Opinion | Troubling Times at the Jewish Museum Berlin",
+   "summary": "\u2018The only thing I would add to it,\u2019 says architect Daniel Libeskind, \u2018would be a bell to ring the alarm of today\u2019s growing antisemitism.\u2019",
+   "url": "https://www.wsj.com/opinion/troubling-times-at-the-jewish-museum-berlin-7f2c8216?mod=rss_worldnews",
+   "publisher": "WSJ",
+   "published_at": "2026-09-18T21:08:00+00:00",
+   "sections": [],
+   "tickers": [],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "n767a735a6344",
+   "title": "Coinbase Files to List Single-Stock Perps on Apple, Tesla and Nvidia",
+   "summary": "The filing seeks CFTC approval for contracts giving US traders 24/5 leveraged exposure to individual stocks without ownership.",
+   "url": "https://decrypt.co/378681/coinbase-single-stock-perps-apple-tesla-nvidia?.tsrc=rss",
+   "publisher": "Yahoo Finance",
+   "published_at": "2026-09-18T21:01:30+00:00",
+   "sections": [
+    "companies",
+    "equities"
+   ],
+   "tickers": [
+    "TSLA",
+    "AAPL",
+    "NVDA"
+   ],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "n9e8657018d03",
+   "title": "Basic Materials Roundup: Market Talk",
+   "summary": "Find insight on Nutrien, Dyno Nobel, gold prices and more in the latest Market Talks covering Basic Materials.",
+   "url": "https://www.wsj.com/business/basic-materials-roundup-market-talk-1ec7c0ee?mod=rss_markets_main",
+   "publisher": "WSJ",
+   "published_at": "2026-09-18T21:00:00+00:00",
+   "sections": [
+    "commodities"
+   ],
+   "tickers": [],
+   "concept_ids": [
+    "gold-real-yields"
+   ],
+   "is_official": false
+  },
+  {
+   "id": "n7669457dfc9c",
+   "title": "Stock Market Today: Nasdaq, S&P Reverse Slightly Higher; Sandisk, Lumentum Lead This Tech Rally",
+   "summary": "Stock Market Today: The Dow Jones index falls Friday as oil prices reverse higher. Apple, AMD, Micron and Sandisk are key movers.",
+   "url": "https://finance.yahoo.com/m/a79cf87c-d3f5-3e16-8ee6-e536ba767ccf/stock-market-today%3A-nasdaq%2C.html?.tsrc=rss",
+   "publisher": "Yahoo Finance",
+   "published_at": "2026-09-18T20:57:21+00:00",
+   "sections": [
+    "companies",
+    "commodities",
+    "equities"
+   ],
+   "tickers": [
+    "AAPL"
+   ],
+   "concept_ids": [
+    "oil-drivers",
+    "risk-on-off"
+   ],
+   "is_official": false
+  },
+  {
+   "id": "n578271069666",
+   "title": "Energy & Utilities Roundup: Market Talk",
+   "summary": "Find insight on oil futures, Korea Electric Power, Harbour Energy and more in the latest Market Talks covering Energy and Utilities.",
+   "url": "https://www.wsj.com/business/energy-utilities-roundup-market-talk-84efa181?mod=pls_whats_news_us_business_f",
+   "publisher": "WSJ",
+   "published_at": "2026-09-18T20:56:00+00:00",
+   "sections": [
+    "commodities",
+    "sectors"
+   ],
+   "tickers": [],
+   "concept_ids": [
+    "oil-drivers"
+   ],
+   "is_official": false
+  },
+  {
+   "id": "n2c414b98cce3",
+   "title": "Tech, Media & Telecom Roundup: Market Talk",
+   "summary": "Find insight on OpenAI, Microsoft, Naver and more in the latest Market Talks covering Technology, Media and Telecom.",
+   "url": "https://www.wsj.com/business/tech-media-telecom-roundup-market-talk-62546ecf?mod=rss_Technology",
+   "publisher": "WSJ",
+   "published_at": "2026-09-18T20:54:00+00:00",
+   "sections": [
+    "companies"
+   ],
+   "tickers": [
+    "MSFT"
+   ],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "n617a4eb7e811",
+   "title": "Nvidia-Backed Cloud Startup Nscale Files for IPO",
+   "summary": "The U.K.-based company didn\u2019t say how many shares it would offer, or at what price, but intends to list shares on the New York Stock Exchange under the symbol NSCL.",
+   "url": "https://www.wsj.com/business/nvidia-backed-cloud-startup-nscale-files-for-ipo-2622ca12?mod=rss_markets_main",
+   "publisher": "WSJ",
+   "published_at": "2026-09-18T20:39:00+00:00",
+   "sections": [
+    "companies"
+   ],
+   "tickers": [
+    "NVDA"
+   ],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "ne1f90cb23437",
+   "title": "GM is re-downloading Apple CarPlay, Android Auto to its cars",
+   "summary": "General Motors (GM) will reinstall Apple's (AAPL) CarPlay and Android Auto in its vehicles after initially planning to remove the software from new cars. Yahoo Finance Senior Autos Reporter Pras Subramanian explains the consumer reaction that led to this decision.",
+   "url": "https://finance.yahoo.com/video/gm-downloading-apple-carplay-android-203500547.html?.tsrc=rss",
+   "publisher": "Yahoo Finance",
+   "published_at": "2026-09-18T20:35:00+00:00",
+   "sections": [
+    "companies"
+   ],
+   "tickers": [
+    "AAPL"
+   ],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "n89b29526c629",
+   "title": "Buffett Hands Berkshire Chairman\u2019s Seat to Son Howard",
+   "summary": "Plus, Coinbase shares soar and Bank of Japan\u2019s rate hike sends yen sinking",
+   "url": "https://www.wsj.com/finance/stocks/buffett-hands-berkshire-chairmans-seat-to-son-howard-bd424456?mod=rss_markets_main",
+   "publisher": "WSJ",
+   "published_at": "2026-09-18T20:31:00+00:00",
+   "sections": [
+    "macro",
+    "fx"
+   ],
+   "tickers": [],
+   "concept_ids": [
+    "rate-expectations",
+    "usd-rate-differentials"
+   ],
+   "is_official": false
+  },
+  {
+   "id": "n46be3a178ec6",
+   "title": "Opinion | AI, Get Thee to an IPO!",
+   "summary": "The challenges facing the industry might be better managed in obedience to public shareholders.",
+   "url": "https://www.wsj.com/opinion/ai-get-thee-to-an-ipo-855cab5b?mod=rss_Technology",
+   "publisher": "WSJ",
+   "published_at": "2026-09-18T20:26:00+00:00",
+   "sections": [
+    "companies"
+   ],
+   "tickers": [],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "n26ac07a92fab",
+   "title": "Opinion | You Probably Have the Iran War Backward",
+   "summary": "The blockade proves the success of sanctions. If the U.S. keeps its chokehold, Tehran will likely break.",
+   "url": "https://www.wsj.com/opinion/you-probably-have-the-iran-war-backward-61be55ea?mod=rss_worldnews",
+   "publisher": "WSJ",
+   "published_at": "2026-09-18T20:26:00+00:00",
+   "sections": [],
+   "tickers": [],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "n9464832e5c58",
+   "title": "Apple Stock Gets Stunning Price Target Hike on Strong iPhone Demand",
+   "summary": "Evercore Delivers Bullish $380 Price Target for Apple Stock",
+   "url": "https://finance.yahoo.com/markets/stocks/articles/apple-stock-gets-stunning-price-202120422.html?.tsrc=rss",
+   "publisher": "Yahoo Finance",
+   "published_at": "2026-09-18T20:21:20+00:00",
+   "sections": [
+    "companies"
+   ],
+   "tickers": [
+    "AAPL"
+   ],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "na18622eb10e6",
+   "title": "2-Year Yield Hits Highest Level Since 2024",
+   "summary": "A bond selloff pushed the 2-year Treasury yield to 4.741%, its highest level since July 2024.",
+   "url": "https://www.wsj.com/finance/jgb-yields-decline-as-energy-inflation-fears-ease-85bf5679?mod=rss_markets_main",
+   "publisher": "WSJ",
+   "published_at": "2026-09-18T20:16:00+00:00",
+   "sections": [
+    "rates",
+    "equities"
+   ],
+   "tickers": [],
+   "concept_ids": [
+    "bond-price-yield",
+    "risk-on-off"
+   ],
+   "is_official": false
+  },
+  {
+   "id": "nb356a9a21be2",
+   "title": "Apple will essentially sell 'every single' iPhone Duo it makes: CFRA",
+   "summary": "Apple's (AAPL) iPhone 18 Pro has hit store shelves on Friday, coming out a full month before the foldable iPhone Duo's release in late October. CFRA Research senior vice president and equity analyst Angelo Zino comes on Market Domination to discuss his forecast surrounding demand for the foldable iPhone.",
+   "url": "https://finance.yahoo.com/video/apple-essentially-sell-every-single-200934859.html?.tsrc=rss",
+   "publisher": "Yahoo Finance",
+   "published_at": "2026-09-18T20:09:34+00:00",
+   "sections": [
+    "companies"
+   ],
+   "tickers": [
+    "AAPL"
+   ],
+   "concept_ids": [
+    "earnings-vs-guidance"
+   ],
+   "is_official": false
+  },
+  {
+   "id": "nc4938f48d485",
+   "title": "Apple Stock Near Buy Point As iPhone 18 Pro Goes On Sale",
+   "summary": "Apple began selling its latest premium smartphones Friday and analysts are cautiously optimistic about its prospects.",
+   "url": "https://finance.yahoo.com/m/96ad86b7-14c7-3144-9782-7a5caf8deddd/apple-stock-near-buy-point-as.html?.tsrc=rss",
+   "publisher": "Yahoo Finance",
+   "published_at": "2026-09-18T20:06:46+00:00",
+   "sections": [
+    "companies"
+   ],
+   "tickers": [
+    "AAPL"
+   ],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "nb4989450eed9",
+   "title": "Stablecoin Company for Big Business Gets a Conditional Banking License",
+   "summary": "Bastion, a stablecoin partner for Sony and other corporations, received a conditional approval from OCC to be a trust bank.",
+   "url": "https://www.wsj.com/finance/currencies/stablecoin-company-for-big-business-gets-a-conditional-banking-license-d457ed5d?mod=rss_markets_main",
+   "publisher": "WSJ",
+   "published_at": "2026-09-18T20:05:00+00:00",
+   "sections": [],
+   "tickers": [],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "n0cdc2f3b6707",
+   "title": "Natural U.S. Gas Futures End Week With Moderate Gains",
+   "summary": "U.S. natural gas futures settled higher, ending the week with moderate gains as warm summer weather extended well into September.",
+   "url": "https://www.wsj.com/finance/commodities-futures/u-s-natural-gas-futures-on-track-for-weekly-gains-7f67c787?mod=rss_markets_main",
+   "publisher": "WSJ",
+   "published_at": "2026-09-18T20:05:00+00:00",
+   "sections": [
+    "commodities"
+   ],
+   "tickers": [],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "n0ca3a2f45580",
+   "title": "Nvidia-Backed Data Center Firm Nscale Files Publicly for US IPO",
+   "summary": "Nscale, a developer of artificial intelligence data centers that counts Nvidia Corp. and Microsoft Corp. among its partners, filed for an initial public offering in New York to tap into AI\u2019s insatiable demand for computing power.",
+   "url": "https://finance.yahoo.com/technology/ai/articles/nvidia-backed-data-center-firm-195220456.html?.tsrc=rss",
+   "publisher": "Yahoo Finance",
+   "published_at": "2026-09-18T19:52:20+00:00",
+   "sections": [
+    "companies"
+   ],
+   "tickers": [
+    "MSFT",
+    "NVDA"
+   ],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "n6b3d806723e6",
+   "title": "2 Stocks to Buy as Google Starts Selling Its AI Chips",
+   "summary": "The search giant's in-house AI chip is now a product line. Two companies collect on every system that ships.",
+   "url": "https://www.fool.com/investing/2026/09/18/2-stocks-to-buy-as-google-starts-selling-its-ai-chips/?.tsrc=rss",
+   "publisher": "Yahoo Finance",
+   "published_at": "2026-09-18T19:42:01+00:00",
+   "sections": [
+    "companies",
+    "equities",
+    "sectors"
+   ],
+   "tickers": [
+    "GOOGL"
+   ],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "nee159ddf7d8a",
+   "title": "Oil Futures Fall for Third Day on Easing Supply Concerns",
+   "summary": "Oil futures fell, with market concerns about Saudi Arabia supply disruptions tempered by expectations that some flows could soon be restored through the kingdom\u2019s damaged East-West Pipeline.",
+   "url": "https://www.wsj.com/business/energy-oil/oil-prices-fall-for-third-day-as-wti-slips-below-100-e533d2fe?mod=rss_worldnews",
+   "publisher": "WSJ",
+   "published_at": "2026-09-18T19:40:00+00:00",
+   "sections": [
+    "commodities"
+   ],
+   "tickers": [],
+   "concept_ids": [
+    "oil-drivers"
+   ],
+   "is_official": false
+  },
+  {
+   "id": "n666ea2789466",
+   "title": "Oil Futures End Week Little Changed",
+   "summary": "Oil futures ended a frantic week little changed with prices easing back after a midweek rise to four-month highs on disruptions to Saudi Arabia\u2019s East-West pipeline.",
+   "url": "https://www.wsj.com/finance/commodities-futures/oil-falls-as-worries-over-middle-east-supply-disruptions-ease-36be861a?mod=rss_markets_main",
+   "publisher": "WSJ",
+   "published_at": "2026-09-18T19:38:00+00:00",
+   "sections": [
+    "commodities"
+   ],
+   "tickers": [],
+   "concept_ids": [
+    "oil-drivers"
+   ],
+   "is_official": false
+  },
+  {
+   "id": "n3ac192b97ec7",
+   "title": "Automakers Urge Trump Not to Allow Chinese Cars Into U.S. Ahead of Xi Summit",
+   "summary": "A group representing carmakers and dealers warned against any deal that might allow the sale or manufacture of Chinese cars in the U.S.",
+   "url": "https://www.wsj.com/business/autos/automakers-urge-trump-not-to-allow-chinese-cars-into-u-s-ahead-of-xi-summit-61bbcf86?mod=pls_whats_news_us_business_f",
+   "publisher": "WSJ",
+   "published_at": "2026-09-18T19:30:00+00:00",
+   "sections": [
+    "sectors"
+   ],
+   "tickers": [],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "naec1b94d8bed",
+   "title": "Where AAPL Stock's $510 Billion Of Shareholder Cash Came From",
+   "summary": "One of the world\u2019s largest companies has become a cash-return machine of historic scale, but its engine is now facing a serious test.",
+   "url": "https://www.trefis.com/articles/615801/where-aapl-stocks-510-billion-of-shareholder-cash-came-from/2026-09-18?.tsrc=rss",
+   "publisher": "Yahoo Finance",
+   "published_at": "2026-09-18T19:24:37+00:00",
+   "sections": [
+    "companies"
+   ],
+   "tickers": [
+    "AAPL"
+   ],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "n0a0d8ec825c5",
+   "title": "Dollar Rally Eases as Currency\u2019s Gain Against Yen Cools",
+   "summary": "The dollar lost some steam, particularly against the Japanese yen, as markets price in central bank decisions with an uncertain outlook.",
+   "url": "https://www.wsj.com/finance/currencies/yen-weakens-after-boj-raises-rate-as-expected-10cc8985?mod=rss_markets_main",
+   "publisher": "WSJ",
+   "published_at": "2026-09-18T19:20:00+00:00",
+   "sections": [
+    "macro",
+    "fx",
+    "equities"
+   ],
+   "tickers": [],
+   "concept_ids": [
+    "usd-rate-differentials",
+    "risk-on-off",
+    "earnings-vs-guidance"
+   ],
+   "is_official": false
+  },
+  {
+   "id": "n696505414a43",
+   "title": "Gold, Silver Post Weekly Gains Despite Fed Rate Increase",
+   "summary": "Gold futures settled higher on the day and on the week, holding their ground despite the rise in Treasury yields and the Fed\u2019s first interest-rate increase since 2023.",
+   "url": "https://www.wsj.com/finance/commodities-futures/gold-rises-likely-supported-by-oil-pullback-0023a879?mod=rss_markets_main",
+   "publisher": "WSJ",
+   "published_at": "2026-09-18T19:11:00+00:00",
+   "sections": [
+    "macro",
+    "rates",
+    "commodities"
+   ],
+   "tickers": [],
+   "concept_ids": [
+    "rate-expectations",
+    "bond-price-yield",
+    "gold-real-yields"
+   ],
+   "is_official": false
+  },
+  {
+   "id": "naf13ce501b33",
+   "title": "Canada Ready to Clawback Stellantis Cash Unless Production Resumes at Toronto-Area Factory",
+   "summary": "The plant, in Brampton, Ontario, has been idle since 2024, and Stelantis is in advanced talks to sell that factory to a Canadian armored-car maker.",
+   "url": "https://www.wsj.com/business/autos/canada-ready-to-clawback-stellantis-cash-unless-production-resumes-at-toronto-area-factory-1217b3f1?mod=rss_worldnews",
+   "publisher": "WSJ",
+   "published_at": "2026-09-18T19:01:00+00:00",
+   "sections": [],
+   "tickers": [],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "n017e881832e5",
+   "title": "NIO Just Dropped 20% in a Month. Is It Time to Sell?",
+   "summary": "Nio shares cratered 20% in a single month while Tesla climbed and a broad EV fund barely flinched, a pattern that puts the blame squarely on one company and forces a hard question for anyone still holding the stock.",
+   "url": "https://247wallst.com/investing/2026/09/18/nio-just-dropped-20-in-a-month-is-it-time-to-sell/?.tsrc=rss",
+   "publisher": "Yahoo Finance",
+   "published_at": "2026-09-18T18:58:42+00:00",
+   "sections": [
+    "companies"
+   ],
+   "tickers": [
+    "TSLA"
+   ],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "nf7dc3641a490",
+   "title": "Meta Platforms Just Ripped 23% in a Month: Take Profits, or Buy More?",
+   "summary": "Meta Platforms surged far past its mega-cap peers in a single month while the broader tech sector sat flat, and now shareholders face a decision that hinges entirely on how you read what the July earnings report actually said about the business.",
+   "url": "https://247wallst.com/investing/2026/09/18/meta-platforms-just-ripped-23-in-a-month-take-profits-or-buy-more/?.tsrc=rss",
+   "publisher": "Yahoo Finance",
+   "published_at": "2026-09-18T18:47:39+00:00",
+   "sections": [
+    "companies"
+   ],
+   "tickers": [
+    "META"
+   ],
+   "concept_ids": [
+    "earnings-vs-guidance",
+    "sector-rotation"
+   ],
+   "is_official": false
+  },
+  {
+   "id": "n905ecd3b1fde",
+   "title": "Analyst Sets Jaw-Dropping Price Target on Alphabet Stock",
+   "summary": "AI is becoming a broader earnings engine across Google",
+   "url": "https://finance.yahoo.com/markets/stocks/articles/analyst-sets-jaw-dropping-price-184326859.html?.tsrc=rss",
+   "publisher": "Yahoo Finance",
+   "published_at": "2026-09-18T18:43:26+00:00",
+   "sections": [
+    "companies"
+   ],
+   "tickers": [
+    "GOOGL"
+   ],
+   "concept_ids": [
+    "earnings-vs-guidance"
+   ],
+   "is_official": false
+  },
+  {
+   "id": "na626de65d5f1",
+   "title": "Apple Stock Drops as 1,600+ Italian Workers Strike on iPhone 18 Pro Launch",
+   "summary": "Apple's Italian stores remained open as unions pressed for more hiring, permanent contracts and increased hours for part-time employees",
+   "url": "https://finance.yahoo.com/markets/stocks/articles/apple-stock-drops-1-600-184117196.html?.tsrc=rss",
+   "publisher": "Yahoo Finance",
+   "published_at": "2026-09-18T18:41:17+00:00",
+   "sections": [
+    "companies"
+   ],
+   "tickers": [
+    "AAPL"
+   ],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "nd061888c095c",
+   "title": "Why Russia Is Holding an Election When Voters Know the Result",
+   "summary": "The election is meant to jump-start flagging support for President Vladimir Putin and the war.",
+   "url": "https://www.wsj.com/world/russia/why-russia-is-holding-an-election-when-voters-know-the-result-169acf43?mod=rss_worldnews",
+   "publisher": "WSJ",
+   "published_at": "2026-09-18T18:34:00+00:00",
+   "sections": [],
+   "tickers": [],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "nd7b550a19aa3",
+   "title": "Stocks Decline as Treasury Yields Rise",
+   "summary": "Rising bond yields dampened stock indexes, which were mostly in the red.",
+   "url": "https://www.wsj.com/finance/stocks/stock-futures-rise-as-oil-extends-losses-treasury-yields-rise-0bda0bff?mod=rss_markets_main",
+   "publisher": "WSJ",
+   "published_at": "2026-09-18T18:34:00+00:00",
+   "sections": [
+    "rates",
+    "equities"
+   ],
+   "tickers": [],
+   "concept_ids": [
+    "bond-price-yield"
+   ],
+   "is_official": false
+  },
+  {
+   "id": "n4e04543a6cee",
+   "title": "Nvidia, Google, Emerald AI Form AI Energy Management Alliance",
+   "summary": "Nvidia, Google and Emerald AI have launched the AI Energy Management Alliance (AEMA), a coalition that dynamically manages the electricity use of data centers in response to grid conditions. Varun Sivaram Founder and CEO of Emerald AI joins to discuss the alliance.",
+   "url": "https://finance.yahoo.com/video/nvidia-google-emerald-ai-form-183350465.html?.tsrc=rss",
+   "publisher": "Yahoo Finance",
+   "published_at": "2026-09-18T18:33:50+00:00",
+   "sections": [
+    "companies"
+   ],
+   "tickers": [
+    "GOOGL",
+    "NVDA"
+   ],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "n300544a121cf",
+   "title": "Faire Won Over Main Street. Now it Wants to Woo Wall Street.",
+   "summary": "The startup, which had a valuation of $5.2 billion last November, expects a stock-market debut in the next 12 months, Chief Financial Officer Jason Lee said.",
+   "url": "https://www.wsj.com/business/retail/exclusive-faire-won-over-main-street-now-it-wants-to-woo-wall-street-524fc733?mod=pls_whats_news_us_business_f",
+   "publisher": "WSJ",
+   "published_at": "2026-09-18T18:21:00+00:00",
+   "sections": [
+    "equities"
+   ],
+   "tickers": [],
+   "concept_ids": [
+    "discount-rates-equities"
+   ],
+   "is_official": false
+  },
+  {
+   "id": "ndac101e9309a",
+   "title": "Meta-Tied Data Center Draws Blowout Demand for Debut Junk Bond",
+   "summary": "The first junk-bond offering for a data center tied to Meta Platforms Inc. attracted demand more than four times the deal\u2019s size, with juicy yields helping to lure investors.",
+   "url": "https://finance.yahoo.com/markets/stocks/articles/meta-tied-data-center-draws-181816486.html?.tsrc=rss",
+   "publisher": "Yahoo Finance",
+   "published_at": "2026-09-18T18:18:16+00:00",
+   "sections": [
+    "companies",
+    "rates"
+   ],
+   "tickers": [
+    "META"
+   ],
+   "concept_ids": [
+    "bond-price-yield"
+   ],
+   "is_official": false
+  },
+  {
+   "id": "n66a788ad37b4",
+   "title": "3 Reasons to Avoid TSLA and 1 Stock to Buy Instead",
+   "summary": "Over the last six months, Tesla\u2019s shares have sunk to $365.62, producing a disappointing 6.9% loss - a stark contrast to the S&P 500\u2019s 14% gain. This might have investors contemplating their next move.",
+   "url": "https://finance.yahoo.com/markets/stocks/articles/3-reasons-avoid-tsla-1-181640867.html?.tsrc=rss",
+   "publisher": "Yahoo Finance",
+   "published_at": "2026-09-18T18:16:40+00:00",
+   "sections": [
+    "companies",
+    "equities"
+   ],
+   "tickers": [
+    "TSLA"
+   ],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "n52f964ac816a",
+   "title": "Apple Raised Stakes with its $2000-Priced Foldable. But Can it Be the New Growth Engine?",
+   "summary": "Apple Inc. (NASDAQ:AAPL) has just released its first foldable phone, the Duo, marking the most significant design change to an iPhone in recent years. The Duo is priced at a steep $1,999 in the United States and features a 7.6-inch inner display; its outer screen is 5.4 inches in size. It is driven by the [\u2026]",
+   "url": "https://finance.yahoo.com/technology/articles/apple-raised-stakes-2000-priced-181154520.html?.tsrc=rss",
+   "publisher": "Yahoo Finance",
+   "published_at": "2026-09-18T18:11:54+00:00",
+   "sections": [
+    "companies",
+    "equities"
+   ],
+   "tickers": [
+    "AAPL"
+   ],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "n02f9258bf85c",
+   "title": "Oracle Falls 3% While Cloud Rivals Hold Their Ground; Microsoft Dips, Amazon Nudges Higher",
+   "summary": "Oracle is sliding hard on a day when its cloud rivals are barely flinching, and the reason behind that split tells investors something important about where the real pressure on ORCL stock is coming from.",
+   "url": "https://247wallst.com/investing/2026/09/18/oracle-falls-3-while-cloud-rivals-hold-their-ground-microsoft-dips-amazon-nudges-higher/?.tsrc=rss",
+   "publisher": "Yahoo Finance",
+   "published_at": "2026-09-18T18:07:07+00:00",
+   "sections": [
+    "companies"
+   ],
+   "tickers": [
+    "MSFT",
+    "AMZN"
+   ],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "nbb7c88acf1ab",
+   "title": "The Highest-Returning Stock of the Last 45 Years Is Home Depot",
+   "summary": "The \u2018Acquired\u2019 podcast ran the numbers to see how home improvement became much larger than anyone could have imagined.",
+   "url": "https://www.wsj.com/business/retail/home-depot-acquired-podcast-stock-returns-cbdf037f?mod=pls_whats_news_us_business_f",
+   "publisher": "WSJ",
+   "published_at": "2026-09-18T18:00:00+00:00",
+   "sections": [],
+   "tickers": [],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "nf18437342992",
+   "title": "A new Federal Reserve inquiry into the 2023 collapse of Silicon Valley Bank found that bank-supervision staff in the Biden era could have anticipated and prevented the bank\u2019s failure",
+   "summary": "The report, commissioned by Trump ally Michelle Bowman, blamed bank-supervision staff in the Biden era.",
+   "url": "https://www.wsj.com/economy/central-banking/new-fed-report-on-svb-collapse-pins-blame-on-feds-own-regulators-9a3cb062?mod=rss_socialeconomyfeed",
+   "publisher": "WSJ",
+   "published_at": "2026-09-18T17:51:00+00:00",
+   "sections": [
+    "macro"
+   ],
+   "tickers": [],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "nd7501a682d6a",
+   "title": "New Report on SVB Collapse Pins Blame on Fed\u2019s Own Regulators, Fed Official Says",
+   "summary": "The report, commissioned by Trump ally Michelle Bowman, blamed bank-supervision staff in the Biden era.",
+   "url": "https://www.wsj.com/economy/central-banking/new-fed-report-on-svb-collapse-pins-blame-on-feds-own-regulators-9a3cb062?mod=rss_markets_main",
+   "publisher": "WSJ",
+   "published_at": "2026-09-18T17:51:00+00:00",
+   "sections": [
+    "macro"
+   ],
+   "tickers": [],
+   "concept_ids": [
+    "rate-expectations"
+   ],
+   "is_official": false
+  },
+  {
+   "id": "n5b8066129893",
+   "title": "Volkswagen Warns on Profit After Big Porsche Write-Down",
+   "summary": "The group reported roughly $11.5 billion of impairment charges linked to its stake in Porsche, fierce Chinese competition and its restructuring efforts.",
+   "url": "https://www.wsj.com/business/autos/volkswagen-lowers-full-year-forecast-as-market-challenges-persist-e1edbbfd?mod=pls_whats_news_us_business_f",
+   "publisher": "WSJ",
+   "published_at": "2026-09-18T17:44:00+00:00",
+   "sections": [
+    "companies"
+   ],
+   "tickers": [],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "n471f08fe168f",
+   "title": "Tesla Q3 Deliveries Could Beat Expectations, Says Barclays \u2014 Analyst Calls Fundamentals An \u2018Afterthought\u2019 To AI Story",
+   "summary": "Barclays expects Tesla to deliver 475,000 vehicles in Q3, above the 466,000 estimate reportedly compiled by Bloomberg, according to The Fly.",
+   "url": "https://stocktwits.com/news-articles/markets/equity/tesla-q3-deliveries-could-beat-expectations-says-barclays-analyst-calls-fundamentals-an-afterthought-to-ai-story/cZtHcTnRBEE?.tsrc=rss",
+   "publisher": "Yahoo Finance",
+   "published_at": "2026-09-18T17:34:09+00:00",
+   "sections": [
+    "companies"
+   ],
+   "tickers": [
+    "TSLA"
+   ],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "n36dd8ea624ed",
+   "title": "Tesla Slips 1% as $16.8 Billion AI Fab Meets a Naming Fight",
+   "summary": "The trademark case is manageable; vertically integrated chipmaking creates the larger execution and capital test.",
+   "url": "https://finance.yahoo.com/technology/ai/articles/tesla-slips-1-16-8-172712872.html?.tsrc=rss",
+   "publisher": "Yahoo Finance",
+   "published_at": "2026-09-18T17:27:12+00:00",
+   "sections": [
+    "companies"
+   ],
+   "tickers": [
+    "TSLA"
+   ],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "n35128596f049",
+   "title": "Opinion | AI: Ghostwriter in the Machine",
+   "summary": "\u2018If we insisted that every politician write his own piece, we\u2019d either get terrible pieces or none at all,\u2019 said an op-ed editor at the New York Times.",
+   "url": "https://www.wsj.com/opinion/ai-ghostwriter-in-the-machine-720d79c1?mod=rss_Technology",
+   "publisher": "WSJ",
+   "published_at": "2026-09-18T17:26:00+00:00",
+   "sections": [],
+   "tickers": [],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "n16f827890287",
+   "title": "California\u2019s Newsom Issues Executive Order to Weigh AI Oversight, Including \u2018Kill Switch\u2019",
+   "summary": "The executive order, which would convene experts to mull possible AI-oversight policies, comes as discussions about AI risk have exploded from Silicon Valley circles into public view.",
+   "url": "https://www.wsj.com/tech/ai/californias-newsom-issues-executive-order-to-weigh-ai-oversight-including-kill-switch-3a98040f?mod=rss_Technology",
+   "publisher": "WSJ",
+   "published_at": "2026-09-18T17:05:00+00:00",
+   "sections": [],
+   "tickers": [],
+   "concept_ids": [
+    "risk-on-off"
+   ],
+   "is_official": false
+  },
+  {
+   "id": "naa574cc6008d",
+   "title": "JPMorgan Values Bitcoin at $266,000 Against Gold. Why It\u2019s Trading Below $81,000?",
+   "summary": "JPMorgan's analysts put a staggering price tag on Bitcoin that dwarfs every other bank's forecast, yet the coin keeps trading at a fraction of that figure. Understanding why reveals something uncomfortable about how valuation models actually work.",
+   "url": "https://247wallst.com/investing/cryptocurrency/2026/09/18/jpmorgan-values-bitcoin-at-266000-against-gold-why-its-trading-below-81000/?.tsrc=rss",
+   "publisher": "Yahoo Finance",
+   "published_at": "2026-09-18T17:03:50+00:00",
+   "sections": [
+    "companies",
+    "commodities"
+   ],
+   "tickers": [
+    "JPM"
+   ],
+   "concept_ids": [
+    "gold-real-yields",
+    "earnings-vs-guidance",
+    "discount-rates-equities"
+   ],
+   "is_official": false
+  },
+  {
+   "id": "n776f126feb2a",
+   "title": "Multibillion-Dollar Stock-Market Scandal Roils Erdogan\u2019s Turkey",
+   "summary": "The implosion of a series of investment funds that held billions of dollars heaped fresh stress on Turkey\u2019s troubled economy.",
+   "url": "https://www.wsj.com/world/multibillion-dollar-stock-market-scandal-roils-erdogans-turkey-05931e02?mod=rss_worldnews",
+   "publisher": "WSJ",
+   "published_at": "2026-09-18T16:57:00+00:00",
+   "sections": [
+    "macro"
+   ],
+   "tickers": [],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "n88a1f69fe793",
+   "title": "Hyrox Is Popular, Lucrative and Not for the Faint of Heart",
+   "summary": "Plus, energy-drink crackdowns and bodega peptides.",
+   "url": "https://www.wsj.com/health/wellness/hyrox-is-popular-lucrative-and-not-for-the-faint-of-heart-6b864e21?mod=pls_whats_news_us_business_f",
+   "publisher": "WSJ",
+   "published_at": "2026-09-18T16:55:00+00:00",
+   "sections": [],
+   "tickers": [],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "nf67d09c810cd",
+   "title": "JPMorgan Sees Investment Banking and Trading Powering Q3 Growth",
+   "summary": "JPMorgan Chase & Co. (NYSE:JPM) expects investment banking fees and markets revenue to rise in the mid-to-high teens percentage in the third quarter, according to co-President Doug Petno, contrasting sharply with Bank of America\u2019s expectation for a roughly 10% decline in investment banking fees. Petno said JPMorgan entered the quarter with a strong pipeline and [\u2026]",
+   "url": "https://finance.yahoo.com/markets/stocks/articles/jpmorgan-sees-investment-banking-trading-164740809.html?.tsrc=rss",
+   "publisher": "Yahoo Finance",
+   "published_at": "2026-09-18T16:47:40+00:00",
+   "sections": [
+    "companies"
+   ],
+   "tickers": [
+    "JPM"
+   ],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "nf228d9320e67",
+   "title": "Hundreds of Thousands Rally in Iran as War and Economy Squeeze",
+   "summary": "The pro-government push comes as Iran faces economic woes in the U.S. blockade and an anniversary of the 2022 protests.",
+   "url": "https://www.wsj.com/world/middle-east/hundreds-of-thousands-rally-in-iran-as-war-and-economy-squeeze-7dadb4d4?mod=rss_worldnews",
+   "publisher": "WSJ",
+   "published_at": "2026-09-18T16:45:00+00:00",
+   "sections": [
+    "macro",
+    "equities"
+   ],
+   "tickers": [],
+   "concept_ids": [
+    "risk-on-off"
+   ],
+   "is_official": false
+  },
+  {
+   "id": "n3af2c366c585",
+   "title": "What's Going On With Tesla Stock Friday",
+   "summary": "Tesla Stock Rises as Automaker Rally and New Charging Deal Lift Shares",
+   "url": "https://finance.yahoo.com/markets/stocks/articles/whats-going-tesla-stock-friday-164138175.html?.tsrc=rss",
+   "publisher": "Yahoo Finance",
+   "published_at": "2026-09-18T16:41:38+00:00",
+   "sections": [
+    "companies",
+    "equities"
+   ],
+   "tickers": [
+    "TSLA"
+   ],
+   "concept_ids": [
+    "risk-on-off"
+   ],
+   "is_official": false
+  },
+  {
+   "id": "ne38c5c1f9849",
+   "title": "Disney Beefs Up Tech Ambitions With Newly Created CTO Role",
+   "summary": "Karandeep Anand, head of Character.AI, will report directly to Disney CEO Josh D\u2019Amaro, who has made tech a focus.",
+   "url": "https://www.wsj.com/business/media/disney-beefs-up-tech-ambitions-with-newly-created-cto-role-87a5e473?mod=rss_Technology",
+   "publisher": "WSJ",
+   "published_at": "2026-09-18T16:10:00+00:00",
+   "sections": [
+    "companies"
+   ],
+   "tickers": [],
+   "concept_ids": [],
+   "is_official": false
+  },
+  {
+   "id": "na4923049fc3d",
+   "title": "Bowman, Initial Findings from Independent Review of Silicon Valley Bank",
+   "summary": "Speech At the Luncheon of the Lord Mayor City of London at Mansion House, London, United Kingdom",
+   "url": "https://www.federalreserve.gov/newsevents/speech/bowman20260918b.htm",
+   "publisher": "Federal Reserve",
+   "published_at": "2026-09-18T13:30:00+00:00",
+   "sections": [
+    "macro"
+   ],
+   "tickers": [],
+   "concept_ids": [],
+   "is_official": true
+  },
+  {
+   "id": "n6ec3b472a80d",
+   "title": "Bowman, The Final Chapter on Modernizing Bank Regulatory Stress Testing",
+   "summary": "Speech At the Luncheon of the Lord Mayor City of London at Mansion House, London, United Kingdom",
+   "url": "https://www.federalreserve.gov/newsevents/speech/bowman20260918a.htm",
+   "publisher": "Federal Reserve",
+   "published_at": "2026-09-18T13:30:00+00:00",
+   "sections": [
+    "macro"
+   ],
+   "tickers": [],
+   "concept_ids": [],
+   "is_official": true
+  },
+  {
+   "id": "nfe283a4d738a",
+   "title": "Federal Reserve issues FOMC statement",
+   "summary": "Federal Reserve issues FOMC statement",
+   "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20260916a.htm",
+   "publisher": "Federal Reserve",
+   "published_at": "2026-09-16T18:00:00+00:00",
+   "sections": [
+    "macro",
+    "rates"
+   ],
+   "tickers": [],
+   "concept_ids": [
+    "rate-expectations"
+   ],
+   "is_official": true
+  },
+  {
+   "id": "n96bceaa064df",
+   "title": "Federal Reserve Board and Federal Open Market Committee release economic projections from the September 15-16 FOMC meeting",
+   "summary": "Federal Reserve Board and Federal Open Market Committee release economic projections from the September 15-16 FOMC meeting",
+   "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20260916b.htm",
+   "publisher": "Federal Reserve",
+   "published_at": "2026-09-16T18:00:00+00:00",
+   "sections": [
+    "macro",
+    "rates"
+   ],
+   "tickers": [],
+   "concept_ids": [
+    "rate-expectations"
+   ],
+   "is_official": true
+  },
+  {
+   "id": "na89335cf0468",
+   "title": "Waller, The Economic Outlook and Some Comments on My Policy Communication",
+   "summary": "Speech At Reuters NEXT Newsmaker Interview, Washington, D.C.",
+   "url": "https://www.federalreserve.gov/newsevents/speech/waller20260903a.htm",
+   "publisher": "Federal Reserve",
+   "published_at": "2026-09-03T12:30:00+00:00",
+   "sections": [
+    "macro"
+   ],
+   "tickers": [],
+   "concept_ids": [
+    "earnings-vs-guidance"
+   ],
+   "is_official": true
+  },
+  {
+   "id": "nc2ec2c18dd9c",
+   "title": "Barr, Unlocking Opportunities for Workers and Entrepreneurs with a Criminal Record",
+   "summary": "Speech At the Second-Chance Lending Forum, Developing Evidence-Based Policy on Creditworthiness and Criminal History, Washington, D.C.",
+   "url": "https://www.federalreserve.gov/newsevents/speech/barr20260901a.htm",
+   "publisher": "Federal Reserve",
+   "published_at": "2026-09-01T13:05:00+00:00",
+   "sections": [
+    "macro"
+   ],
+   "tickers": [],
+   "concept_ids": [],
+   "is_official": true
+  }
+ ]
+}

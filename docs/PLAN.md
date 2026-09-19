@@ -27,9 +27,15 @@ On approval, implementation starts by committing this plan to `docs/PLAN.md` and
 - Set a real `QUIZ_HMAC_SECRET` (code default is a dev value)
 - Finance owner to review the 7 lessons (`reviewed: false`) and add more (target ≥15)
 
+### ✅ Done 2026-09-19: Markets tab
+- Market data (Yahoo → yfinance → last good → golden; Treasury.gov curve), Fed/WSJ/Yahoo RSS news with section tagging, real golden day captured
+- Markets tab: interest-ordered Macro / Micro / Company / Portfolio sections, each with a "how this market works + how desks trade it" guide, today's numbers, headlines, and a "practice this section" quiz link
+- AI market overview + per-section desk notes: every key point cites facts and headlines as evidence; numbers rendered from data, never the LLM
+- Portfolio pipeline: `broker.PortfolioSource` (demo book) + deterministic attribution; a real broker plugs in behind the interface
+
 ### ❌ Not started (next, in priority order)
-1. **Market data** (`backend/app/market/`): Yahoo chart provider, FRED provider, golden demo day, fallback chain, `DATA_MODE`, move ranking, `tickers` seed
-2. **News** (`backend/app/news/`): WSJ + Yahoo RSS parsing into `documents(layer='market')`
+1. Seed `tickers`; persist snapshots/headlines (`market_snapshots`, `documents(layer='market')`) from cron instead of in-process caches
+2. Point the Portfolio tab at `broker` + `portfolio.attribution` instead of its fixture
 3. **Daily brief**: cron route → snapshot → `explain_event` prompt → `daily_briefs`; replace Today/Event fixtures with the real brief
 4. **Portfolio**: demo portfolio seed, deterministic attribution, labelled AI narrative; replace Portfolio fixture
 5. Judge demo account, golden-day brief pre-generated, Vercel deployment, demo rehearsal + backup video

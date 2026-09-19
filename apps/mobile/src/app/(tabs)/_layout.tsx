@@ -39,6 +39,10 @@ export default function TabsLayout() {
         options={{ title: 'Quiz', tabBarIcon: tabIcon('help-circle-outline', 'help-circle') }}
       />
       <Tabs.Screen
+        name="markets"
+        options={{ title: 'Markets', tabBarIcon: tabIcon('trending-up-outline', 'trending-up') }}
+      />
+      <Tabs.Screen
         name="portfolio"
         options={{ title: 'Portfolio', tabBarIcon: tabIcon('pie-chart-outline', 'pie-chart') }}
       />

@@ -12,8 +12,9 @@ The product/scope plan lives in `PLAN.md`; this file is the structural contract.
    ▼
  FastAPI (backend/app)  ── user-JWT client ────────► Supabase Postgres (RLS enforced)
    │                    ── service-role client (cron/ingest only) ─► Postgres (bypasses RLS)
-   ├── market/   ──► Yahoo chart endpoint, FRED       (deterministic facts)
-   ├── news/     ──► WSJ RSS, Yahoo RSS               (headlines only)
+   ├── market/   ──► Yahoo chart endpoint (+ yfinance fallback, local only), Treasury.gov curve   (deterministic facts)
+   ├── news/     ──► Fed RSS, WSJ RSS, Yahoo ticker RSS  (headlines only)
+   ├── broker/   ──► PortfolioSource (demo today; IBKR later)
    ├── llm/      ──► xAI Grok                          (structured JSON only)
    └── rag/      ──► Alibaba Qwen embeddings (DashScope) + pgvector     (retrieval)
  IBKR (later)  ──► broker/ adapter → portfolio tables only, read-only
@@ -30,9 +31,11 @@ The product/scope plan lives in `PLAN.md`; this file is the structural contract.
 | `backend/app/schemas` | Pydantic models for API bodies **and** LLM outputs. The shared contract. | types |
 | `backend/app/deps.py` | Authentication (JWT verify) → `user_id`. All authz decisions start here. | auth |
 | `backend/app/config.py` | Reads environment. The only module allowed to read env vars. | settings |
-| `backend/app/market` | Fetch prices/yields, snapshot, fallback chain (live → cache → golden), rank moves. Produces `Fact`s. | facts |
-| `backend/app/news` | Parse RSS → article rows (headline/summary/url/time). Never fetches article bodies. | articles |
-| `backend/app/portfolio` | Deterministic attribution, sector exposure. Pure functions. | portfolio math |
+| `backend/app/market` | Instrument universe (`universe.py`), providers (`providers/`: Yahoo chart via httpx, optional `yfinance` fallback, Treasury.gov yield curve), Quote → `Move` math (`facts.py`), ranking vs a typical day (`ranking.py`), snapshot with fallback chain live → last good → golden day (`snapshot.py`), golden-day capture CLI (`capture.py`). Produces `Move`s. | facts |
+| `backend/app/news` | Feed registry (`feeds.py`: Fed, WSJ, Yahoo per ticker), stdlib-XML RSS parsing + 15-min cache (`rss.py`), deterministic keyword tagging into sections/concepts (`classify.py`). Never fetches article bodies. | headlines |
+| `backend/app/broker` | `PortfolioSource` protocol + `DemoPortfolioSource`. Read-only; the only place that knows where positions come from. | positions |
+| `backend/app/portfolio` | Deterministic attribution (`attribution.py`: weight × return, sectors). Pure functions. | portfolio math |
+| `backend/app/data` | Static data shipped with the API: `markets_guide.json` (teaching guide per markets section) and `golden_markets.json` (real captured demo day). | data |
 | `backend/app/learning` | Rubric scoring (overall score), mastery updates, Leitner scheduling, adaptive quiz target selection, MCQ HMAC seals. Pure functions. | learner math |
 | `backend/app/services` | Request orchestration that spans db + learning + llm (quiz sessions, refill, grading). Called only by routers. | use-cases |
 | `backend/app/llm` | Grok client (`client.py`), structured-output parsing (`structured.py`), embeddings (`embed.py`), prompts (`prompts/`: system, tutor, quiz_question, quiz_eval), deterministic template fallbacks (`fallbacks/`). No DB reads of its own. | AI calls |
@@ -50,10 +53,11 @@ Allowed direction is **left → right** ("may import / call"). Anything not list
 | `routers` | schemas, deps, services (`market`, `portfolio`, `learning`, `llm`, `rag`, `db`, `services`) | other routers |
 | `llm` | schemas, config | `db`, `rag`, `market`, `routers` (callers pass data in) |
 | `rag` | schemas, config, `db`, `llm.embed` only (embedding call lives in `llm/embed.py`; `rag` never imports other `llm` modules, so retrieval never generates text) | `routers`, `learning` |
-| `market`, `news` | schemas, config, httpx | `llm`, `rag`, `db` writes except via cron entrypoint |
+| `market`, `news` | schemas, config, httpx (`news.classify` may read `market.universe` for company aliases) | `llm`, `rag`, `db` writes except via cron entrypoint |
+| `broker` | schemas only | everything else (no order endpoints, ever) |
 | `portfolio`, `learning` | schemas only (pure functions) | network, DB, `llm` |
 | `db` | schemas, config | everything else |
-| `services` | schemas, config, `db`, `learning`, `llm`, `rag` (as needed) | `routers` |
+| `services` | schemas, config, `db`, `learning`, `llm`, `rag`, `market`, `news`, `broker`, `portfolio` (as needed) | `routers` |
 | `schemas` | pydantic only | anything else |
 | mobile `app/` | `components`, `api`, `constants` | Supabase tables directly (auth only), market/LLM providers |
 | mobile `components` | other components, `constants` | `api` (screens fetch, components render) |
@@ -80,6 +84,8 @@ Allowed direction is **left → right** ("may import / call"). Anything not list
 - **Teaching (live):** `POST /v1/tutor/lesson {concept_id, level, misconception?, question?}` in `routers/tutor.py`: `db.knowledge.get_concept` → `rag.retrieve` (foundation layer, concept-filtered, then unfiltered with a concept boost if thin) → `rag.context.build_context` (escaped `<source id=Sn>` blocks) → `llm.structured.generate(TutorLessonLLM, prompts/tutor)` → `rag.citations.validate_citations` → response with citations (chunk id, section, excerpt, URL). Below the similarity bar the lesson is flagged `insufficient_evidence` and cites nothing. If the LLM fails, an extractive fallback quotes the top sources verbatim. The mobile `lesson.tsx` calls this and falls back to the canned lesson if the API is unreachable. Mastery is not updated here; that belongs to the quiz/evaluation flow.
 - **KB search / sources:** `POST /v1/kb/search` (debug + eval) and `GET /v1/sources/{chunk_id}` (citation drawer).
 - **Portfolio:** positions × snapshot → `portfolio.attribution` (deterministic) ; optional `llm.portfolio_narrative` labelled as interpretation.
+- **Markets feed (Markets tab, no LLM):** `GET /v1/markets/feed?interests=&watch=` → `services/markets.build_feed`: `broker.get_portfolio_source` (demo book) + `market.snapshot.get_snapshot` (Yahoo → yfinance → last good → golden; Treasury.gov for yields/2s10s; `DATA_MODE=demo` = golden only, no network) ‖ `news.rss.fetch_feeds` (Fed + WSJ + Yahoo ticker RSS, golden headlines if all fail) → 8 sections (Macro: Fed & economy, rates, FX, commodities, stocks & VIX · Micro: sectors · Company · Your portfolio with `portfolio.attribution`), each with moves, tagged headlines and its static guide (how it works, drivers, transmission chain, desk strategy archetypes, watch list, glossary). Sections the learner follows (client-side interests in AsyncStorage) come first.
+- **AI market overview + section desk notes (on demand):** `POST /v1/markets/overview` and `POST /v1/markets/sections/{id}/explain` build the feed, wrap headlines as untrusted `<source id="Hn">` blocks (`rag.context.build_news_context`), pass facts as `{fact_id, level, change}` JSON, and call `llm.structured.generate` (`prompts/market_overview`, `prompts/market_section`). Validation drops unknown fact/headline/concept IDs, strips any number-with-unit the model writes (`strip_numbers`), and flags overview points left without evidence as `supported=false`. The UI renders the evidence (numbers from `Move`s, headline links). LLM failure → deterministic template from the biggest moves + guide. Results cached in-process for 15 min per (level, interests, watch, as_of).
 
 ## 6. Extension points (future work slots in here)
 
@@ -113,10 +119,10 @@ Last verified: 2026-09-19 against `main` @ `9f64aca` + migration 0006 applied. B
 | Mobile: onboarding → Quiz (formats/topics → infinite session) → Learn / Portfolio / live lesson | ✅ done |
 | Mobile auth | ⚠️ anonymous sign-in code exists but **Supabase anonymous sign-ins are disabled**, so the app runs on the local bypass. Enable it (or add email/password) before any deployed demo |
 | `QUIZ_HMAC_SECRET` | ⚠️ using code default; set a real secret in `backend/.env` / Vercel |
-| Market data (`market/`: Yahoo, FRED, golden day, fallback chain, ranking) | ❌ not started (empty package) |
-| News (`news/`: WSJ + Yahoo RSS) | ❌ not started (package does not exist yet) |
+| Market data (`market/`: Yahoo + yfinance fallback + Treasury.gov, golden day, fallback chain, ranking) | ✅ done, live-verified 2026-09-19 (44/44 instruments; golden day captured from real data). FRED not used (Treasury.gov covers the curve keylessly). Snapshots kept in-process, not yet in `market_snapshots` |
+| News (`news/`: Fed + WSJ + Yahoo RSS, tagging) | ✅ done, live-verified (15/15 feeds). Not yet ingested into `documents(layer='market')` |
 | Daily brief cron + `explain_event` prompt, `daily_briefs` | ❌ not started (Today/Portfolio still read fixtures) |
-| Portfolio attribution (`portfolio/`) + portfolio narrative | ❌ not started |
+| Markets tab (`/v1/markets/feed`, AI overview with evidence, per-section desk notes, interests) | ✅ done: backend live-verified (overview ~18–28s, cached repeat instant); mobile `tsc` clean + web bundle builds |
 | Long-form analyst challenge evaluation (`evaluate`) | ❌ not started (quiz covers short answers) |
 | RAG-grounded quiz generation | ⏸ deferred (hook: pass retrieved foundation context into `quiz_question` prompt) |
 | Lesson persistence (`lessons` table needs an `evaluation_id`) | ⏸ deferred |
