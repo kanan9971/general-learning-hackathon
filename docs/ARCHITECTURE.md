@@ -98,10 +98,9 @@ Run: `python -m app.rag.ingest ../content/sources/research_papers.yaml` (dry run
 |---|---|
 | FastAPI app, config, typed errors, JWT dependency, `/health` | done (phase 0) |
 | Pydantic API schemas + placeholder fixtures (`app/fixtures`, served at `/v1/dev/fixtures/*` when `DEV_FIXTURES=true`) | done (phase 0) |
-| Supabase migrations 0001–0003 (core, rag, rls) | written, **not yet applied/tested against a real DB** |
+| Supabase migrations 0001–0004 (core, rag, rls, research type) | **applied** to project `apsojsuiginpuqljutyo` on 2026-09-19 via MCP; 17 tables, RLS on all. Known advisories: `llm_calls` has no policy (intentional, service-role only); `vector` extension sits in `public` (leave, moving it means recreating `chunks.embedding`). Tables are empty (no seed yet). |
 | Expo app: onboarding MCQ → plan → Today / case study / daily quiz / feedback / lesson / Portfolio / Learn (palette + AsyncStorage gate; auth skipped) | done (mobile loop UI) |
 | RAG ingest pipeline (extract, clean, chunk, embed, store) + 5 momentum papers (~300 chunks, dry-run verified; **not yet embedded/stored**: needs embedding key + Supabase) | done except store step |
-| Migration 0004 (`research` content type) | written, not applied |
 | market / news / portfolio / learning / llm prompts | empty packages (later phases) |
 | retrieval (`rag/retrieve.py`, `match_chunks`), citations, context builder | not started (next) |
 | `match_chunks` SQL function | not started |
