@@ -51,7 +51,8 @@ Feature freeze at H13. P0 = the "magic moment" loop in docs/PLAN.md §18.
    in the system prompt. Validate citation IDs with `app/rag/citations.py`.
 4. Keep layers separate: foundation vs market chunks (`layer` column); learner memory is relational.
    Misconception teaching retrieves the foundation layer only. Market retrieval is pinned to the brief's as_of date.
-5. Educational only: no buy/sell recommendations, no return promises, no order execution. UI labels
+5. Educational only: no buy/sell recommendations, no return promises, no live brokerage.
+   Paper fills are simulated and labelled educational. UI labels
    Fact / Interpretation / Teaching / Your view distinctly and always shows data mode + as-of timestamp.
 6. Security: user-owned data is queried with a Supabase client carrying the user's JWT (RLS enforced).
    Service-role key only in cron/ingest. Never log secrets or store brokerage credentials.

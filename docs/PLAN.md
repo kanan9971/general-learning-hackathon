@@ -31,15 +31,14 @@ On approval, implementation starts by committing this plan to `docs/PLAN.md` and
 - Market data (Yahoo → yfinance → last good → golden; Treasury.gov curve), Fed/WSJ/Yahoo RSS news with section tagging, real golden day captured
 - Markets tab: interest-ordered Macro / Micro / Company / Portfolio sections, each with a "how this market works + how desks trade it" guide, today's numbers, headlines, and a "practice this section" quiz link
 - AI market overview + per-section desk notes: every key point cites facts and headlines as evidence; numbers rendered from data, never the LLM
-- Portfolio pipeline: `broker.PortfolioSource` (demo book) + deterministic attribution; a real broker plugs in behind the interface
+- Portfolio pipeline: `broker.PortfolioSource` (demo book, or the user's paper book) + deterministic attribution. No live broker.
 
 ### ❌ Not started (next, in priority order)
 1. Seed `tickers`; persist snapshots/headlines (`market_snapshots`, `documents(layer='market')`) from cron instead of in-process caches
-2. Point the Portfolio tab at `broker` + `portfolio.attribution` instead of its fixture
+2. Point Portfolio at `broker` + `portfolio.attribution` instead of its fixture; ship the **paper book** (level-sized cash, simulated fills, next-session analysis)
 3. **Daily brief**: cron route → snapshot → `explain_event` prompt → `daily_briefs`; replace Today/Event fixtures with the real brief
-4. **Portfolio**: demo portfolio seed, deterministic attribution, labelled AI narrative; replace Portfolio fixture
-5. Judge demo account, golden-day brief pre-generated, Vercel deployment, demo rehearsal + backup video
-6. P1: long-form analyst challenge (`evaluate`), Desk drill, paper-trade lab, RAG-grounded quiz questions, lesson persistence
+4. Judge demo account, golden-day brief pre-generated, Vercel deployment, demo rehearsal + backup video
+5. P1: long-form analyst challenge (`evaluate`), Desk drill, RAG-grounded quiz questions, lesson persistence
 
 ### Locked architectural decisions (asked & answered)
 
@@ -64,7 +63,7 @@ On approval, implementation starts by committing this plan to `docs/PLAN.md` and
 - **Main problem:** passive news consumption doesn't build causal reasoning, cross-asset intuition, or the ability to *speak* a market view.
 - **Differentiator:** not a summarizer — a **closed loop with a learner model**. An onboarding MCQ sets the tone of a custom plan; daily news events become case studies + quizzes that continuously update mastery. Facts are deterministic; explanations are labelled interpretations.
 - **MVP will:** onboarding diagnostic quiz (once, retakeable from Learn) → custom plan tone · daily brief with case-study events · demo portfolio attribution · daily MCQ quiz + feedback · RAG-style lesson with citations · Learn mastery screen. Hackathon demo **skips auth**.
-- **MVP will not:** execute trades, give buy/sell advice, integrate IBKR, require sign-up for the demo, cover global markets, do voice, or do full spaced repetition.
+- **MVP will not:** send live brokerage orders, give buy/sell advice, require sign-up for the demo, cover global markets, do voice, or do full spaced repetition.
 
 ## 2. Assumptions & open questions
 
@@ -80,25 +79,33 @@ Assumptions (proceeding unless told otherwise):
 Open questions (defaults in bold, change any time):
 - Product name? **DeskReady**.
 - Golden demo day? **A real CPI-release day with a clear rates-vs-tech story**; the finance member picks and verifies it in hour 0–1 from Yahoo/FRED data, with matching WSJ headlines saved to `content/demo_day/news.json`. No invented numbers.
-- Should the demo portfolio be the same for all users? **Yes, copied into each new account on onboarding** (editable P1).
+- Paper book starting cash? **By placement level, locked at first create:** beginner **$10,000**, intermediate **$50,000**, advanced **$100,000**. Server sets this from saved level; retaking placement does not top up cash.
 
 ## 3. MVP scope (16 h, 4 people)
 
 **Must-have (P0):** onboarding MCQ diagnostic (sets custom-plan tone; once per install, retake from Learn) · Today brief (cross-asset strip + event case studies) · event detail with causal chain, alternatives, confidence · portfolio impact (deterministic attribution + labelled AI narrative) · daily MCQ quiz on the case study · feedback + mastery update · cited micro-lesson · Learn / living plan · data-mode badge · light design palette. **Auth skipped for hackathon demo.**
 
-**Simplify:** onboarding = welcome + 6–8 MCQs + plan reveal · daily assessment = MCQ (not 100–300 word essay) · spaced review = Leitner later · portfolio = demo portfolio only · Desk / S&T drill = deferred.
+**Simplify:** onboarding = welcome + 6–8 MCQs + plan reveal · daily assessment = MCQ (not 100–300 word essay) · spaced review = Leitner later · Desk / S&T drill = deferred.
 
-**Mock / stub:** watchlist · paper-trade journal · long-form analyst challenge (backend schemas remain for later).
+**Mock / stub:** watchlist · long-form analyst challenge (backend schemas remain for later).
 
-**Defer (P2):** IBKR read-only · CSV upload · voice answers · live news ingestion into RAG beyond daily cron · notifications/email · multi-region · advanced S&T role-play · full SM-2 · full Supabase auth UI.
+**Paper book (in scope, educational sim):** fake money, saved to the user's account (JWT + RLS). Profile → paper desk (not mixed with the Markets "Your portfolio" teaching page).
+- **Cash:** beginner $10k / intermediate $50k / advanced $100k, once at book create.
+- **Instruments:** whitelist of stocks/ETFs we already price (AAPL, NVDA, TLT, GLD, sector ETFs, …). Yields/FX/index prints are facts, not paper products. Commodity **ETFs** not raw futures margin.
+- **Controls by level:** beginner = long-only **market** orders. Intermediate+ = **limit**, **stop**, cancel, **short** / cover. Advanced = tiny **listed** calls/puts (few underlyings, next monthly, three strikes; buy-to-open / sell-to-close only; **no naked short options**; premium from **code**, not Grok; demo uses a formula, not a live chain).
+- **Fills:** last snapshot price (`DATA_MODE=demo` = golden day). Persist fill before any LLM (order path has none).
+- **Analysis overview:** button unlocks on the **next US session** (skip weekend + holiday), not 24 hours. Code computes P&L; Grok explains *why* citing `fact_id`s/headlines; Fact vs Interpretation; no advice. Template fallback if Grok is down.
+- **Not in scope:** live brokerage, full option chains, multi-leg spreads, CSV import as the trading UI.
 
-**Non-goals:** order execution, return promises, "buy this now", storing brokerage credentials, scraping paywalled content, LLM-computed numbers.
+**Defer (P2):** CSV upload · voice answers · live news ingestion into RAG beyond daily cron · notifications/email · multi-region · advanced S&T role-play · full SM-2 · full Supabase auth UI.
+
+**Non-goals:** live order execution, return promises, "buy this now", storing brokerage credentials, scraping paywalled content, LLM-computed numbers. **Paper simulation is allowed** if labelled educational.
 
 ## 4. User journeys
 
 1. **First-time onboarding:** Welcome → 6–8 foundation MCQs (static seed about KB concepts, not live RAG) → plan reveal (inferred level + 2–3 focus concepts) → Today. Completion stored in AsyncStorage (`deskready.onboarded`); does not show again unless **Retake diagnostic** on Learn.
 2. **Daily session:** Today → skim strip → open case study → causal chain → Start quiz → MCQ → feedback → lesson → Learn shows updated mastery.
-3. **Portfolio impact:** Portfolio tab → day P&L % (deterministic) → contributors → sectors → AI narrative labelled Interpretation.
+3. **Paper book:** Profile → paper desk → cash + holdings + trade ticket → day P&L (deterministic) → **Analysis overview** after the next US session (Interpretation, not advice).
 4. **Daily quiz:** 3–5 MCQs grounded in today’s event → client-side score + mastery bumps → Teach me CTA.
 5. **RAG teaching:** lesson sections with kind tags + inline citations → check question → back to Learn.
 6. **Retake:** Learn → Retake diagnostic → quiz → new plan → back to Learn (daily mastery kept).
@@ -212,8 +219,9 @@ All tables in `public`, UUID PKs unless noted, `created_at timestamptz default n
 | `concept_edges` | `from_id, to_id, relation (prerequisite/related)` | PK(from,to) | read all |
 | `documents` | full metadata (§6) incl. `layer, version, checksum, is_active` | idx(`layer`,`published_at desc`), gin(`concept_ids`), gin(`tickers`) | read: authenticated; write: service |
 | `chunks` | `document_id FK cascade, chunk_index, section_path, content, token_count, embedding vector(1536), tsv tsvector generated, layer, concept_ids[], tickers[], difficulty, trust_level, published_at, is_active, injection_flag` | **HNSW** (`vector_cosine_ops`), **GIN**(`tsv`), GIN(`concept_ids`), btree(`layer`,`published_at`) | read: authenticated; write: service |
-| `portfolios` | `user_id FK, name, is_demo` | idx(`user_id`) | own rows |
+| `portfolios` | `user_id FK, name, kind (demo\|paper), cash_usd, starting_cash` (starting cash locked: 10k/50k/100k by level) | idx(`user_id`) | own rows |
 | `positions` | `portfolio_id FK cascade, symbol FK tickers, quantity numeric, cost_basis numeric null` | idx(`portfolio_id`) | via portfolio ownership (`exists` policy) |
+| `paper_fills` | `user_id, portfolio_id, symbol, side, quantity, fill_price, order_type (market\|limit\|stop), option fields null, as_of_date, data_mode, filled_at` | idx(`user_id`,`filled_at`) | own rows |
 | `challenges` | `user_id, brief_id FK, event_id text, question jsonb, difficulty, prompt_version` | unique(`user_id`,`brief_id`) | own rows |
 | `responses` | `challenge_id FK, user_id, answer_text, word_count, submitted_at, parent_response_id null (follow-ups)` | idx(`user_id`,`submitted_at`) | own rows; answer text deletable |
 | `evaluations` | `response_id FK, user_id, rubric jsonb, overall_score int (server-computed), retrieved_chunk_ids uuid[], model, prompt_version` | idx(`response_id`) | own rows |
@@ -221,14 +229,14 @@ All tables in `public`, UUID PKs unless noted, `created_at timestamptz default n
 | `concept_mastery` | PK(`user_id`,`concept_id`), `mastery 0–1, confidence 0–1, attempts, correct, misconceptions jsonb, box 1–5, last_reviewed_at, next_review_at, max_difficulty` | idx(`user_id`,`next_review_at`) | own rows |
 | `mastery_events` | `user_id, concept_id, delta, reason, evaluation_id` — audit trail ("evidence for mastery") | idx(`user_id`,`concept_id`) | own rows |
 | `llm_calls` | `user_id null, route, model, prompt_version, latency_ms, ok, input_tokens, output_tokens, error` | idx(`created_at`) | service only |
-| `paper_trades` (P1) | `user_id, instrument, direction, view, reference_level, horizon, catalyst, expected_reaction, invalidation, risks, confidence, exit_condition, evaluation jsonb, status, is_hypothetical true` | idx(`user_id`) | own rows |
+| `paper_trades` (optional thesis lab) | `user_id, instrument, direction, view, … evaluation jsonb` — process critique, **not** the fill ledger | idx(`user_id`) | own rows |
 | `desk_sessions` (P1) | `user_id, drill_type, transcript jsonb, evaluation jsonb` | idx(`user_id`) | own rows |
 
 **Vector ↔ source linkage:** `chunks.document_id → documents` (title, publisher, URL, date, version) + `section_path` + `chunk_index` → the source drawer can show "Document › Section, chunk n, v2, published …" and the exact excerpt. Lessons store `cited_chunk_ids`, so citations stay inspectable even after doc updates (old versions kept `is_active=false`, not deleted, during the event).
 
 **Seed data (`supabase/seed/` + `content/`):** ~25 concepts + edges (bond price/yield, duration, nominal vs real yields, yield curve, inflation & CPI surprise, Fed policy & rate expectations, discount rates & equity valuation, long-duration growth equities, earnings vs guidance, sector rotation, USD & rate differentials, oil drivers, gold & real yields, risk-on/risk-off, correlation, diversification, position sizing, volatility/VIX, liquidity, priced-in expectations, S&T terms, morning-meeting structure); ~25 lesson Markdown files; `tickers` (~30 incl. demo portfolio); golden-day `content/demo_day/{snapshot,news,brief}.json`; demo portfolio (e.g. NVDA, MSFT, AAPL, JPM, XOM, DAL, TLT, GLD — ~8 positions spanning the story); judge account via seed script.
 
-**Do not store:** brokerage credentials (IBKR is P2 and would use OAuth tokens only, encrypted), full-text copyrighted articles, raw LLM prompts containing user text beyond the `responses` row, analytics beyond `llm_calls`. User deletion (`DELETE /v1/me`, P1) cascades all own rows.
+**Do not store:** brokerage credentials, full-text copyrighted articles, raw LLM prompts containing user text beyond the `responses` row, analytics beyond `llm_calls`. User deletion (`DELETE /v1/me`, P1) cascades all own rows.
 
 ## 8. Application structure
 
@@ -292,7 +300,13 @@ All tables in `public`, UUID PKs unless noted, `created_at timestamptz default n
 | `POST /v1/onboarding` | `{level, background, goal, target_desk, asset_prefs, daily_minutes, use_demo_portfolio}` | `Profile` | enums; idempotent upsert | P0 |
 | `GET /v1/brief?date=` | date optional (default latest) | `Brief{as_of, data_mode, strip: Fact[], events: MarketEvent[]}` | no brief → fallback chain → golden day; never empty | P0 |
 | `GET /v1/events/{event_id}` | — | `EventDetail{event, facts, sources: SourceRef[]}` | 404 typed | P0 |
-| `GET /v1/portfolio/impact?date=` | — | `{attribution (deterministic), sectors, narrative: PortfolioImpact (AI, labelled), narrative_status}` | narrative failure → attribution still returned with `narrative_status='unavailable'` | P0 |
+| `GET /v1/portfolio` | — | paper book: cash, positions, attribution, data_mode, as_of | creates book once (cash from server level) | P1 |
+| `POST /v1/portfolio/orders` | `{symbol, side, quantity, order_type, …}` | updated book + fill | whitelist, cash/shares, level-gated controls; fill in code | P1 |
+| `GET /v1/portfolio/fills` | — | fill history | ownership | P1 |
+| `POST /v1/portfolio/analysis` | — | facts + Grok overview (labelled) | unlocks next US session; strip_numbers; template fallback | P1 |
+| `GET /v1/portfolio/impact?date=` | — | `{attribution, sectors, narrative, narrative_status}` | legacy demo-book narrative | P0 |
+| `POST /v1/paper-trades`, `POST /v1/paper-trades/{id}/evaluate` | thesis fields | process eval only | optional; not the fill path | later |
+| `POST /v1/portfolio/import-csv` | CSV ≤100 rows | `Portfolio` | ticker whitelist | P2 |
 | `GET /v1/challenge/today` | — | `Challenge{id, question: AnalystQuestion}` | generated once per user/brief; LLM fail → templated question from event | P0 |
 | `POST /v1/challenge/{id}/responses` | `{answer_text, parent_response_id?}` | `{response_id, evaluation: Evaluation}` | 50–400 words, ownership; **answer saved before LLM call**; LLM fail → `{response_id, evaluation:null, retryable}` | P0 |
 | `POST /v1/evaluations/{id}/retry` | — | `Evaluation` | ownership | P0 |
@@ -302,8 +316,6 @@ All tables in `public`, UUID PKs unless noted, `created_at timestamptz default n
 | `POST /v1/cron/daily` (header `Authorization: Bearer CRON_SECRET`) | `{date?, force?}` | `{snapshot_id, brief_id, ingested}` | idempotent per date | P0 |
 | `POST /v1/kb/search` | `{query, layer?, k?}` | `Chunk[]` with scores | dev/debug + eval harness | P1 |
 | `POST /v1/desk/walkthrough` | `{answer_text}` | `{evaluation, pushback_question}` | 60–250 words | P1 |
-| `POST /v1/paper-trades`, `POST /v1/paper-trades/{id}/evaluate` | thesis fields | `PaperTrade`, `PaperTradeEvaluation` | required invalidation + horizon | P1 |
-| `PUT /v1/portfolio/positions`, `POST /v1/portfolio/import-csv` | positions / CSV ≤100 rows | `Portfolio` | ticker whitelist, numeric checks | P2 |
 | `DELETE /v1/me` | — | 204 | cascades | P1 |
 
 **External APIs:** xAI (chat/structured outputs) · Alibaba DashScope embeddings · Yahoo Finance chart endpoint (unofficial, no key) · WSJ RSS + Yahoo headline RSS · FRED (`series/observations`) · Supabase (PostgREST/Auth). **Retries:** `httpx` with 2 retries + jittered backoff for data providers; LLM: 1 retry on 5xx/timeout, 1 repair retry on schema failure. **Timeouts:** providers 5s, LLM 25s. **Rate limiting (P1):** per-user daily cap on LLM routes via a counter query on `llm_calls`. **Type sharing:** `scripts/gen_types.sh` → `openapi-typescript $API_URL/openapi.json -o apps/mobile/src/api/schema.d.ts`.
@@ -318,7 +330,8 @@ All tables in `public`, UUID PKs unless noted, `created_at timestamptz default n
   4. `evaluate` (reasoning): question + answer + facts + learner level → `Evaluation` (per-category 0–4 + justification; **overall computed server-side**).
   5. `tutor` (fast): misconception + retrieved Layer-A chunks + learner profile → `TeachingLesson` + follow-up.
   6. `desk_interviewer` (P1): persona (interviewer/trader/client) + walkthrough → desk rubric + pushback.
-  7. `paper_trade` (P1): thesis → `PaperTradeEvaluation` (process-only; forbidden to state whether to take the trade).
+  7. `paper_analysis` (fast): eligible fills + attribution facts + headlines → overview citing `fact_id`s only; no advice; no numbers in prose.
+  8. `paper_trade` (optional): thesis → `PaperTradeEvaluation` (process-only; forbidden to state whether to take the trade).
 - **Structured schemas (Pydantic, `app/schemas/ai.py`):**
   - `MarketEvent{id, title, asset_moves: [fact_id], period, catalyst, mechanism_chain: [ChainStep{from, to, explanation}], positively_affected[], negatively_affected[], alternatives: [{explanation, evidence_that_would_confirm}], confidence: low|medium|high, confidence_reason, source_ids[], concept_ids[]}`
   - `PortfolioImpact{summary, position_notes: [{symbol, event_id|null, explanation, confidence}], concepts[]}`
@@ -342,7 +355,7 @@ All tables in `public`, UUID PKs unless noted, `created_at timestamptz default n
 | Infinite quiz | Multi-format Qs, immediate feedback, refill 2–3 | `/v1/quiz/sessions*` | retry / end | adaptive |
 | Feedback (legacy) | Kept for old deep links; session uses inline feedback | — | — | |
 | Lesson | Sections + citations + check question | `POST /v1/tutor/lesson` | local fallback | |
-| Portfolio | Day %, contributors, sectors, narrative | `GET /fixtures/portfolio_impact` | fallback | demo book |
+| Portfolio / paper | Cash, holdings, trade ticket, day P&L, analysis after next session | `/v1/portfolio*` | analysis locked until next open | paper book |
 | Learn | Server mastery + recommendations + Retake diagnostic | `GET /v1/learn/progress` | plan-only fallback | |
 
 Design system (locked palette): page `#FAFAF7` · surface `#FFFFFF` · primary `#1E4E8C` · secondary `#087E8B` · accent `#F4B942` · success `#1F7A4D` · error `#B42318` · text `#1F2937` · muted `#596579` · borders `#D9E2EC` · soft info/success/accent backgrounds. `LabelledSection`: **Fact** (muted) · **Interpretation** (amber) · **Teaching** (teal) · **Your view** (primary). No confetti, no "win" language.
@@ -359,12 +372,12 @@ Hours are wall-clock from kickoff. **Feature freeze at H13.**
 | 1c. AI & RAG (B2 + finance owner) | 1.5–6 | Concepts + ~15 lessons first (then 25), ingest CLI, `match_chunks`, retrieve/boost, LLM client + structured parse, prompts explain_event / question / evaluate / tutor | `rag/**`, `llm/**`, `content/**`, migration 0004 | CLI ingests KB; `pytest -m rag` passes top-3 hit on 8 core cases; evaluate returns valid schema on 3 fixtures | rag hit-rate, schema, injection | lesson writing is the bottleneck — use Grok to draft, human to verify |
 | 2. Integration #1 | 6–7.5 | Swap fixtures → live API for brief, event, portfolio; generate TS types; generate golden-day brief via cron script | `src/api/*`, `scripts/*` | Today/Event/Portfolio live on phone | manual | CORS/JWT issues |
 | 3. Learning loop | 7.5–11 | Challenge → evaluate → lesson → follow-up → mastery update → progress; source drawer; data-mode badge | `routers/challenge, lessons, progress`, `learning/**`, feedback/lesson/learn screens | full loop works on judge account against golden day | integration: loop end-to-end; mastery math unit tests; citation validation tests | latency — sequential short calls + staged loaders |
-| 4. P1 slice (parallel, optional) | 9–13 | Desk walkthrough drill; paper-trade form + evaluation; number guard; `DELETE /me`; rate cap | `routers/desk.py`, `paper_trade` prompt | each shippable independently or cut | schema tests | cut first if behind |
+| 4. P1 slice (parallel, optional) | 9–13 | Desk walkthrough drill; paper book + analysis overview; number guard; `DELETE /me`; rate cap | `routers/portfolio.py`, `services/paper.py`, `paper_analysis` prompt | each shippable independently or cut | schema tests | cut first if behind |
 | 5. Hardening | 11–13 | Error/empty states, retries, disclaimer, accessibility pass, prompt tuning on eval set, pre-generate judge day content | all | manual checklist §14 passes twice | eval run | |
 | **Freeze** | 13 | no new features | | | | |
 | 6. Demo prep | 13–16 | Deploy final, seed judge account, warm-up script, rehearse 3×, record backup video, README quickstart | `scripts/warm.sh`, README | demo runs in < 4 min, backup video saved | e2e manual | live API flakiness → `DATA_MODE=demo` switch |
 
-**If this became 24 h / 48 h:** 24 h → add Desk mode + paper-trade eval + number guard fully, CSV upload. 48 h → live news RAG refresh intraday, full spaced-review queue UI, voice answers (`expo-audio` + transcription), IBKR read-only via Client Portal Web API (OAuth, read-only scopes, no password storage).
+**If this became 24 h / 48 h:** 24 h → add Desk mode + paper-book analysis + number guard fully, CSV upload. 48 h → live news RAG refresh intraday, full spaced-review queue UI, voice answers (`expo-audio` + transcription).
 
 ## 13. Team allocation
 
@@ -431,7 +444,6 @@ Each case: `id, query, learner_level, layer_expected, expected_doc_ids, expected
 | Hallucinations | numbers only from facts; enum concept IDs; citation validation; insufficient-evidence path; number guard |
 | RAG retrieval failure | hybrid + metadata filters + concept routing; threshold → honest fallback; eval set |
 | Privacy | RLS everywhere, user-JWT DB client, minimal PII, cascade deletion, no brokerage creds |
-| Brokerage security | IBKR deferred; if added: read-only OAuth, tokens encrypted, never passwords |
 | Latency | brief precomputed; evaluate (reasoning) then tutor (fast) as separate requests with staged loaders |
 | Cost | tiny KB embeddings; fast model for most calls; per-user daily caps; persisted results never regenerated |
 | Demo reliability | judge account pre-warmed; `DATA_MODE=demo`; backup video; two phones |
@@ -495,14 +507,13 @@ Legend: `[x]` done · `[~]` partly done · `[ ]` not started.
 
 **P1 (if time)**
 - [ ] Desk "walk me through the markets" drill
-- [ ] Paper-trade form + process evaluation
+- [ ] Paper book: level-sized cash, simulated fills, next-session analysis overview
 - [ ] Number guard, per-user LLM cap, `DELETE /v1/me`
 - [x] `kb/search` debug + automated eval run (`pytest -m rag`)
 - [ ] Watchlist mode
 
 **P2 (post-hackathon)**
 - [ ] CSV upload, manual positions
-- [ ] IBKR read-only (OAuth)
 - [ ] Voice answers
 - [ ] Full spaced-review queue, notifications/email brief
 - [ ] Intraday news RAG, multi-region/asset coverage, paper-trade revisits (process vs luck)
@@ -539,7 +550,8 @@ Full plan: docs/PLAN.md. Deadline-driven: prefer working + simple over clever.
    into the system prompt. Validate citation IDs with `app/rag/citations.py`.
 4. Keep layers separate: foundation vs market chunks (`layer` column); learner memory is relational.
    Misconception teaching retrieves foundation layer only. Market retrieval is pinned to the brief's as_of date.
-5. Educational only: no buy/sell recommendations, no return promises, no order execution. UI labels
+5. Educational only: no buy/sell recommendations, no return promises, no live brokerage.
+   Paper fills are simulated and labelled educational. UI labels
    Fact / Interpretation / Teaching / Your view distinctly and always shows data mode + as-of timestamp.
 6. Security: user-owned data is queried with a Supabase client carrying the user's JWT (RLS enforced).
    Service-role key only in cron/ingest. Never log secrets or store brokerage credentials.

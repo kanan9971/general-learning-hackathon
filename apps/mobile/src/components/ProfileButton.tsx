@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 
 import { Palette } from '@/constants/theme';
 
-/** Top-right on every tab: portfolio, progress, interests and settings live behind it. */
+/** Top-right on every tab: progress, interests and settings live behind it. */
 export function ProfileButton() {
   const router = useRouter();
   return (

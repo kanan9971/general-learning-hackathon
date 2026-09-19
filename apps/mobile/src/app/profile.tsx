@@ -11,7 +11,7 @@ import { ThemedText } from '@/components/themed-text';
 import { Palette } from '@/constants/theme';
 import { getPlan, type LearnerPlan } from '@/lib/learner';
 
-/** Everything that isn't part of the daily loop: portfolio, progress, interests, placement. */
+/** Level, demo teaching book, progress, interests, placement. Paper classroom is the Portfolio tab. */
 export default function ProfileScreen() {
   const router = useRouter();
   const [plan, setPlan] = useState<LearnerPlan | null>(null);
@@ -35,10 +35,10 @@ export default function ProfileScreen() {
       <SectionHeader title="Your stuff" />
       <TileGrid>
         <HubTile
-          tone="teal"
+          tone="info"
           icon="pie-chart-outline"
-          title="My portfolio"
-          subtitle="Demo book today; broker later"
+          title="Demo book"
+          subtitle="Teaching holdings on the Markets tab"
           onPress={() => router.push({ pathname: '/market/[section]', params: { section: 'portfolio' } })}
         />
         <HubTile tone="info" icon="stats-chart-outline" title="Progress" subtitle="Mastery, attempts, streak" onPress={() => router.push('/progress')} />

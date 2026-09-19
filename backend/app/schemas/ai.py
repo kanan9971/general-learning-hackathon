@@ -121,6 +121,24 @@ class NoteScoreLLM(BaseModel):
     comment: str = Field(max_length=260)
 
 
+class PaperPointLLM(BaseModel):
+    symbol: str = Field(max_length=16)
+    point: str = Field(max_length=220)
+    explanation: str = Field(max_length=800)
+    fact_ids: list[str] = Field(default_factory=list, max_length=4)
+    headline_ids: list[str] = Field(default_factory=list, max_length=3)
+
+
+class PaperAnalysisLLM(BaseModel):
+    """Why paper holdings moved. Numbers stay in facts; prose cites fact_ids only."""
+    headline: str = Field(max_length=200)
+    summary: str = Field(max_length=1200)
+    points: list[PaperPointLLM] = Field(min_length=1, max_length=8)
+    confidence: Literal["low", "medium", "high"]
+    confidence_reason: str = Field(max_length=300)
+    concept_ids: list[str] = Field(default_factory=list, max_length=5)
+
+
 class AnalystNoteLLM(BaseModel):
     """Grade of a structured analyst note. The overall score is computed server-side from prompt_scores."""
     prompt_scores: list[NoteScoreLLM] = Field(min_length=5, max_length=5)

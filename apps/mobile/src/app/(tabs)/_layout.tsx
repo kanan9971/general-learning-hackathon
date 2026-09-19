@@ -39,6 +39,10 @@ export default function TabsLayout() {
         options={{ title: 'Today', tabBarIcon: tabIcon('today-outline', 'today') }}
       />
       <Tabs.Screen
+        name="portfolio"
+        options={{ title: 'Portfolio', tabBarIcon: tabIcon('briefcase-outline', 'briefcase') }}
+      />
+      <Tabs.Screen
         name="learn"
         options={{ title: 'Learn', tabBarIcon: tabIcon('git-network-outline', 'git-network') }}
       />

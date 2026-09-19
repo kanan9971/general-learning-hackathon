@@ -27,7 +27,7 @@ Hackathon app for Sales & Trading prep. A short mobile loop turns market concept
 | **Daily finite MCQ fixture** | Old `daily-quiz.json` path retired from the active Quiz flow |
 | **RAG-grounded quiz questions** | Deferred — questions are **hypothetical** educational exercises today (not live-market fact IDs) |
 | **Email/password login** | Deferred — anonymous auth only for the hackathon demo |
-| **IBKR / orders / advice** | Out of scope — never implemented |
+| **Live brokerage / advice** | Out of scope — never implemented. Paper book (when built) is simulated and educational only |
 | **Supabase quiz tables in production** | Migration `0006_adaptive_quiz.sql` is additive; apply it for durable RLS persistence. Without it (or without anon JWT), the API uses the **in-memory** store |
 
 ## Demo loop (current)

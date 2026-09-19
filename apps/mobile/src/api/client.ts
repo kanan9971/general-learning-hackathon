@@ -619,3 +619,123 @@ export const completeDailyTask = (
 ) => request<DailyToday>(`/v1/daily/tasks/${taskId}/complete`, body);
 export const submitDailyAnalysis = (body: { level?: Level; today: string; answers: Record<string, string> }) =>
   request<AnalysisFeedback>('/v1/daily/analysis', body);
+
+// ---- Paper classroom (simulated fills; not live brokerage) ----
+export type PaperSide = 'buy' | 'sell' | 'short' | 'cover';
+export type TicketKind = 'market' | 'limit' | 'stop';
+export type InstrumentKind = 'equity' | 'option';
+export type FillStatus = 'filled' | 'working' | 'cancelled';
+export type OptionRight = 'call' | 'put';
+
+export type PaperLot = {
+  id: string;
+  kind: InstrumentKind;
+  symbol: string;
+  quantity: number;
+  cost_basis: number;
+  market_price: number | null;
+  market_value: number | null;
+  unrealized_pct: number | null;
+  option_right: OptionRight | null;
+  option_strike: number | null;
+  option_expiry: string | null;
+};
+
+export type PaperFill = {
+  id: string;
+  symbol: string;
+  side: PaperSide;
+  quantity: number;
+  fill_price: number | null;
+  notional: number | null;
+  ticket_kind: TicketKind;
+  limit_price: number | null;
+  status: FillStatus;
+  instrument_kind: InstrumentKind;
+  option_right: OptionRight | null;
+  option_strike: number | null;
+  option_expiry: string | null;
+  fact_id: string | null;
+  as_of_date: string | null;
+  filled_at: string;
+  analysis_ready: boolean;
+};
+
+export type ListedOption = {
+  underlying: string;
+  right: OptionRight;
+  strike: number;
+  expiry: string;
+  mark: number;
+};
+
+export type PaperBook = {
+  level: Level;
+  cash_usd: number;
+  starting_cash: number;
+  equity_value: number;
+  nav: number;
+  data_mode: DataMode;
+  as_of: string | null;
+  source: 'paper';
+  attribution: { portfolio_return_pct: number; contributions: { symbol: string; weight: number; return_pct: number; contribution_pct: number }[]; sectors: Record<string, number> } | null;
+  lots: PaperLot[];
+  fills: PaperFill[];
+  whitelist: { symbol: string; name: string; sector: string }[];
+  allowed_sides: PaperSide[];
+  allowed_ticket_kinds: TicketKind[];
+  options_allowed: boolean;
+  custom_tickers_allowed: boolean;
+  option_underlyings: string[];
+  listed_options: ListedOption[];
+  analysis_available: boolean;
+  analysis_unlocks_on: string | null;
+  educational: string;
+};
+
+export type PaperTicket = {
+  symbol: string;
+  side: PaperSide;
+  quantity: number;
+  ticket_kind?: TicketKind;
+  limit_price?: number | null;
+  instrument_kind?: InstrumentKind;
+  option_right?: OptionRight | null;
+  option_strike?: number | null;
+  option_expiry?: string | null;
+  level?: Level;
+};
+
+export type PaperAnalysis = {
+  as_of: string | null;
+  data_mode: DataMode;
+  unlocks_on: string | null;
+  eligible_fill_ids: string[];
+  facts: {
+    fact_id: string;
+    symbol: string;
+    label: string;
+    change: number;
+    change_unit: string;
+    return_since_fill: number | null;
+    fill_price: number | null;
+    last: number | null;
+  }[];
+  headlines: { id: string; title: string; url: string; publisher: string }[];
+  analysis: {
+    headline: string;
+    summary: string;
+    points: { symbol: string; point: string; explanation: string; fact_ids: string[]; headline_ids: string[]; supported: boolean }[];
+    confidence: 'low' | 'medium' | 'high';
+    confidence_reason: string;
+    concept_ids: string[];
+    status: 'ok' | 'fallback';
+  };
+  prompt_version: string;
+};
+
+export const getPaperBook = (level?: Level) => request<PaperBook>(`/v1/portfolio${q({ level })}`);
+export const submitPaperOrder = (body: PaperTicket) => request<{ fill: PaperFill; book: PaperBook }>('/v1/portfolio/orders', body);
+export const cancelPaperOrder = (fillId: string) =>
+  request<PaperBook>(`/v1/portfolio/orders/${fillId}/cancel`, {});
+export const getPaperAnalysis = () => request<PaperAnalysis>('/v1/portfolio/analysis', {});

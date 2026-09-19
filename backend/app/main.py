@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .config import get_settings
 from .errors import install_error_handlers
-from .routers import daily, dev_fixtures, health, markets, quiz, roadmap, tutor
+from .routers import daily, dev_fixtures, health, markets, portfolio, quiz, roadmap, tutor
 
 
 def create_app() -> FastAPI:
@@ -22,6 +22,7 @@ def create_app() -> FastAPI:
     app.include_router(markets.router)
     app.include_router(roadmap.router)
     app.include_router(daily.router)
+    app.include_router(portfolio.router)
     if settings.dev_fixtures:
         app.include_router(dev_fixtures.router)
     return app
