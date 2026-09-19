@@ -74,7 +74,7 @@ Allowed direction is **left → right** ("may import / call"). Anything not list
 5. **Two DB identities:** requests touching *user-owned* tables use a Supabase client carrying the *user's JWT* (`db.client.user_client`, RLS enforces ownership). The service-role key is used by `/v1/cron/*`, the ingest CLI, and **read-only reference-data reads** in `db/knowledge.py` (documents, chunks, concepts via `match_chunks`) plus the `llm_calls` audit insert. Routes still require an authenticated user before doing any of this.
 6. **Secrets:** env only, read via `config.py`. Never logged, never in the mobile app (only the Supabase anon key and API URL are public). `QUIZ_HMAC_SECRET` seals MCQ answers; the code default is a dev value and **must** be overridden in any deployment.
 7. **Answers are saved before any LLM call**, so a failed grader never loses user input.
-8. **Auth modes:** (a) production: mobile signs in with Supabase (currently *anonymous* sign-in, `apps/mobile/src/lib/auth.ts`) and sends the JWT; (b) local dev: `AUTH_DEV_BYPASS=true` lets token-less requests act as user `00000000-…` and the quiz uses the in-memory store. `deps.py` ignores the bypass whenever the `VERCEL` env var is set, so it can never be on in a deployment.
+8. **Auth modes:** (a) production: mobile signs in with Supabase (currently *anonymous* sign-in, `apps/mobile/src/lib/auth.ts`) and sends the JWT; (b) local dev: `AUTH_DEV_BYPASS=true` lets token-less requests act as user `00000000-…` and the quiz uses the in-memory store. `deps.py` ignores the bypass whenever the `VERCEL` env var is set, so it can never be on in a deployment. (c) **deployed public demo (current):** while Supabase sign-in is off, `PUBLIC_DEMO=true` (`config.allow_tokenless`) lets token-less requests act as the shared demo user with in-memory state (ephemeral per serverless instance, shared by everyone). Turn it off and enable Supabase anonymous/email sign-in for real per-user persistence.
 
 ## 5. Request flows
 
@@ -127,8 +127,8 @@ Last verified: 2026-09-20. Backend offline RAG+unit tests pass; live RAG eval 24
 | RAG retrieval + tutor (`/v1/tutor/lesson`, `/v1/kb/search`, `/v1/sources/{id}`), citation validation, LLM audit | ✅ done, live-verified 2026-09-20 (`evals/rag_cases.yaml` 24 cases, hit@3 20/20, MRR@5 1.000, beginners still get zero research chunks) |
 | Adaptive quiz (`/v1/quiz/*`, `/v1/learn/progress`), mastery math, template fallbacks, HMAC MCQ seals | ✅ done, live-verified with Supabase persistence (~13s to start a session, ~6s per graded answer) |
 | Mobile: onboarding → Quiz (formats/topics → infinite session) → Learn / Portfolio / live lesson | ✅ done |
-| Mobile auth | ⚠️ anonymous sign-in code exists but **Supabase anonymous sign-ins are disabled**, so the app runs on the local bypass. Enable it (or add email/password) before any deployed demo |
-| `QUIZ_HMAC_SECRET` | ⚠️ using code default; set a real secret in `backend/.env` / Vercel |
+| Mobile auth | ⚠️ anonymous sign-in code exists but **Supabase anonymous sign-ins are disabled**; no sign-up page yet (deliberately). The deployed app runs on `PUBLIC_DEMO` (shared, in-memory). Enable sign-in, unset `PUBLIC_DEMO`, and set `EXPO_PUBLIC_SUPABASE_ANON_KEY` on the web project to get per-user persistence |
+| `QUIZ_HMAC_SECRET` | ✅ random secret set on Vercel (local still uses the code default) |
 | Market data (`market/`: Yahoo + yfinance fallback + Treasury.gov, golden day, fallback chain, ranking) | ✅ done, live-verified 2026-09-19 (44/44 instruments; golden day captured from real data). FRED not used (Treasury.gov covers the curve keylessly). Snapshots kept in-process, not yet in `market_snapshots` |
 | News (`news/`: Fed + WSJ + Yahoo RSS, tagging) | ✅ done, live-verified (15/15 feeds). Not yet ingested into `documents(layer='market')` |
 | Daily brief cron + `explain_event` prompt, `daily_briefs` | ❌ not started (Today/Portfolio still read fixtures) |
@@ -139,5 +139,5 @@ Last verified: 2026-09-20. Backend offline RAG+unit tests pass; live RAG eval 24
 | Long-form analyst challenge evaluation (`evaluate`) | ❌ not started (quiz covers short answers) |
 | RAG-grounded quiz generation | ⏸ deferred (hook: pass retrieved foundation context into `quiz_question` prompt) |
 | Lesson persistence (`lessons` table needs an `evaluation_id`) | ⏸ deferred |
-| Vercel deployment | ❌ not deployed |
+| Vercel deployment | ✅ 2026-09-20. API: https://deskready-api.vercel.app (project `deskready-api`, root `backend/`, FastAPI auto-detected, `DATA_MODE=live`, `ALLOWED_ORIGINS=*`, `PUBLIC_DEMO=true`; smoke-tested feed/daily/roadmap/lab). Web app: https://deskready-app.vercel.app (project `deskready-app`, root `apps/mobile/`, `expo export --platform web` → `dist`, `EXPO_PUBLIC_API_URL` baked in at build). Env pushed with `scripts/vercel_env_push.py`. No cron yet (`/v1/cron/daily` unbuilt) |
 | IBKR read-only | ⏸ P2 (extension point in §6) |

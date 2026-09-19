@@ -259,7 +259,7 @@ All tables in `public`, UUID PKs unless noted, `created_at timestamptz default n
 │   └── src/fixtures/*.json       # mock API responses (used until backend lands)
 ├── backend/
 │   ├── api/index.py              # Vercel entry: from app.main import app
-│   ├── vercel.json               # routes, maxDuration, crons
+│   ├── vercel.json               # maxDuration (crons once /v1/cron/daily exists)
 │   ├── requirements.txt          # runtime deps only
 │   ├── requirements-dev.txt      # pytest, tiktoken, ingest extras
 │   ├── app/
@@ -444,8 +444,8 @@ Each case: `id, query, learner_level, layer_expected, expected_doc_ids, expected
 - **Env vars (backend):** `XAI_API_KEY`, `XAI_BASE_URL=https://api.x.ai/v1`, `XAI_MODEL_FAST`, `XAI_MODEL_REASONING`, `EMBEDDING_API_KEY`, `EMBEDDING_BASE_URL`, `EMBEDDING_MODEL=qwen3.7-text-embedding`, `EMBEDDING_DIMS=1536`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_JWT_SECRET`, `FRED_API_KEY`, `WSJ_RSS_FEEDS` (comma-separated URLs), `YAHOO_USER_AGENT`, `CRON_SECRET`, `DATA_MODE=live|cache|demo`, `DEMO_DATE=YYYY-MM-DD`, `ALLOWED_ORIGINS`. **Mobile:** `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`, `EXPO_PUBLIC_API_URL`. Secrets only in `.env` (gitignored) / Vercel env; `.env.example` committed.
 - **Migrations:** `supabase db push` (CLI linked to project) or paste SQL in dashboard in order 0001→0004. Enable `vector` extension first.
 - **Seed:** `psql $DB_URL -f supabase/seed/seed.sql` (concepts, tickers) → `python -m app.rag.ingest content/` → `python supabase/seed/create_judge_user.py` → `scripts/run_cron_local.sh --date $DEMO_DATE` (golden brief).
-- **Deploy:** Vercel project root = `backend/`, Python runtime, env vars set, `vercel.json` with `functions.maxDuration` and `crons`. Mobile: Expo Go via `npx expo start --tunnel`; optional `eas update --channel demo`.
-- **Scheduled jobs:** Vercel Cron → `POST /v1/cron/daily` (Vercel sends `Authorization: Bearer $CRON_SECRET`).
+- **Deploy (done 2026-09-20):** two Vercel projects. `deskready-api` (root `backend/`, FastAPI auto-detected; **no `rewrites`**, they break routing; `vercel.json` sets `maxDuration` only; env via `scripts/vercel_env_push.py`; `vercel deploy --prod`) → https://deskready-api.vercel.app. `deskready-app` (root `apps/mobile/`, static Expo web export, `EXPO_PUBLIC_API_URL`) → https://deskready-app.vercel.app. Phones: Expo Go via `npx expo start --tunnel`; optional `eas update --channel demo`. Until sign-in is enabled the API runs `PUBLIC_DEMO=true`.
+- **Scheduled jobs:** Vercel Cron → `POST /v1/cron/daily` (Vercel sends `Authorization: Bearer $CRON_SECRET`). **Not built yet**, so `crons` is absent from `vercel.json`; add both together.
 - **Demo mode:** set `DATA_MODE=demo` + `DEMO_DATE` in Vercel and redeploy (≈1 min) if live data is dull or failing.
 - **Rollback:** Vercel "Promote previous deployment" instantly; migrations additive-only during the event; KB rollback via `is_active` toggle.
 
@@ -481,7 +481,7 @@ Legend: `[x]` done · `[~]` partly done · `[ ]` not started.
 **P0 (demo-critical)**
 - [x] Repo scaffold, `CLAUDE.md`, `docs/PLAN.md`, `.env.example`
 - [x] Supabase migrations (core, rag, rls, match_chunks, adaptive quiz) + seed concepts · [ ] seed tickers
-- [~] FastAPI with JWT auth dep + `/health` (done locally; **not deployed to Vercel yet**)
+- [~] FastAPI with JWT auth dep + `/health` (**deployed to Vercel 2026-09-20**)
 - [ ] Providers (Yahoo, FRED, golden) + WSJ/Yahoo RSS news + fallback chain + `DATA_MODE`
 - [ ] Ranking + attribution (tested)
 - [ ] Cron route → snapshot → `explain_event` → brief
