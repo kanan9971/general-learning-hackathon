@@ -19,7 +19,8 @@ On approval, implementation starts by committing this plan to `docs/PLAN.md` and
 | API hosting | **Vercel serverless Python** | Free, git-push deploys, built-in cron. **Mitigations for its weaknesses:** brief generation pre-computed by cron (never on request path), LLM work split into short requests (<30s each), tiny dependency footprint (250 MB limit, no local ML models), `maxDuration` raised in `vercel.json`, warm-up ping before demo. |
 | LLM | **xAI Grok** via `openai` Python SDK (`base_url=https://api.x.ai/v1`) | User choice. OpenAI-compatible + structured outputs. Model IDs kept in env vars (`XAI_MODEL_FAST`, `XAI_MODEL_REASONING`) — confirm current IDs in the xAI console at hour 0. |
 | Embeddings | **OpenAI `text-embedding-3-small` (1536-d)** | Same `openai` SDK (different key/base URL), ~cents to embed the whole KB. No reranker → we rerank deterministically (RRF + metadata boosts). |
-| Market data | **Live-first with cache fallback** (+ seeded "golden day" as last resort) | Live feels real; cache absorbs rate limits; golden day guarantees the demo when the market is closed/dull/API down. Every screen shows a `LIVE / CACHED / DEMO DAY` badge + as-of timestamp. |
+| Market data | **Yahoo Finance prices, live-first with cache fallback** (+ seeded "golden day" as last resort); FRED only for the 2Y yield, curve and macro releases Yahoo lacks | Yahoo covers real indices, yields, FX and futures with no key. It is unofficial, so cache + golden day are mandatory. Every screen shows a `LIVE / CACHED / DEMO DAY` badge + as-of timestamp. |
+| News | **WSJ public RSS feeds + Yahoo Finance ticker headlines** | Recognisable, credible publisher for judges. Store **headline + RSS summary + URL + timestamp only**, link out; WSJ article bodies are paywalled, so we never scrape them. |
 | Auth | **Full sign-up (email + password)** | User choice. Password over magic-link because mobile deep links are fragile live. **Pre-created judge account** (`judge@deskready.app`) printed on the demo card. |
 
 ---
@@ -36,17 +37,17 @@ On approval, implementation starts by committing this plan to `docs/PLAN.md` and
 ## 2. Assumptions & open questions
 
 Assumptions (proceeding unless told otherwise):
-1. Scope = **US equities (via ETF proxies), US Treasury yields, 2 FX/commodity proxies, US macro releases.**
-2. Market data: **Finnhub** (free: quotes incl. `dp` daily % change, company/market news with timestamps + URLs) + **FRED** (official, free: `DGS2`, `DGS10`, `DGS30`, `T10Y2Y`, `DCOILWTICO`, `DEXUSEU`, CPI). FRED series lag ~1 day → labelled "as of".
-3. ETFs as index proxies (SPY, QQQ, IWM, XLK, XLF, XLE, SMH, JETS, TLT, GLD, USO, UUP) — avoids index-data licensing and fits the free tier. UI says "S&P 500 (SPY proxy)".
-4. News stored as **headline + provider summary + URL + timestamp only** (no full-text scraping; link out).
+1. Scope = **US equity indices + sector ETFs + portfolio stocks, US Treasury yields, DXY/EURUSD, WTI, gold, VIX, US macro releases.**
+2. Market data: **Yahoo Finance** via its public chart endpoint (`query1.finance.yahoo.com/v8/finance/chart/{symbol}?range=5d&interval=1d`) called with `httpx`. Yahoo has no official API and restricts reuse, which we accept for an educational hackathon demo. **Don't use `yfinance` on Vercel**: it pulls in pandas/numpy, which strains the 250MB bundle limit, and Yahoo often throttles cloud IPs. `yfinance` is used only in local scripts (e.g. capturing the golden day). **FRED** (official, free) supplies `DGS2`, `DGS10`, `T10Y2Y` for the curve and CPI/release data; it lags ~1 day, so values are labelled "as of".
+3. Yahoo symbols: indices `^GSPC ^IXIC ^RUT ^VIX`; sectors `XLK XLF XLE SMH JETS`; yields `^IRX ^FVX ^TNX ^TYX` (Yahoo has no 2Y, so that comes from FRED); FX `DX-Y.NYB EURUSD=X`; commodities `CL=F GC=F`; plus portfolio stocks. The mapping lives in the `tickers` table; nothing is hard-coded.
+4. News: **WSJ public RSS** (e.g. Markets, US Business, World feeds from `feeds.a.dj.com`; exact feed URLs to be verified at H0 and kept in config) + **Yahoo Finance headline RSS per ticker** (`feeds.finance.yahoo.com/rss/2.0/headline?s=SYMBOL`). Stored as **headline + RSS description + publisher + URL + pubDate only**; never scrape WSJ article bodies (paywall + ToS). Because only headlines are available, event explanations are grounded in headlines + official releases (Fed, BLS) + our lessons, and confidence is capped at *medium* when only headlines support a catalyst.
 5. One team member has finance knowledge and owns KB content quality.
 6. Demo on phones via Expo Go + one laptop running an iOS simulator / screen-mirror for the projector.
 7. Currency USD; timezone America/New_York for "market day".
 
 Open questions (defaults in bold, change any time):
 - Product name? **DeskReady**.
-- Golden demo day? **A real CPI-release day with a clear rates-vs-tech story**; the finance member picks and verifies it in hour 0–1 from FRED/Finnhub data. No invented numbers.
+- Golden demo day? **A real CPI-release day with a clear rates-vs-tech story**; the finance member picks and verifies it in hour 0–1 from Yahoo/FRED data, with matching WSJ headlines saved to `content/demo_day/news.json`. No invented numbers.
 - Should the demo portfolio be the same for all users? **Yes, copied into each new account on onboarding** (editable P1).
 
 ## 3. MVP scope (16 h, 4 people)
@@ -84,7 +85,7 @@ Open questions (defaults in bold, change any time):
 │ auth dep: verify Supabase JWT → user_id; per-request Supabase client w/ user JWT    │
 │ routers: brief · events · portfolio · challenge · lessons · progress · desk · cron  │
 │ ┌─────────────── deterministic ───────────────┐  ┌─────────────── AI ──────────────┐ │
-│ │ market/providers (Finnhub, FRED, golden)    │  │ llm/client (openai SDK → xAI)   │ │
+│ │ market/providers (Yahoo, FRED, golden)      │  │ llm/client (openai SDK → xAI)   │ │
 │ │ market/snapshot + fallback chain            │  │ llm/prompts/* (versioned)       │ │
 │ │ market/events: rank moves (z-score)         │  │ llm/structured: Pydantic parse, │ │
 │ │ portfolio/attribution, sectors              │  │   1 repair retry, fallback copy │ │
@@ -96,7 +97,7 @@ Open questions (defaults in bold, change any time):
 └───────────────┬───────────────────────────────┬──────────────────────┬───────────────┘
                 │                               │                      │
      Supabase Postgres (+pgvector, FTS,   xAI Grok API          OpenAI embeddings
-     Auth, RLS, SQL RPC match_chunks)                            Finnhub · FRED
+     Auth, RLS, SQL RPC match_chunks)              Yahoo Finance · FRED · WSJ/Yahoo RSS
                 ▲
      Local CLI: python -m app.rag.ingest content/  (KB ingestion runs on laptops, not Vercel)
 ```
@@ -105,8 +106,8 @@ Open questions (defaults in bold, change any time):
 - **Backend:** FastAPI app at `backend/api/index.py` (Vercel entry), routers under `backend/app/`. Deps kept minimal: `fastapi`, `pydantic`, `openai`, `supabase`, `httpx`, `pyjwt`, `python-frontmatter`, `tiktoken` (ingest only — CLI extra).
 - **Database:** Supabase; SQL migrations in `supabase/migrations/`; hybrid retrieval as SQL function `match_chunks`.
 - **Auth:** Supabase email/password in-app. FastAPI verifies the JWT (Supabase JWKS / JWT secret) → `user_id`. For user-owned data, backend builds a Supabase client **with the user's JWT** so **RLS enforces ownership**; the service-role key is used only by cron + ingestion.
-- **Market-data ingestion:** `providers/finnhub.py`, `providers/fred.py`, `providers/golden.py` behind one `MarketDataProvider` interface. Fallback chain: **live (≤15 min cache) → last good snapshot in DB → golden day JSON**. `DATA_MODE=live|cache|demo` env override for the demo.
-- **News ingestion:** Finnhub market + company news for tracked tickers during cron → `documents(layer='market')` one chunk per article (headline + summary), timestamped.
+- **Market-data ingestion:** `providers/yahoo.py` (httpx → chart endpoint, browser-like User-Agent, batched symbols, 5s timeout), `providers/fred.py`, `providers/golden.py` behind one `MarketDataProvider` interface. If Yahoo blocks Vercel IPs, run `scripts/run_cron_local.sh` (or a GitHub Action) from a non-cloud IP; it writes the snapshot to Supabase, and the API then serves it from the cache. Fallback chain: **live (≤15 min cache) → last good snapshot in DB → golden day JSON**. `DATA_MODE=live|cache|demo` env override for the demo.
+- **News ingestion:** `news/rss.py` parses WSJ RSS + Yahoo per-ticker RSS with `feedparser` during the cron run. It dedupes by URL/title hash, keeps the last 72h, and tags tickers (Yahoo feed symbol or ticker/company-name match) and indicators (keyword map: CPI, payrolls, FOMC…). Each article becomes one `documents(layer='market')` row with a single chunk (headline + description) plus publisher and pubDate.
 - **AI orchestration:** plain Python functions (no agent framework). Each AI task = `prompt_version` + Pydantic output model + `llm.parse()` with one repair retry, then deterministic fallback text. No tools given to the LLM (limits injection blast radius).
 - **Scheduled jobs:** Vercel Cron `0 22 * * 1-5` (UTC, after US close) hitting `/v1/cron/daily` with `CRON_SECRET`. Manual trigger script for the demo.
 - **Caching:** snapshots + briefs are DB rows keyed by date (compute once, read many); per-user challenge cached per day; TanStack Query client cache; evaluation/lesson rows persisted so reloads never re-bill the LLM.
@@ -126,7 +127,7 @@ Open questions (defaults in bold, change any time):
 
 Rationale: A and B share an index shape but differ in filters/freshness, so one table + `layer` column keeps the SQL simple; C is structured state, where vector search adds nothing.
 
-**Source selection:** team-written Markdown lessons (~25 concepts, see §7 seed), glossary, S&T interview prep; official sources (Fed statements/FOMC, BLS CPI release pages, Treasury, SEC/investor.gov education pages) as link-backed summaries; Finnhub news metadata. No paywalled scraping.
+**Source selection:** team-written Markdown lessons (~25 concepts, see §7 seed), glossary, S&T interview prep; official sources (Fed statements/FOMC, BLS CPI release pages, Treasury, SEC/investor.gov education pages) as link-backed summaries; WSJ + Yahoo Finance RSS headline metadata. No paywalled scraping; WSJ bodies are never fetched.
 
 **Ingestion pipeline (`app/rag/ingest.py`, local CLI):**
 1. **Collect** — read `content/lessons/*.md` (YAML frontmatter) or market items from cron.
@@ -233,7 +234,7 @@ All tables in `public`, UUID PKs unless noted, `created_at timestamptz default n
 │   │   ├── main.py, config.py (pydantic-settings), deps.py (auth, db clients), errors.py
 │   │   ├── schemas/              # Pydantic: api.py, market.py, ai.py (LLM outputs)
 │   │   ├── routers/{brief, events, portfolio, onboarding, challenge, lessons, progress, desk, cron}.py
-│   │   ├── market/{providers/{base,finnhub,fred,golden}.py, snapshot.py, ranking.py}
+│   │   ├── market/{providers/{base,yahoo,fred,golden}.py, snapshot.py, ranking.py}, news/rss.py
 │   │   ├── portfolio/attribution.py
 │   │   ├── learning/{rubric.py, mastery.py, scheduler.py}
 │   │   ├── llm/{client.py, structured.py, audit.py, prompts/{system.py, explain_event.py,
@@ -273,7 +274,7 @@ All tables in `public`, UUID PKs unless noted, `created_at timestamptz default n
 | `PUT /v1/portfolio/positions`, `POST /v1/portfolio/import-csv` | positions / CSV ≤100 rows | `Portfolio` | ticker whitelist, numeric checks | P2 |
 | `DELETE /v1/me` | — | 204 | cascades | P1 |
 
-**External APIs:** xAI (chat/structured outputs) · OpenAI embeddings · Finnhub (`/quote`, `/news`, `/company-news`) · FRED (`series/observations`) · Supabase (PostgREST/Auth). **Retries:** `httpx` with 2 retries + jittered backoff for data providers; LLM: 1 retry on 5xx/timeout, 1 repair retry on schema failure. **Timeouts:** providers 5s, LLM 25s. **Rate limiting (P1):** per-user daily cap on LLM routes via a counter query on `llm_calls`. **Type sharing:** `scripts/gen_types.sh` → `openapi-typescript $API_URL/openapi.json -o apps/mobile/src/api/schema.d.ts`.
+**External APIs:** xAI (chat/structured outputs) · OpenAI embeddings · Yahoo Finance chart endpoint (unofficial, no key) · WSJ RSS + Yahoo headline RSS · FRED (`series/observations`) · Supabase (PostgREST/Auth). **Retries:** `httpx` with 2 retries + jittered backoff for data providers; LLM: 1 retry on 5xx/timeout, 1 repair retry on schema failure. **Timeouts:** providers 5s, LLM 25s. **Rate limiting (P1):** per-user daily cap on LLM routes via a counter query on `llm_calls`. **Type sharing:** `scripts/gen_types.sh` → `openapi-typescript $API_URL/openapi.json -o apps/mobile/src/api/schema.d.ts`.
 
 ## 10. AI prompt architecture
 
@@ -303,7 +304,7 @@ All tables in `public`, UUID PKs unless noted, `created_at timestamptz default n
 |---|---|---|---|---|
 | Sign in / up | email+password; "Educational, not financial advice" footer | Supabase | inline errors | judge creds on printed card |
 | Onboarding (3 steps) | level chips, goal/desk chips, portfolio choice | `POST /onboarding` | progress dots; retry | pre-completed for judge |
-| **Today** | `DataModeBadge` + as-of, `CrossAssetStrip` (horizontal scroll: SPY, QQQ, 2Y, 10Y, 2s10s, DXY proxy, WTI, Gold), 3 `EventCard`s (move, catalyst, confidence), Challenge CTA, streak pill | `GET /brief` | skeleton cards; "Live data unavailable — showing cached day" banner | golden day forced via `DATA_MODE=demo` if live is dull |
+| **Today** | `DataModeBadge` + as-of, `CrossAssetStrip` (horizontal scroll: S&P 500, Nasdaq, 2Y, 10Y, 2s10s, DXY, WTI, Gold, VIX), 3 `EventCard`s (move, catalyst, confidence), Challenge CTA, streak pill | `GET /brief` | skeleton cards; "Live data unavailable — showing cached day" banner | golden day forced via `DATA_MODE=demo` if live is dull |
 | Event detail | Facts block (numbers from data, source + timestamp) → `CausalChain` (vertical stepper) → Alternatives → Affected +/− chips → Concepts chips → Sources | `GET /events/{id}` | missing sources → "No supporting source; low confidence" | the explanation magic moment |
 | Portfolio | day % (deterministic, labelled "Calculated"), `ContributionChart` (top ±), sector donut/bar, positions list linked to events, AI narrative in `LabelledSection kind=interpretation` | `GET /portfolio/impact` | no positions → watchlist CTA; narrative unavailable → hide section | airline vs oil & semis story |
 | Challenge | question card, type/difficulty tags, collapsible hints, multiline input w/ word counter (100–300), submit | `GET /challenge/today` | disabled submit outside range; saved-draft (AsyncStorage) | pre-typed demo answer ready to paste |
@@ -321,9 +322,9 @@ Hours are wall-clock from kickoff. **Feature freeze at H13.**
 
 | Phase | Hours | Objective & features | Files/modules | Done when | Tests | Risk |
 |---|---|---|---|---|---|---|
-| 0. Contracts & scaffold (all, **blocking**) | 0–1.5 | Repo skeleton, Expo app boots, FastAPI `/health` on Vercel, Supabase project + migrations 0001–0003, Pydantic API schemas + **fixture JSON for every P0 endpoint**, env vars shared, confirm xAI model IDs + Finnhub/FRED keys, pick golden day | `backend/app/schemas/*`, `supabase/migrations/*`, `apps/mobile/src/fixtures/*`, `CLAUDE.md` | mobile can render fixtures; `/health` green in prod | schema import test | Vercel Python config — do first |
+| 0. Contracts & scaffold (all, **blocking**) | 0–1.5 | Repo skeleton, Expo app boots, FastAPI `/health` on Vercel, Supabase project + migrations 0001–0003, Pydantic API schemas + **fixture JSON for every P0 endpoint**, env vars shared, confirm xAI model IDs + FRED key, **smoke-test Yahoo chart endpoint from a Vercel preview** + WSJ RSS URLs, pick golden day | `backend/app/schemas/*`, `supabase/migrations/*`, `apps/mobile/src/fixtures/*`, `CLAUDE.md` | mobile can render fixtures; `/health` green in prod | schema import test | Vercel Python config — do first |
 | 1a. Mobile shell (M1, M2) | 1.5–6 | Auth screens, onboarding, tabs, Today, Event detail, Portfolio from fixtures; component library | `apps/mobile/app/**`, `src/components/**` | all P0 screens navigable on fixtures, dark/light OK | component smoke | styling time sink — use NativeWind + limited components |
-| 1b. Data & deterministic core (B1) | 1.5–6 | Finnhub/FRED/golden providers, fallback chain, snapshot, move ranking, attribution, onboarding + brief/portfolio routes, cron route, JWT auth dep | `market/**`, `portfolio/attribution.py`, `routers/*`, `deps.py` | `/v1/brief` returns real-shaped data in all 3 data modes | unit: attribution, ranking, fallback; auth 401/403 | free-tier limits → cache aggressively |
+| 1b. Data & deterministic core (B1) | 1.5–6 | Yahoo/FRED/golden providers, WSJ/Yahoo RSS news, fallback chain, snapshot, move ranking, attribution, onboarding + brief/portfolio routes, cron route, JWT auth dep | `market/**`, `portfolio/attribution.py`, `routers/*`, `deps.py` | `/v1/brief` returns real-shaped data in all 3 data modes | unit: attribution, ranking, fallback; auth 401/403 | Yahoo throttling cloud IPs → cache + local cron fallback |
 | 1c. AI & RAG (B2 + finance owner) | 1.5–6 | Concepts + ~15 lessons first (then 25), ingest CLI, `match_chunks`, retrieve/boost, LLM client + structured parse, prompts explain_event / question / evaluate / tutor | `rag/**`, `llm/**`, `content/**`, migration 0004 | CLI ingests KB; `pytest -m rag` passes top-3 hit on 8 core cases; evaluate returns valid schema on 3 fixtures | rag hit-rate, schema, injection | lesson writing is the bottleneck — use Grok to draft, human to verify |
 | 2. Integration #1 | 6–7.5 | Swap fixtures → live API for brief, event, portfolio; generate TS types; generate golden-day brief via cron script | `src/api/*`, `scripts/*` | Today/Event/Portfolio live on phone | manual | CORS/JWT issues |
 | 3. Learning loop | 7.5–11 | Challenge → evaluate → lesson → follow-up → mastery update → progress; source drawer; data-mode badge | `routers/challenge, lessons, progress`, `learning/**`, feedback/lesson/learn screens | full loop works on judge account against golden day | integration: loop end-to-end; mastery math unit tests; citation validation tests | latency — sequential short calls + staged loaders |
@@ -349,7 +350,7 @@ Other sizes: **1 person** — skip portfolio narrative AI, Desk, paper trades; g
 ## 14. Testing strategy (pytest backend, minimal jest on mobile)
 
 - **Unit:** attribution (weights, contributions sum to portfolio return ±1e-9, zero-quantity, missing price), ranking (z-score ordering, bp vs % units), Leitner scheduling + mastery clamps, rubric overall computation, date/market-day logic (weekends, holidays → previous trading day), chunker (section boundaries, oversize split), cleaner (injection flag).
-- **Integration:** fallback chain (mock Finnhub 429 → cache → golden), `/v1/brief` in all data modes, challenge→evaluation→lesson loop with LLM stubbed (recorded responses), cron idempotency.
+- **Integration:** fallback chain (mock Yahoo 429/HTML response → cache → golden; malformed RSS skipped, not fatal), `/v1/brief` in all data modes, challenge→evaluation→lesson loop with LLM stubbed (recorded responses), cron idempotency.
 - **RAG retrieval:** `evals/rag_cases.yaml` → hit@3 of expected doc/concept ≥ 80%; misconception queries return **zero** market-layer chunks; as-of window excludes future/old news.
 - **AI structured output:** each prompt × 3 fixtures parses; repair retry path; invalid concept IDs rejected.
 - **Citations:** unknown source IDs dropped; `supported` sections without valid IDs downgraded; every rendered citation resolves via `/sources/{id}`.
@@ -390,7 +391,8 @@ Each case: `id, query, learner_level, layer_expected, expected_doc_ids, expected
 | Scope (16h, 4 ppl) | P0 = magic-moment loop only; freeze at H13; P1 items independent & cuttable |
 | Vercel serverless (timeouts, cold starts, 250MB) | pre-generated briefs; short sequential calls; slim deps; `maxDuration` in `vercel.json`; `warm.sh` before demo |
 | External API failure / rate limits | 3-tier fallback + `DATA_MODE` switch + badge; 15-min cache; golden day always seeded |
-| Data licensing | ETF proxies, official FRED data, headlines+links only, attribution footer, educational use |
+| Data licensing | Yahoo data is unofficial with restricted reuse → educational demo only, "Data: Yahoo Finance, FRED" attribution footer, swap to a licensed feed post-hackathon. WSJ: RSS headlines + links only, never bodies, publisher credited on every card. |
+| Yahoo endpoint breaks/blocks | provider behind an interface; snapshot cached in DB; local/GitHub-Action cron from a non-cloud IP; golden day |
 | Stale info | as-of pinned retrieval windows; timestamps on every fact/source; stale banner |
 | False causal attribution | "likely" language, mandatory alternatives + confidence, facts vs interpretation UI separation |
 | Hallucinations | numbers only from facts; enum concept IDs; citation validation; insufficient-evidence path; number guard |
@@ -406,7 +408,7 @@ Each case: `id, query, learner_level, layer_expected, expected_doc_ids, expected
 ## 17. Deployment plan
 
 - **Local:** `cd backend && python -m venv .venv && pip install -r requirements-dev.txt && uvicorn app.main:app --reload`; `cd apps/mobile && npm i && npx expo start` (phone on same Wi-Fi or `--tunnel`); Supabase cloud project (no local Docker needed) — optional `supabase start` for those with Docker.
-- **Env vars (backend):** `XAI_API_KEY`, `XAI_BASE_URL=https://api.x.ai/v1`, `XAI_MODEL_FAST`, `XAI_MODEL_REASONING`, `OPENAI_API_KEY`, `EMBEDDING_MODEL=text-embedding-3-small`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_JWT_SECRET`, `FINNHUB_API_KEY`, `FRED_API_KEY`, `CRON_SECRET`, `DATA_MODE=live|cache|demo`, `DEMO_DATE=YYYY-MM-DD`, `ALLOWED_ORIGINS`. **Mobile:** `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`, `EXPO_PUBLIC_API_URL`. Secrets only in `.env` (gitignored) / Vercel env; `.env.example` committed.
+- **Env vars (backend):** `XAI_API_KEY`, `XAI_BASE_URL=https://api.x.ai/v1`, `XAI_MODEL_FAST`, `XAI_MODEL_REASONING`, `OPENAI_API_KEY`, `EMBEDDING_MODEL=text-embedding-3-small`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_JWT_SECRET`, `FRED_API_KEY`, `WSJ_RSS_FEEDS` (comma-separated URLs), `YAHOO_USER_AGENT`, `CRON_SECRET`, `DATA_MODE=live|cache|demo`, `DEMO_DATE=YYYY-MM-DD`, `ALLOWED_ORIGINS`. **Mobile:** `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`, `EXPO_PUBLIC_API_URL`. Secrets only in `.env` (gitignored) / Vercel env; `.env.example` committed.
 - **Migrations:** `supabase db push` (CLI linked to project) or paste SQL in dashboard in order 0001→0004. Enable `vector` extension first.
 - **Seed:** `psql $DB_URL -f supabase/seed/seed.sql` (concepts, tickers) → `python -m app.rag.ingest content/` → `python supabase/seed/create_judge_user.py` → `scripts/run_cron_local.sh --date $DEMO_DATE` (golden brief).
 - **Deploy:** Vercel project root = `backend/`, Python runtime, env vars set, `vercel.json` with `functions.maxDuration` and `crons`. Mobile: Expo Go via `npx expo start --tunnel`; optional `eas update --channel demo`.
@@ -430,7 +432,7 @@ Each case: `id, query, learner_level, layer_expected, expected_doc_ids, expected
 
 - **Auth:** sign-up + login with email/password works on iOS & Android Expo Go; unauthenticated API calls return 401; judge account logs in in < 5s.
 - **Onboarding:** ≤ 3 screens, ≤ 60s; creates profile, demo portfolio (8 positions), mastery priors for all seeded concepts.
-- **Brief:** returns exactly 3 events + ≥ 6 strip items; every number traces to a `fact_id` with source + as-of; badge reflects data mode; loads < 2s from DB; with Finnhub blocked, still renders (cache or golden).
+- **Brief:** returns exactly 3 events + ≥ 6 strip items; every number traces to a `fact_id` with source + as-of; badge reflects data mode; loads < 2s from DB; with Yahoo blocked, still renders (cache or golden).
 - **Event detail:** has catalyst, ≥ 3-step causal chain, ≥ 1 alternative, confidence + reason, ≥ 1 source, ≥ 1 concept; interpretation visually distinct from facts.
 - **Portfolio:** daily return and contributions computed deterministically and sum correctly (test); top ± contributors shown; AI narrative labelled and omittable.
 - **Challenge:** one question per user per day, tied to a brief event, word range enforced 100–300 (API accepts 50–400).
@@ -445,7 +447,7 @@ Each case: `id, query, learner_level, layer_expected, expected_doc_ids, expected
 - [ ] Repo scaffold, `CLAUDE.md`, `docs/PLAN.md`, `.env.example`
 - [ ] Supabase migrations (core, rag, rls, match_chunks) + seed concepts/tickers
 - [ ] FastAPI on Vercel with JWT auth dep + `/health`
-- [ ] Providers (Finnhub, FRED, golden) + fallback chain + `DATA_MODE`
+- [ ] Providers (Yahoo, FRED, golden) + WSJ/Yahoo RSS news + fallback chain + `DATA_MODE`
 - [ ] Ranking + attribution (tested)
 - [ ] Cron route → snapshot → `explain_event` → brief
 - [ ] KB: ~25 concepts, ≥ 15 lessons ingested (target 25)
@@ -483,7 +485,7 @@ Full plan: docs/PLAN.md. Deadline-driven: prefer working + simple over clever.
 - backend — Python FastAPI deployed on Vercel serverless (entry: backend/api/index.py)
 - supabase — Postgres + pgvector + Auth (email/password) + RLS; SQL migrations in supabase/migrations
 - LLM: xAI Grok via `openai` SDK (base_url https://api.x.ai/v1); embeddings: OpenAI text-embedding-3-small (1536-d)
-- Market data: Finnhub (quotes/news) + FRED (yields/macro), fallback chain live → cached snapshot → golden demo day
+- Market data: Yahoo Finance chart endpoint (prices) + FRED (2Y/curve/macro); news: WSJ + Yahoo RSS headlines only; fallback chain live → cached snapshot → golden demo day
 
 ## Commands
 - Backend dev: `cd backend && uvicorn app.main:app --reload`
