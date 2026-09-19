@@ -393,6 +393,8 @@ Other sizes: **1 person** — skip portfolio narrative AI, Desk, paper trades; g
 
 ## 15. RAG evaluation set (`evals/rag_cases.yaml`, ~24 cases)
 
+**Status 2026-09-20:** retrieval harness is live (`evals/rag_cases.yaml`, `evals/run_evals.py`, `pytest -m rag`). 24 cases, hit@3 20/20 (100%), MRR@5 1.000, sufficient=100% on hit cases, beginner queries return zero research chunks, misconception queries stay on `layer=foundation`. Generation-side metrics (citation correctness LLM-judge, `must_not_claim` grounding, Layer B as-of window) still wait on news ingest.
+
 Each case: `id, query, learner_level, layer_expected, expected_doc_ids, expected_concepts, must_not_claim[]`.
 
 | Type | Example query | Expected sources/concepts | Unacceptable claims |

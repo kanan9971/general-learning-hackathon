@@ -1,0 +1,225 @@
+# Retrieval evaluation cases (PLAN.md §15).
+# kind: hit | insufficient | guardrail
+# requires_any: skip the case unless at least one of these document ids is in the KB.
+cases:
+  - id: bond-price-yield
+    kind: hit
+    query: Why do bond prices fall when yields rise?
+    query_hint: Bond prices and yields
+    learner_level: beginner
+    layer_expected: foundation
+    expected_doc_ids: [lesson-bond-price-yield]
+    expected_concepts: [bond-price-yield]
+    must_not_claim: ["yields and prices move together"]
+
+  - id: real-yields
+    kind: hit
+    query: Nominal versus real yields
+    query_hint: Nominal vs real yields
+    learner_level: intermediate
+    layer_expected: foundation
+    expected_doc_ids: [lesson-real-yields]
+    expected_concepts: [real-yields]
+    must_not_claim: ["real yield = nominal + inflation"]
+
+  - id: discount-rates-equities
+    kind: hit
+    query: Why can higher interest rates hurt growth stocks?
+    query_hint: Discount rates and equity valuation
+    learner_level: beginner
+    layer_expected: foundation
+    expected_doc_ids: [lesson-discount-rates-equities]
+    expected_concepts: [discount-rates-equities]
+
+  - id: yield-curve
+    kind: hit
+    query: What does an inverted yield curve mean?
+    query_hint: Yield curve
+    learner_level: beginner
+    layer_expected: foundation
+    expected_doc_ids: [lesson-yield-curve]
+    expected_concepts: [yield-curve]
+
+  - id: cpi-surprise
+    kind: hit
+    query: Why does the market react to CPI versus consensus?
+    query_hint: Inflation (CPI) surprises
+    learner_level: beginner
+    layer_expected: foundation
+    expected_doc_ids: [lesson-cpi-surprise]
+    expected_concepts: [cpi-surprise]
+
+  - id: duration
+    kind: hit
+    query: How sensitive is a bond price to yield changes?
+    query_hint: Duration
+    learner_level: intermediate
+    layer_expected: foundation
+    expected_doc_ids: [lesson-duration]
+    expected_concepts: [duration]
+
+  - id: momentum-lesson
+    kind: hit
+    query: How does a momentum strategy buy winners and sell losers?
+    query_hint: Momentum strategies
+    learner_level: advanced
+    layer_expected: foundation
+    expected_doc_ids: [lesson-momentum-strategy]
+    expected_concepts: [momentum-strategy]
+
+  - id: momentum-crashes
+    kind: hit
+    query: Why do momentum strategies crash after market rebounds?
+    query_hint: Momentum crashes
+    learner_level: advanced
+    layer_expected: foundation
+    expected_doc_ids: [paper-daniel-moskowitz-2016, lesson-momentum-strategy]
+    expected_concepts: [momentum-crashes, momentum-strategy]
+
+  - id: earnings-momentum
+    kind: hit
+    query: Does earnings surprise explain price momentum?
+    query_hint: Earnings momentum
+    learner_level: advanced
+    layer_expected: foundation
+    expected_doc_ids: [paper-novy-marx-2015]
+    expected_concepts: [earnings-momentum, momentum-strategy]
+
+  - id: underreaction-overreaction
+    kind: hit
+    query: underreaction newswatchers momentum traders overreaction
+    query_hint: Underreaction and overreaction
+    learner_level: advanced
+    layer_expected: foundation
+    expected_doc_ids: [paper-hong-stein-1999]
+    expected_concepts: [underreaction-overreaction, momentum-strategy]
+
+  - id: liquidity-risk-momentum
+    kind: hit
+    query: liquidity risk priced in momentum returns
+    query_hint: Liquidity risk
+    learner_level: advanced
+    layer_expected: foundation
+    expected_doc_ids: [paper-sadka-2003]
+    expected_concepts: [liquidity-risk, momentum-strategy]
+
+  - id: momentum-return-chasing
+    kind: hit
+    query: Momentum trading, return chasing, and predictable crashes
+    query_hint: Momentum crashes
+    learner_level: advanced
+    layer_expected: foundation
+    expected_doc_ids: [paper-chabot-ghysels-jagannathan-2014, paper-daniel-moskowitz-2016]
+    expected_concepts: [momentum-crashes, market-regime]
+
+  - id: misconception-bond-prices
+    kind: hit
+    query: "Bond prices and yields move together, right?"
+    query_hint: Bond prices and yields
+    learner_level: beginner
+    layer_expected: foundation
+    expected_doc_ids: [lesson-bond-price-yield]
+    expected_concepts: [bond-price-yield]
+    guardrails: [foundation_only, no_research]
+    must_not_claim: ["yields and prices move together"]
+
+  - id: misconception-real-yields
+    kind: hit
+    query: "Real yield equals nominal yield plus inflation"
+    query_hint: Nominal vs real yields
+    learner_level: intermediate
+    layer_expected: foundation
+    expected_doc_ids: [lesson-real-yields]
+    expected_concepts: [real-yields]
+    guardrails: [foundation_only]
+    must_not_claim: ["real yield = nominal + inflation"]
+
+  - id: momentum-crash-beginner
+    kind: guardrail
+    query: Why do momentum strategies crash after market rebounds?
+    query_hint: Momentum crashes
+    learner_level: beginner
+    layer_expected: foundation
+    expected_doc_ids: []
+    expected_concepts: [momentum-crashes]
+    guardrails: [no_research, foundation_only]
+
+  - id: punctuation-bond-prices
+    kind: hit
+    query: "Why do bond prices fall when yields rise???"
+    query_hint: Bond prices and yields
+    learner_level: beginner
+    layer_expected: foundation
+    expected_doc_ids: [lesson-bond-price-yield]
+    expected_concepts: [bond-price-yield]
+
+  - id: punctuation-real-yields
+    kind: hit
+    query: "nominal vs. real yields — TIPS??"
+    query_hint: Nominal vs real yields
+    learner_level: intermediate
+    layer_expected: foundation
+    expected_doc_ids: [lesson-real-yields]
+    expected_concepts: [real-yields]
+
+  - id: off-topic-cake
+    kind: insufficient
+    query: recipe for chocolate cake
+    learner_level: advanced
+    layer_expected: foundation
+    expected_doc_ids: []
+    expected_concepts: []
+
+  - id: off-topic-football
+    kind: insufficient
+    query: who won the football world cup
+    learner_level: advanced
+    layer_expected: foundation
+    expected_doc_ids: []
+    expected_concepts: []
+
+  - id: off-topic-biotech
+    kind: insufficient
+    query: Why did a small-cap biotech stock jump today?
+    learner_level: advanced
+    layer_expected: foundation
+    expected_doc_ids: []
+    expected_concepts: []
+
+  - id: gold-real-yields
+    kind: hit
+    query: Why does gold often fall when real yields rise?
+    query_hint: Gold and real yields
+    learner_level: intermediate
+    layer_expected: foundation
+    expected_doc_ids: [lesson-real-yields, paper-erb-harvey-2013, paper-gurkaynak-sack-wright-2008]
+    expected_concepts: [gold-real-yields, real-yields]
+
+  - id: yield-curve-recession
+    kind: hit
+    query: How does an inverted 2s10s yield curve signal recession risk?
+    query_hint: Yield curve
+    learner_level: intermediate
+    layer_expected: foundation
+    expected_doc_ids: [lesson-yield-curve, paper-estrella-mishkin-1996, paper-bauer-mertens-2018]
+    expected_concepts: [yield-curve, rate-expectations]
+
+  - id: fed-policy-equity-reaction
+    kind: hit
+    query: What explains the stock market's reaction to Federal Reserve policy?
+    query_hint: Interest-rate expectations
+    learner_level: advanced
+    layer_expected: foundation
+    expected_doc_ids: [paper-bernanke-kuttner-2005, paper-nakamura-steinsson-2018]
+    expected_concepts: [rate-expectations, priced-in]
+    requires_any: [paper-bernanke-kuttner-2005, paper-nakamura-steinsson-2018]
+
+  - id: vix-variance-premium
+    kind: hit
+    query: How is the VIX related to the variance premium and stock market volatility?
+    query_hint: Volatility and the VIX
+    learner_level: advanced
+    layer_expected: foundation
+    expected_doc_ids: [paper-bekaert-hoerova-2013]
+    expected_concepts: [vix, market-regime]
+    requires_any: [paper-bekaert-hoerova-2013]

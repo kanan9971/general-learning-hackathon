@@ -47,4 +47,4 @@ def clean_pages(pages: list[str]) -> str:
     kept = [ln for ln in lines if _is_prose(ln) or re.match(r"^(\d+(\.\d+)*\.?|[IVX]+\.)\s", ln)]
     text = "\n".join(kept)
     text = re.sub(r"-\n(?=[a-z])", "", text)  # de-hyphenate line-broken words
-    return text
+    return text.replace("\x00", "")

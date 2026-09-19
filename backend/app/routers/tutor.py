@@ -39,11 +39,13 @@ def _cite(sid: str, c: RetrievedChunk) -> SourceRefLite:
 
 def _retrieve_for_concept(db, concept: dict, req: TutorLessonRequest) -> Retrieval:
     query = " ".join(filter(None, [concept["name"], concept.get("summary"), req.misconception, req.question]))
+    hint = concept["name"]
     # Misconception teaching: foundation layer only (CLAUDE.md rule 4), concept-filtered first.
-    r = retrieve(db, query, layer="foundation", concept_ids=[concept["id"]], level=req.level, k=5)
+    r = retrieve(db, query, layer="foundation", concept_ids=[concept["id"]], level=req.level, k=5,
+                 query_hint=hint)
     if not r.sufficient:
         r = retrieve(db, query, layer="foundation", concept_ids=None, level=req.level,
-                     focus_concepts=[concept["id"]], k=5)
+                     focus_concepts=[concept["id"]], k=5, query_hint=hint)
     return r
 
 
@@ -139,7 +141,9 @@ def get_source(chunk_id: str, user_id: CurrentUser) -> SourceRef:
         chunk = knowledge.get_chunk(db, chunk_id)
     except Exception:
         chunk = None  # malformed uuid etc.
-    if not chunk or not chunk["is_active"] or chunk["injection_flag"]:
+    # Superseded (is_active=false) chunks stay resolvable so stored citations do not 404
+    # after a versioned re-ingest. Injection-flagged text is never shown.
+    if not chunk or chunk["injection_flag"]:
         raise ApiError("not_found", "Source not found", 404)
     doc = knowledge.get_documents(db, [chunk["document_id"]]).get(chunk["document_id"], {})
     return SourceRef(

@@ -103,25 +103,28 @@ Allowed direction is **left → right** ("may import / call"). Anything not list
 
 ## 6b. Research-paper ingestion (RAG owner's pipeline)
 
+`scripts/fetch_papers.py` (manifest `pdf_url` → `content/raw/<local_file>`; skips existing PDFs; refuses HTML) →
 `content/sources/research_papers.yaml` (manifest: id, title, authors, publisher, canonical `source_url`, `pdf_url`, concept_ids) →
-`rag/extract.py` (PDF→text; refuses scanned PDFs) → `rag/clean.py` (running headers/footers, references, equation/table debris, injection flag) →
+`rag/extract.py` (PDF→text; refuses scanned PDFs) → `rag/clean.py` (running headers/footers, references, equation/table debris, NUL bytes, injection flag) →
 `rag/chunk.py` (section-aware, ≤350-token target / 500 max, 1-sentence overlap, `Title > Section` path) →
-`llm/embed.py` (Alibaba Qwen qwen3.7-text-embedding, 1536-d, batch ≤10) → `db/knowledge.py` (upsert `documents` + `chunks`, layer=`foundation`, content_type=`research`).
-Run: `python -m app.rag.ingest ../content/sources/research_papers.yaml` (dry run, writes `content/processed/*.jsonl`) or add `--store`.
+`llm/embed.py` (Alibaba Qwen qwen3.7-text-embedding, 1536-d, batch ≤10; query embed is `embed_query` with an in-process LRU cache) → `db/knowledge.py` (checksum skip; if migration 0007 is applied, insert the new `chunks.version` inactive then `activate_document_version` in one RPC; otherwise insert **new** documents only and never delete existing chunks).
+Run: `python ../scripts/fetch_papers.py` then `python -m app.rag.ingest ../content/sources/research_papers.yaml` (dry run, writes `content/processed/*.jsonl`) or add `--store`.
 Lessons: `python -m app.rag.ingest ../content/lessons --store` (Markdown with frontmatter; one `## Section` = one chunk).
+**Retrieval:** hybrid `match_chunks` (vector ∪ FTS + RRF). Python filters `similarity >= 0.50` **before** taking k, prefixes the query embed with a concept hint (`Title`-like shape), and keeps at least one `content_type='lesson'` chunk in top-k when one cleared the bar. `GET /v1/sources/{chunk_id}` serves superseded (`is_active=false`) chunks so stored citations survive a versioned re-ingest; injection-flagged text is still hidden.
+**Eval:** `evals/rag_cases.yaml` (~24 cases) + `evals/run_evals.py`; live gate is `pytest -m rag` (hit@3 ≥ 80%).
 **Rules:** PDFs (`content/raw/`) and extracted text (`content/processed/`) are gitignored, not redistributed. The UI shows short excerpts and always links to `source_url`. Papers are difficulty 3 / trust_level 2. Retrieval allows difficulty ≤ level+1, so beginners never get papers (tested); intermediate/advanced can.
 
 ## 7. Current status (update as phases land)
 
-Last verified: 2026-09-19 against `main` @ `9f64aca` + migration 0006 applied. Backend 36 offline tests + 5 live RAG tests pass; mobile `tsc` clean; web bundle builds; live quiz flow checked with a real Supabase user (start → MCQ answer graded correct → mastery 0.35→0.50 → `quiz_attempts` row visible only to that user → session end).
+Last verified: 2026-09-20. Backend offline RAG+unit tests pass; live RAG eval 24/24 cases, hit@3 20/20 (100%), MRR@5 1.000. Migration 0007 is in `supabase/migrations/` but **not yet applied** to `apsojsuiginpuqljutyo` (`chunks.version` absent); ingest therefore inserts new documents only and never deletes the original 5 papers' chunk UUIDs. FTS `plainto_tsquery` fallback is waiting on that migration; punctuation queries still hit via the vector half.
 
 | Area | State |
 |---|---|
 | FastAPI app, config, typed errors (incl. 422 → `invalid_request`), JWT dependency (ES256 via Supabase JWKS; HS256 fallback; local dev bypass), `/health` | ✅ done, live-verified |
-| Supabase migrations 0001–0007 (core, rag, rls, research type, `match_chunks`, adaptive quiz, daily cycle) | ✅ **all applied** to `apsojsuiginpuqljutyo`. RLS on all 23 tables. Advisories: `llm_calls` has no policy (intentional, service only); `vector` in `public` (left as is). |
+| Supabase migrations 0001–0007 (core, rag, rls, research type, `match_chunks`, adaptive quiz, daily cycle) | ✅ **applied** to `apsojsuiginpuqljutyo`. 0008 (`chunks.version`, FTS fallback, `activate_document_version`) is **written, not applied**. RLS on all 23 tables. Advisories: `llm_calls` has no policy (intentional, service only); `vector` in `public` (left as is). |
 | Seed | ✅ `concepts` (29) + `concept_edges` (14). ❌ `tickers`, demo portfolio, judge account not seeded |
-| Knowledge base | ✅ 5 research papers (377 chunks) + 7 lessons (49 chunks), Qwen `qwen3.7-text-embedding` 1536-d. ⚠️ lessons `reviewed: false`; plan target was ≥15 lessons |
-| RAG retrieval + tutor (`/v1/tutor/lesson`, `/v1/kb/search`, `/v1/sources/{id}`), citation validation, LLM audit | ✅ done, live-verified (hit@3 10/10, ~6s/lesson) |
+| Knowledge base | ✅ 24 research papers + 7 lessons, 1736 active chunks, Qwen `qwen3.7-text-embedding` 1536-d. Original 5 papers left untouched. ⚠️ lessons `reviewed: false`; plan target was ≥15 lessons |
+| RAG retrieval + tutor (`/v1/tutor/lesson`, `/v1/kb/search`, `/v1/sources/{id}`), citation validation, LLM audit | ✅ done, live-verified 2026-09-20 (`evals/rag_cases.yaml` 24 cases, hit@3 20/20, MRR@5 1.000, beginners still get zero research chunks) |
 | Adaptive quiz (`/v1/quiz/*`, `/v1/learn/progress`), mastery math, template fallbacks, HMAC MCQ seals | ✅ done, live-verified with Supabase persistence (~13s to start a session, ~6s per graded answer) |
 | Mobile: onboarding → Quiz (formats/topics → infinite session) → Learn / Portfolio / live lesson | ✅ done |
 | Mobile auth | ⚠️ anonymous sign-in code exists but **Supabase anonymous sign-ins are disabled**, so the app runs on the local bypass. Enable it (or add email/password) before any deployed demo |
