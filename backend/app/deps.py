@@ -61,7 +61,7 @@ def get_bearer_token(
 ) -> str | None:
     """Raw JWT for user-scoped Supabase clients. None only under local AUTH_DEV_BYPASS."""
     if not authorization or not authorization.lower().startswith("bearer "):
-        if settings.auth_dev_bypass and not settings.vercel:
+        if settings.allow_tokenless:
             return None
         raise ApiError("unauthorized", "Missing bearer token", 401)
     return authorization.split(" ", 1)[1]
@@ -75,7 +75,7 @@ def get_user_id(
     token = None
     if authorization and authorization.lower().startswith("bearer "):
         token = authorization.split(" ", 1)[1]
-    elif settings.auth_dev_bypass and not settings.vercel:
+    elif settings.allow_tokenless:
         return DEV_USER_ID
     else:
         raise ApiError("unauthorized", "Missing bearer token", 401)

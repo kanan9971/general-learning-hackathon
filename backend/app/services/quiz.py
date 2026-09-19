@@ -791,7 +791,7 @@ def _save_prefs(user_id, token, s, row: dict) -> None:
         quiz_db.upsert_preferences(db, user_id, row)
     except Exception as e:
         STORE.preferences[user_id] = {**row, "user_id": user_id}
-        if not s.auth_dev_bypass:
+        if not s.allow_tokenless:
             raise ApiError("prefs_save_failed", str(e)[:200], 503, True) from e
 
 

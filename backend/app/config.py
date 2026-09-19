@@ -37,11 +37,19 @@ class Settings(BaseSettings):
     # Ignored when running on Vercel (VERCEL env var is set there).
     auth_dev_bypass: bool = False
     vercel: str = ""
+    # Deployed demo without sign-in: tokenless requests act as the shared demo user with
+    # in-memory state (per serverless instance, ephemeral). Off by default; remove once
+    # Supabase anonymous/email sign-in is enabled.
+    public_demo: bool = False
     # HMAC key for MCQ answer seals (never returned to clients). Falls back to a
     # deterministic local value so demos work; set QUIZ_HMAC_SECRET in production.
     quiz_hmac_secret: str = "deskready-dev-quiz-hmac"
     # Force in-memory quiz store (tests / offline). Auto-on when no JWT under bypass.
     quiz_use_memory: bool = False
+
+    @property
+    def allow_tokenless(self) -> bool:
+        return (self.auth_dev_bypass and not self.vercel) or self.public_demo
 
 
 @lru_cache
