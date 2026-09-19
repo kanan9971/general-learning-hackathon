@@ -1,0 +1,14 @@
+{
+  "id": "eval-1",
+  "category_scores": [
+    {"category": "factual_accuracy", "score": 3, "justification": "Placeholder."},
+    {"category": "causal_mechanism", "score": 2, "justification": "Placeholder."}
+  ],
+  "overall_score": 62,
+  "strengths": ["Placeholder strength"],
+  "gaps": ["Placeholder gap"],
+  "misconceptions": [{"concept_id": "real-yields", "description": "Confuses nominal and real yields.", "evidence_quote": "Placeholder quote"}],
+  "stronger_answer": "Placeholder stronger answer.",
+  "follow_up_question": "Placeholder follow-up?",
+  "review_concept_ids": ["real-yields"]
+}

@@ -1,0 +1,12 @@
+{
+  "id": "chal-1",
+  "question": {
+    "event_id": "evt-1",
+    "question_type": "compare_explanations",
+    "prompt": "Placeholder: give two possible explanations for the move and one indicator that could distinguish them.",
+    "difficulty": 1,
+    "word_range": [100, 300],
+    "expected_elements": ["catalyst", "mechanism", "alternative", "distinguishing indicator"],
+    "hints": ["Think about rates first.", "What would confirm each explanation?"]
+  }
+}

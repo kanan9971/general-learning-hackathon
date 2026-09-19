@@ -1,0 +1,15 @@
+{
+  "lesson": {
+    "concept_id": "real-yields",
+    "level": "beginner",
+    "sections": [
+      {"kind": "supported", "heading": "Definition", "text": "Placeholder text from a source.", "source_ids": ["S1"]},
+      {"kind": "synthesis", "heading": "Why it matters today", "text": "Placeholder AI synthesis.", "source_ids": []}
+    ],
+    "check_question": "Placeholder check question?",
+    "insufficient_evidence": false
+  },
+  "citations": [{"source_id": "S1", "title": "Placeholder lesson", "publisher": "DeskReady", "url": null}],
+  "follow_up": "Placeholder stronger follow-up?",
+  "mastery_updates": [{"concept_id": "real-yields", "observed": "partial", "mastery_before": 0.3, "mastery_after": 0.35, "next_review_at": "2000-01-04T00:00:00Z"}]
+}

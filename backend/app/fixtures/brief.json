@@ -1,0 +1,33 @@
+{
+  "_note": "PLACEHOLDER shape-only data. Not real market data. Replaced by the golden day.",
+  "as_of_date": "2000-01-01",
+  "data_mode": "demo",
+  "strip": [
+    {"fact_id": "SPX.pct_change.1d", "symbol": "^GSPC", "label": "S&P 500", "metric": "pct_change", "value": 0.0, "unit": "%", "period": "1d", "source": "golden", "as_of": "2000-01-01T21:00:00Z"},
+    {"fact_id": "US10Y.bp_change.1d", "symbol": "^TNX", "label": "US 10Y", "metric": "bp_change", "value": 0.0, "unit": "bp", "period": "1d", "source": "golden", "as_of": "2000-01-01T21:00:00Z"}
+  ],
+  "events": [
+    {
+      "id": "evt-1",
+      "title": "Placeholder: inflation surprise lifts yields",
+      "fact_ids": ["US10Y.bp_change.1d"],
+      "period": "1d",
+      "catalyst": "Placeholder catalyst (likely, not certain)",
+      "mechanism_chain": [
+        {"from_": "Higher-than-expected inflation", "to": "Rate expectations stay higher", "explanation": "Placeholder explanation."},
+        {"from_": "Rate expectations stay higher", "to": "Government bond yields rise", "explanation": "Placeholder explanation."},
+        {"from_": "Government bond yields rise", "to": "Long-duration growth equities face pressure", "explanation": "Higher discount rate on future earnings."}
+      ],
+      "positively_affected": ["Banks"],
+      "negatively_affected": ["Long-duration growth equities"],
+      "alternatives": [{"explanation": "Positioning ahead of earnings", "evidence_that_would_confirm": "Volume spike without a yield move"}],
+      "confidence": "medium",
+      "confidence_reason": "Supported by headlines only (placeholder).",
+      "source_ids": ["S1"],
+      "concept_ids": ["real-yields", "bond-price-yield"]
+    }
+  ],
+  "sources": [
+    {"source_id": "S1", "title": "Placeholder headline", "publisher": "Placeholder", "url": null, "published_at": "2000-01-01T14:00:00Z", "trust_level": 4}
+  ]
+}

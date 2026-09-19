@@ -1,0 +1,10 @@
+{
+  "_note": "PLACEHOLDER shape-only data.",
+  "attribution": {
+    "portfolio_return_pct": 0.0,
+    "contributions": [{"symbol": "AAA", "weight": 0.5, "return_pct": 0.0, "contribution_pct": 0.0}],
+    "sectors": {"Technology": 0.5, "Energy": 0.5}
+  },
+  "narrative": {"summary": "Placeholder AI narrative.", "position_notes": [{"symbol": "AAA", "event_id": "evt-1", "explanation": "Placeholder.", "confidence": "low"}], "concepts": ["real-yields"]},
+  "narrative_status": "ok"
+}

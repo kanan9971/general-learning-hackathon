@@ -1,6 +1,12 @@
 # DeskReady — AI daily market tutor (hackathon)
 
 Mobile app that runs a daily loop: OBSERVE → EXPLAIN → APPLY → ANSWER → FEEDBACK → REVISIT.
+## START HERE (every new chat)
+Before writing or changing any code, read **docs/ARCHITECTURE.md** — it defines what each module does and
+what may call/import what. Treat it as the contract. If your change adds a dependency edge, new module or
+new data flow, update ARCHITECTURE.md in the same commit. Product scope and phases: docs/PLAN.md.
+Expo (SDK 57) has changed a lot: read https://docs.expo.dev/versions/v57.0.0/ before writing mobile code (see apps/mobile/AGENTS.md).
+
 Full plan: docs/PLAN.md. Deadline-driven (16h, 4 people): prefer working + simple over clever.
 Feature freeze at H13. P0 = the "magic moment" loop in docs/PLAN.md §18.
 
@@ -15,11 +21,12 @@ Feature freeze at H13. P0 = the "magic moment" loop in docs/PLAN.md §18.
 - Fallback chain: live → cached snapshot → golden demo day
 
 ## Commands
-- Backend dev: `cd backend && uvicorn app.main:app --reload`
-- Backend tests: `cd backend && pytest` (markers `-m rag`, `-m prompts` hit live APIs; default run is offline)
+- Backend setup: `cd backend && python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt` (copy `.env.example` → `backend/.env`, set `DEV_FIXTURES=true` for local fixture routes)
+- Backend dev: `cd backend && .venv/bin/uvicorn app.main:app --reload --port 8000`
+- Backend tests: `cd backend && .venv/bin/pytest` (markers `-m rag`, `-m prompts` hit live APIs; default run is offline)
 - Ingest KB: `cd backend && python -m app.rag.ingest ../content`
 - Generate daily brief locally: `scripts/run_cron_local.sh --date YYYY-MM-DD`
-- Mobile: `cd apps/mobile && npx expo start --tunnel`
+- Mobile: `cd apps/mobile && npm install && npx expo start` (press `w` for web on localhost:8081; `--tunnel` for phones). Routes live in `apps/mobile/src/app`
 - Regenerate API types after changing backend schemas: `scripts/gen_types.sh`
 
 ## Non-negotiable rules
