@@ -1,258 +1,2261 @@
 {
-  "primer": {
-    "title": "How the market fits together",
-    "intro": "Markets are one connected machine. Most days, news enters at the top (the economy and the Fed), changes the price of money (interest rates), and that ripples out to currencies, commodities, the whole stock market, individual sectors and finally single companies. Trading desks at banks are organised along this same chain. Read today's sections top-down and ask at each step: what changed, why, and who is affected next?",
-    "steps": [
-      {"from_": "Economic data (inflation, jobs, growth)", "to": "Fed policy expectations", "why": "The Fed's job is stable prices and maximum employment. Hotter inflation or a strong jobs market makes rate cuts less likely; weak data makes them more likely."},
-      {"from_": "Fed policy expectations", "to": "Treasury yields", "why": "Short-dated yields (like the 2-year) track where traders think the Fed's rate will be. Longer yields add growth, inflation and risk premia."},
-      {"from_": "Treasury yields", "to": "The US dollar", "why": "Higher US yields relative to other countries attract global money into dollars, so the dollar tends to strengthen."},
-      {"from_": "Yields and the dollar", "to": "Commodities", "why": "Oil and gold are priced in dollars; a stronger dollar makes them pricier for the rest of the world. Gold also competes with bonds that pay a real yield."},
-      {"from_": "Yields and growth", "to": "The stock market", "why": "A stock is worth its future profits discounted back to today. Higher discount rates shrink that value, especially for companies whose profits are far in the future."},
-      {"from_": "The stock market", "to": "Sectors", "why": "Sectors react differently to the same news: banks can benefit from higher rates, tech usually suffers, energy follows oil. Moving money between sectors is called rotation."},
-      {"from_": "Sectors", "to": "Companies", "why": "Each company then moves on its own news too: earnings, guidance and deals. Analysing a company means separating the market-wide move from the company-specific one."}
-    ]
-  },
-  "sections": [
-    {
-      "id": "macro",
-      "group": "macro",
-      "title": "The Fed & the economy",
-      "tagline": "Inflation, jobs and growth decide what the Fed does with interest rates.",
-      "desk": "Macro strategy / economics, and every desk listens: the Fed sets the price of money for all of them.",
-      "how_it_works": [
-        "The Federal Reserve sets a short-term interest rate (the fed funds rate). Raising it makes borrowing more expensive and slows the economy to fight inflation; cutting it supports growth and jobs.",
-        "Markets move BEFORE the Fed acts. Traders constantly price the path of future rates, so what matters on any day is how new data or Fed speeches change those expectations: the surprise, not the level.",
-        "The key data releases are CPI and PCE (inflation), the monthly jobs report (payrolls and unemployment), GDP (growth), and retail sales. The Fed meets eight times a year (FOMC); its statement, projections (the 'dot plot') and the chair's press conference are the biggest scheduled events."
-      ],
-      "key_drivers": [
-        {"name": "Inflation surprises", "why": "Inflation above forecasts pushes rate-cut expectations out and yields up."},
-        {"name": "Labour market", "why": "Strong hiring supports spending and wages (inflationary); rising unemployment points to cuts."},
-        {"name": "Fed communication", "why": "Speeches, minutes and the dot plot tell markets how officials are leaning. A change in tone can move markets as much as a rate change."},
-        {"name": "Growth and fiscal policy", "why": "GDP, tariffs and government borrowing change the growth and inflation outlook."}
-      ],
-      "transmission": [
-        {"from_": "CPI comes in hotter than expected", "to": "Traders price fewer or later Fed cuts", "why": "The Fed is less likely to ease while inflation is above target."},
-        {"from_": "Fewer cuts priced", "to": "2-year Treasury yield rises", "why": "The 2-year is the market's best single read of the expected policy path."},
-        {"from_": "Higher yields", "to": "Stronger dollar, pressure on growth stocks", "why": "Higher yields attract capital into dollars and raise the discount rate on future profits."}
-      ],
-      "strategies": [
-        {"name": "Trading the data surprise", "idea": "Prices react to the gap between the data and the consensus forecast, not to the data itself.", "how_expressed": "Desks position for, or react to, the surprise in the most rate-sensitive instruments such as 2-year Treasury futures or SOFR futures.", "what_breaks_it": "The surprise was already priced in, or a detail inside the release (e.g. core vs headline) tells a different story.", "concept_ids": ["cpi-surprise", "priced-in"]},
-        {"name": "Fed path view", "idea": "Form a view on whether the market is pricing too many or too few rate cuts versus what the Fed is signalling.", "how_expressed": "Rates desks express it with short-dated rate futures or 2-year notes; if you think the market prices too many cuts, you expect short yields to rise.", "what_breaks_it": "Data turns the other way, or the Fed changes its reaction function.", "concept_ids": ["rate-expectations"]},
-        {"name": "Morning meeting narrative", "idea": "Every S&T morning starts with 'what happened overnight, what's on the calendar, what's priced'.", "how_expressed": "Summarise the macro story in 3 sentences, name the key release today and say how you'd expect rates, the dollar and stocks to react to an upside or downside surprise.", "what_breaks_it": "Anchoring on one story and ignoring evidence against it.", "concept_ids": ["st-morning-meeting"]}
-      ],
-      "watch": ["Next CPI / jobs report vs consensus", "FOMC statement wording and the dot plot", "Speeches by the Fed chair and voting members"],
-      "glossary": {"FOMC": "Federal Open Market Committee, the Fed group that votes on rates.", "Dot plot": "Each Fed official's projection for future rates, published quarterly.", "Consensus": "The average economist forecast for a data release."},
-      "concept_ids": ["rate-expectations", "cpi-surprise", "priced-in", "st-morning-meeting"]
-    },
-    {
-      "id": "rates",
-      "group": "macro",
-      "title": "Rates & bonds",
-      "tagline": "Government bond yields: the price of money for different lengths of time.",
-      "desk": "Rates desk: Treasuries, interest-rate swaps and futures. Often the largest flow desk at a bank.",
-      "how_it_works": [
-        "A bond pays fixed coupons. When market yields rise, existing bonds with lower coupons become less attractive, so their prices fall. Yield up = price down, always.",
-        "The yield curve plots yields from short (3 months) to long (30 years). Short yields follow Fed expectations; long yields add expectations about growth, inflation and a 'term premium' for locking money up longer.",
-        "The 2s10s spread (10-year minus 2-year) summarises the curve's shape. An inverted curve (short above long) has often come before recessions because it signals markets expect future rate cuts."
-      ],
-      "key_drivers": [
-        {"name": "Fed expectations", "why": "Drive the front end (2-year and shorter)."},
-        {"name": "Inflation expectations", "why": "Investors demand higher yields to hold bonds when inflation erodes their fixed payments."},
-        {"name": "Supply and deficits", "why": "More government borrowing means more bonds to absorb, which can push long yields up."},
-        {"name": "Risk sentiment", "why": "In a panic, investors buy Treasuries as a safe haven and yields fall."}
-      ],
-      "transmission": [
-        {"from_": "Rates rise", "to": "Bond prices fall", "why": "Fixed coupons are worth less when new bonds pay more."},
-        {"from_": "Long bonds have high duration", "to": "They fall the most", "why": "Duration measures price sensitivity to yield changes; longer maturity = more sensitivity."},
-        {"from_": "Higher long yields", "to": "Higher mortgage and corporate borrowing costs", "why": "Many loans are priced off Treasury yields."}
-      ],
-      "strategies": [
-        {"name": "Duration (long or short)", "idea": "A directional view on yields.", "how_expressed": "Long duration (own bonds or bond futures) benefits if yields fall; short duration benefits if yields rise. Size is measured in DV01: money made or lost per 1bp move.", "what_breaks_it": "Inflation or supply surprises push yields against you.", "concept_ids": ["duration", "bond-price-yield"]},
-        {"name": "Curve steepener / flattener", "idea": "A view on the SHAPE of the curve, not its level.", "how_expressed": "A 2s10s steepener buys 2-year and sells 10-year (DV01-matched), profiting if the spread widens, e.g. when the Fed is expected to cut. A flattener is the opposite.", "what_breaks_it": "Long yields fall faster than short (bull flattening) or the Fed turns hawkish.", "concept_ids": ["yield-curve"]},
-        {"name": "Carry and roll-down", "idea": "Earn the yield of a bond plus the price gain as it 'rolls down' a sloped curve toward lower yields over time.", "how_expressed": "Hold bonds on a steep part of the curve, funded at a lower short rate.", "what_breaks_it": "A sharp rise in yields wipes out months of carry in days.", "concept_ids": ["yield-curve", "duration"]}
-      ],
-      "watch": ["2-year yield on data days", "10-year yield vs mortgage rates", "Treasury auction demand", "2s10s curve shape"],
-      "glossary": {"bp": "Basis point = 0.01 percentage point. A yield going from 4.00% to 4.10% is +10bp.", "Duration": "Approximate % price change of a bond for a 1 percentage point move in yield.", "DV01": "Dollar value of a 1bp move."},
-      "concept_ids": ["bond-price-yield", "duration", "yield-curve", "real-yields"]
-    },
-    {
-      "id": "fx",
-      "group": "macro",
-      "title": "Currencies (FX)",
-      "tagline": "Exchange rates move with interest-rate gaps between countries and risk appetite.",
-      "desk": "FX desk: spot, forwards and options in currency pairs. The biggest, most liquid market in the world.",
-      "how_it_works": [
-        "A currency pair like EUR/USD tells you how many dollars one euro buys. If EUR/USD rises, the euro strengthened (or the dollar weakened).",
-        "The main driver is the interest-rate differential: money flows toward the currency that pays more. If US yields rise relative to Europe or Japan, the dollar usually strengthens.",
-        "The dollar is also a safe haven. In global stress, investors buy dollars (and often the yen and Swiss franc), so the dollar can rise even on bad US news."
-      ],
-      "key_drivers": [
-        {"name": "Rate differentials", "why": "The gap between US and foreign yields steers capital flows."},
-        {"name": "Central bank divergence", "why": "If the Fed stays tight while the ECB or BoJ eases, the dollar tends to rise."},
-        {"name": "Risk appetite", "why": "Risk-off episodes favour USD, JPY and CHF; risk-on favours commodity and emerging-market currencies."},
-        {"name": "Trade and policy", "why": "Tariffs, interventions and capital controls can override the usual relationships."}
-      ],
-      "transmission": [
-        {"from_": "US yields rise vs the rest of the world", "to": "Dollar strengthens", "why": "Higher returns on dollar assets attract flows."},
-        {"from_": "Stronger dollar", "to": "Pressure on dollar-priced commodities and US multinationals' foreign earnings", "why": "Overseas revenue translates into fewer dollars; commodities cost more abroad."}
-      ],
-      "strategies": [
-        {"name": "Carry trade", "idea": "Borrow in a low-yielding currency and hold a high-yielding one, earning the rate gap.", "how_expressed": "Classic example: fund in yen, hold dollars. Positive carry each day as long as the exchange rate is stable.", "what_breaks_it": "A sudden risk-off move or policy shift unwinds carry trades violently: 'up the stairs, down the elevator'.", "concept_ids": ["usd-rate-differentials", "risk-on-off"]},
-        {"name": "Policy divergence", "idea": "Trade the pair where two central banks are moving in opposite directions.", "how_expressed": "If the Fed is expected to hold while another central bank cuts, a desk expects the dollar to gain vs that currency.", "what_breaks_it": "The other central bank surprises hawkishly, or US data weakens.", "concept_ids": ["usd-rate-differentials", "rate-expectations"]}
-      ],
-      "watch": ["Dollar index (DXY) vs 2-year yield", "USD/JPY and Bank of Japan decisions", "EUR/USD around ECB meetings"],
-      "glossary": {"DXY": "Index of the dollar against a basket of six major currencies.", "Carry": "The return from the interest-rate gap between two currencies."},
-      "concept_ids": ["usd-rate-differentials", "risk-on-off"]
-    },
-    {
-      "id": "commodities",
-      "group": "macro",
-      "title": "Commodities",
-      "tagline": "Oil, gas, gold and copper: supply shocks, global demand and the dollar.",
-      "desk": "Commodities desk: energy, metals and agriculture futures, plus hedging for producers and airlines.",
-      "how_it_works": [
-        "Commodities are physical goods, so supply matters as much as demand: OPEC+ output decisions, inventories, weather and geopolitics can move oil sharply.",
-        "Copper is sometimes called 'Dr. Copper' because demand tracks global industrial growth. Oil feeds straight into inflation through fuel prices.",
-        "Gold pays no interest, so it competes with bonds: when real (inflation-adjusted) yields fall, gold tends to rise. It also rises on fear and when central banks buy it."
-      ],
-      "key_drivers": [
-        {"name": "Supply decisions and shocks", "why": "OPEC+ quotas, outages and conflicts change available supply."},
-        {"name": "Global growth", "why": "Industrial activity, especially China's, drives demand for oil and metals."},
-        {"name": "The dollar", "why": "Most commodities are priced in dollars; a strong dollar is a headwind."},
-        {"name": "Real yields (gold)", "why": "Lower real yields reduce the cost of holding a non-yielding asset."}
-      ],
-      "transmission": [
-        {"from_": "Oil price jumps", "to": "Headline inflation rises", "why": "Gasoline and transport costs feed into CPI."},
-        {"from_": "Higher inflation", "to": "Fewer Fed cuts priced", "why": "Energy-driven inflation can keep the Fed cautious."},
-        {"from_": "Higher fuel costs", "to": "Airlines and transport stocks pressured; energy producers helped", "why": "Fuel is a cost for one group and revenue for the other."}
-      ],
-      "strategies": [
-        {"name": "Supply-shock trade", "idea": "Physical disruptions tighten markets quickly.", "how_expressed": "Desks watch inventory data and OPEC+ headlines; a view on tightening supply is expressed through oil futures or the spread between nearby and later contracts.", "what_breaks_it": "Demand weakens, or spare capacity comes online.", "concept_ids": ["oil-drivers"]},
-        {"name": "Gold vs real yields", "idea": "Gold tends to move inversely to real yields.", "how_expressed": "A view that real yields will fall is sometimes expressed through gold.", "what_breaks_it": "The relationship breaks when central bank buying or geopolitical demand dominates.", "concept_ids": ["gold-real-yields", "real-yields"]},
-        {"name": "Producer and consumer hedging", "idea": "Much commodity flow is hedging, not speculation.", "how_expressed": "An airline locks in fuel costs; a miner locks in selling prices. Sales teams structure these hedges for corporate clients.", "what_breaks_it": "Hedges cap upside as well as downside, which is the point.", "concept_ids": ["correlation"]}
-      ],
-      "watch": ["OPEC+ meetings and weekly US inventory data", "Gold vs 10-year real yields", "Copper as a growth signal"],
-      "glossary": {"WTI / Brent": "The US and international oil benchmarks.", "Futures": "Contracts to buy or sell a commodity at a set price on a future date."},
-      "concept_ids": ["oil-drivers", "gold-real-yields", "real-yields"]
-    },
-    {
-      "id": "equities",
-      "group": "macro",
-      "title": "Stock market & risk mood",
-      "tagline": "Indices and the VIX: is the market in risk-on or risk-off mode?",
-      "desk": "Equity index / delta-one and equity derivatives desks trade index futures, ETFs and volatility.",
-      "how_it_works": [
-        "A stock index (S&P 500, Nasdaq, Dow, Russell 2000) is a basket that shows the direction of the whole market. The S&P 500 is weighted by company size, so a few giant tech companies can move it a lot.",
-        "Stocks are worth their future profits discounted to today. Two things move an index: expected earnings (growth) and the discount rate (interest rates and the risk premium investors demand).",
-        "The VIX measures the volatility options traders expect over the next 30 days. It usually jumps when stocks fall sharply, which is why it is nicknamed the fear gauge."
-      ],
-      "key_drivers": [
-        {"name": "Earnings growth", "why": "Rising profit expectations lift prices."},
-        {"name": "Interest rates", "why": "Higher yields lower the present value of future profits, especially for growth stocks."},
-        {"name": "Risk appetite", "why": "In risk-on periods investors buy stocks and small caps; in risk-off they sell and buy safe havens."},
-        {"name": "Positioning and liquidity", "why": "Crowded positions and thin trading can exaggerate moves."}
-      ],
-      "transmission": [
-        {"from_": "Yields rise sharply", "to": "Nasdaq underperforms the Dow", "why": "Tech-heavy indices hold more long-duration growth companies."},
-        {"from_": "Stocks fall fast", "to": "VIX rises", "why": "Investors pay up for protection (put options)."},
-        {"from_": "Small caps (Russell 2000) rally", "to": "Signal of improving domestic growth or lower rate expectations", "why": "Smaller firms rely more on borrowing and the US economy."}
-      ],
-      "strategies": [
-        {"name": "Risk-on / risk-off regime", "idea": "Identify the regime and which assets lead in it.", "how_expressed": "Desks compare stocks, VIX, Treasuries, the dollar and gold on the same day to label the mood and spot assets that don't fit the story.", "what_breaks_it": "Correlations can flip, e.g. stocks and bonds falling together when inflation is the problem.", "concept_ids": ["risk-on-off", "correlation", "market-regime"]},
-        {"name": "Momentum (trend-following)", "idea": "Assets that have risen recently tend to keep rising for a while.", "how_expressed": "Systematic strategies buy recent winners and sell losers across indices or stocks.", "what_breaks_it": "Momentum crashes: sharp reversals after a sell-off, when beaten-down assets rebound fastest.", "concept_ids": ["momentum-strategy", "momentum-crashes"]},
-        {"name": "Hedging with volatility", "idea": "Options let investors buy protection; their price reflects expected volatility.", "how_expressed": "When a portfolio manager fears a drop, they buy index puts. Equity derivatives desks make markets in them and manage the resulting risk.", "what_breaks_it": "Protection costs money every day it is not needed.", "concept_ids": ["vix", "position-sizing"]}
-      ],
-      "watch": ["S&P 500 vs Nasdaq (growth vs broad market)", "Russell 2000 on rate news", "VIX spikes"],
-      "glossary": {"Index": "A basket of stocks tracking a market.", "VIX": "Market-implied 30-day volatility of the S&P 500.", "Risk-off": "Investors selling risky assets and buying safe ones."},
-      "concept_ids": ["risk-on-off", "vix", "discount-rates-equities", "long-duration-equities", "momentum-strategy"]
-    },
-    {
-      "id": "sectors",
-      "group": "micro",
-      "title": "Sectors & industries",
-      "tagline": "Micro analysis: which industries win or lose from today's macro story.",
-      "desk": "Equity sales & trading sector specialists, plus research analysts who cover an industry.",
-      "how_it_works": [
-        "The stock market is split into sectors: technology, financials, energy, health care and so on. Each has its own economics, so the same macro news helps some and hurts others.",
-        "Banks earn more when the gap between long and short rates widens. Energy follows oil. Utilities and real estate behave like bonds and suffer when yields rise. Tech and other growth sectors are sensitive to the discount rate.",
-        "Cyclical sectors (industrials, materials, consumer discretionary) do well when the economy accelerates; defensive sectors (staples, utilities, health care) hold up better in slowdowns."
-      ],
-      "key_drivers": [
-        {"name": "Interest rates", "why": "Hurt rate-sensitive sectors (utilities, real estate, growth tech), can help banks."},
-        {"name": "Commodity prices", "why": "Oil helps energy producers, hurts airlines and chemical makers."},
-        {"name": "Economic cycle", "why": "Early cycle favours cyclicals; late cycle favours defensives."},
-        {"name": "Industry themes", "why": "AI spending, regulation, or a supply chain shift can drive one industry independently."}
-      ],
-      "transmission": [
-        {"from_": "Curve steepens", "to": "Bank stocks outperform", "why": "Banks borrow short and lend long, so a steeper curve widens their margin."},
-        {"from_": "Oil falls", "to": "Airlines up, energy down", "why": "Fuel is a large airline cost and a producer's revenue."},
-        {"from_": "Yields fall", "to": "Utilities and real estate rally", "why": "Their steady dividends look more attractive vs bonds."}
-      ],
-      "strategies": [
-        {"name": "Sector rotation", "idea": "Move money into the sectors best positioned for the next phase of the cycle.", "how_expressed": "Overweight cyclicals when growth is accelerating, defensives when slowing, typically via sector ETFs.", "what_breaks_it": "Calling the cycle wrong, or a theme (like AI) overriding the macro.", "concept_ids": ["sector-rotation", "market-regime"]},
-        {"name": "Relative value (long one, short another)", "idea": "Isolate a view on one sector vs another while cancelling out the whole-market move.", "how_expressed": "E.g. long banks vs short utilities as a view on higher rates, sized so the pair is roughly market-neutral.", "what_breaks_it": "The two legs don't move as expected; correlation breaks.", "concept_ids": ["correlation", "diversification"]}
-      ],
-      "watch": ["Which sectors led and lagged today", "Banks vs the 2s10s curve", "Energy vs oil, airlines vs oil"],
-      "glossary": {"Cyclical": "Business tied to the economic cycle.", "Defensive": "Steady demand in any economy (food, utilities, health care).", "ETF": "A fund that trades like a stock, often tracking a sector."},
-      "concept_ids": ["sector-rotation", "discount-rates-equities", "correlation"]
-    },
-    {
-      "id": "companies",
-      "group": "company",
-      "title": "Company analysis",
-      "tagline": "Single stocks: earnings, guidance and what's already priced in.",
-      "desk": "Single-stock / cash equities trading, equity research and event-driven desks.",
-      "how_it_works": [
-        "A company's stock moves for two reasons: the whole market or its sector moved (beta), and news specific to the company (earnings, guidance, deals, management). Good analysis separates the two.",
-        "Earnings season happens every quarter. The market compares results to analyst expectations, but guidance (what management says about the future) often matters more than the quarter just reported.",
-        "Valuation asks what is already priced in. A great company can fall on good news if investors expected even better. Common tools: price-to-earnings multiples, growth rates and comparison with peers."
-      ],
-      "key_drivers": [
-        {"name": "Earnings vs expectations", "why": "Beats and misses relative to consensus drive the day's reaction."},
-        {"name": "Guidance", "why": "Forward outlook changes the expected profits the stock is valued on."},
-        {"name": "Sector and market moves", "why": "Most stocks move with their sector on macro days."},
-        {"name": "Corporate actions", "why": "Mergers, buybacks, leadership changes and regulation."}
-      ],
-      "transmission": [
-        {"from_": "Company raises guidance", "to": "Analysts raise earnings estimates", "why": "Future profit expectations go up."},
-        {"from_": "Higher estimates", "to": "Stock re-rates higher, peers may move too", "why": "Investors read one company's news as a signal for the industry."}
-      ],
-      "strategies": [
-        {"name": "Earnings event trading", "idea": "Stocks can gap sharply on results.", "how_expressed": "Options desks price the expected earnings move; investors decide whether the market is over- or under-estimating it.", "what_breaks_it": "The reaction depends on guidance and positioning, not just the headline numbers.", "concept_ids": ["earnings-vs-guidance", "priced-in"]},
-        {"name": "Pairs trade", "idea": "Long one company, short a close peer, to bet on relative performance only.", "how_expressed": "E.g. long the company you think executes better, short its competitor, sized to cancel out sector moves.", "what_breaks_it": "Company-specific news hits the short leg, or the pair's correlation breaks.", "concept_ids": ["correlation", "limits-to-arbitrage"]},
-        {"name": "Post-earnings drift", "idea": "Research shows prices often keep drifting in the direction of an earnings surprise for weeks, because investors underreact.", "how_expressed": "Systematic funds build strategies around surprises and estimate revisions.", "what_breaks_it": "Crowding, costs and faster markets have reduced the effect.", "concept_ids": ["earnings-momentum", "underreaction-overreaction"]}
-      ],
-      "watch": ["Upcoming earnings dates for your companies", "Guidance language vs last quarter", "Moves vs the company's sector ETF"],
-      "glossary": {"Guidance": "Management's forecast for future results.", "Beta": "How much a stock tends to move with the overall market.", "P/E": "Share price divided by earnings per share."},
-      "concept_ids": ["earnings-vs-guidance", "priced-in", "earnings-momentum"]
-    },
-    {
-      "id": "portfolio",
-      "group": "portfolio",
-      "title": "Your portfolio",
-      "tagline": "How today's moves flowed through your holdings, calculated rather than guessed.",
-      "desk": "Risk management: every trader and portfolio manager starts the day by knowing their exposures.",
-      "how_it_works": [
-        "Your daily return is the sum of each holding's weight times its return. A small position that moves a lot can matter less than a big one that moves a little.",
-        "Exposures tell you what you're really betting on. Holding several tech names plus a long-bond ETF is, underneath, a big bet on falling interest rates.",
-        "Diversification works when holdings don't move together. On macro days, correlations often rise and diversification helps less than expected."
-      ],
-      "key_drivers": [
-        {"name": "Position size", "why": "Weight decides how much each move matters."},
-        {"name": "Factor exposure", "why": "Rates, oil, the dollar and growth drive groups of holdings together."},
-        {"name": "Correlation", "why": "Holdings that fall together concentrate risk."}
-      ],
-      "transmission": [
-        {"from_": "Macro move (e.g. yields up)", "to": "Several holdings react together", "why": "They share an exposure to the same driver."},
-        {"from_": "Shared exposure", "to": "Portfolio moves more than any single idea suggests", "why": "Correlated positions add up."}
-      ],
-      "strategies": [
-        {"name": "Position sizing", "idea": "Size positions by how much they can move, not by conviction alone.", "how_expressed": "Traders cap risk per position so no single idea can dominate the book.", "what_breaks_it": "Volatility rises suddenly and old sizes become too big.", "concept_ids": ["position-sizing"]},
-        {"name": "Hedging an exposure", "idea": "Neutralise a risk you don't want to keep.", "how_expressed": "E.g. if a book is heavily exposed to rates, a desk might offset some of it with bond futures.", "what_breaks_it": "Hedges cost money and can be imperfect (basis risk).", "concept_ids": ["diversification", "correlation"]}
-      ],
-      "watch": ["Top contributors and detractors today", "Your biggest shared exposure", "Headlines about the companies you hold"],
-      "glossary": {"Weight": "A holding's share of total portfolio value.", "Contribution": "Weight x return: how much a holding added to or subtracted from the total."},
-      "concept_ids": ["diversification", "position-sizing", "correlation"]
-    }
+ "primer": {
+  "title": "How the market fits together",
+  "intro": "Markets are one connected machine. Most days, news enters at the top (the economy and the Fed), changes the price of money (interest rates), and that ripples out to currencies, commodities, the whole stock market, individual sectors and finally single companies. Trading desks at banks are organised along this same chain. Read today's sections top-down and ask at each step: what changed, why, and who is affected next?",
+  "steps": [
+   {
+    "from_": "Economic data (inflation, jobs, growth)",
+    "to": "Fed policy expectations",
+    "why": "The Fed's job is stable prices and maximum employment. Hotter inflation or a strong jobs market makes rate cuts less likely; weak data makes them more likely."
+   },
+   {
+    "from_": "Fed policy expectations",
+    "to": "Treasury yields",
+    "why": "Short-dated yields (like the 2-year) track where traders think the Fed's rate will be. Longer yields add growth, inflation and risk premia."
+   },
+   {
+    "from_": "Treasury yields",
+    "to": "The US dollar",
+    "why": "Higher US yields relative to other countries attract global money into dollars, so the dollar tends to strengthen."
+   },
+   {
+    "from_": "Yields and the dollar",
+    "to": "Commodities",
+    "why": "Oil and gold are priced in dollars; a stronger dollar makes them pricier for the rest of the world. Gold also competes with bonds that pay a real yield."
+   },
+   {
+    "from_": "Yields and growth",
+    "to": "The stock market",
+    "why": "A stock is worth its future profits discounted back to today. Higher discount rates shrink that value, especially for companies whose profits are far in the future."
+   },
+   {
+    "from_": "The stock market",
+    "to": "Sectors",
+    "why": "Sectors react differently to the same news: banks can benefit from higher rates, tech usually suffers, energy follows oil. Moving money between sectors is called rotation."
+   },
+   {
+    "from_": "Sectors",
+    "to": "Companies",
+    "why": "Each company then moves on its own news too: earnings, guidance and deals. Analysing a company means separating the market-wide move from the company-specific one."
+   }
   ]
+ },
+ "sections": [
+  {
+   "id": "macro",
+   "group": "macro",
+   "title": "The Fed & the economy",
+   "tagline": "Inflation, jobs and growth decide what the Fed does with interest rates.",
+   "desk": "Macro strategy / economics, and every desk listens: the Fed sets the price of money for all of them.",
+   "how_it_works": [
+    "The Federal Reserve sets a short-term interest rate (the fed funds rate). Raising it makes borrowing more expensive and slows the economy to fight inflation; cutting it supports growth and jobs.",
+    "Markets move BEFORE the Fed acts. Traders constantly price the path of future rates, so what matters on any day is how new data or Fed speeches change those expectations: the surprise, not the level.",
+    "The key data releases are CPI and PCE (inflation), the monthly jobs report (payrolls and unemployment), GDP (growth), and retail sales. The Fed meets eight times a year (FOMC); its statement, projections (the 'dot plot') and the chair's press conference are the biggest scheduled events."
+   ],
+   "key_drivers": [
+    {
+     "name": "Inflation surprises",
+     "why": "Inflation above forecasts pushes rate-cut expectations out and yields up."
+    },
+    {
+     "name": "Labour market",
+     "why": "Strong hiring supports spending and wages (inflationary); rising unemployment points to cuts."
+    },
+    {
+     "name": "Fed communication",
+     "why": "Speeches, minutes and the dot plot tell markets how officials are leaning. A change in tone can move markets as much as a rate change."
+    },
+    {
+     "name": "Growth and fiscal policy",
+     "why": "GDP, tariffs and government borrowing change the growth and inflation outlook."
+    }
+   ],
+   "transmission": [
+    {
+     "from_": "CPI comes in hotter than expected",
+     "to": "Traders price fewer or later Fed cuts",
+     "why": "The Fed is less likely to ease while inflation is above target."
+    },
+    {
+     "from_": "Fewer cuts priced",
+     "to": "2-year Treasury yield rises",
+     "why": "The 2-year is the market's best single read of the expected policy path."
+    },
+    {
+     "from_": "Higher yields",
+     "to": "Stronger dollar, pressure on growth stocks",
+     "why": "Higher yields attract capital into dollars and raise the discount rate on future profits."
+    }
+   ],
+   "strategies": [
+    {
+     "name": "Trading the data surprise",
+     "idea": "Prices react to the gap between the data and the consensus forecast, not to the data itself.",
+     "how_expressed": "Desks position for, or react to, the surprise in the most rate-sensitive instruments such as 2-year Treasury futures or SOFR futures.",
+     "what_breaks_it": "The surprise was already priced in, or a detail inside the release (e.g. core vs headline) tells a different story.",
+     "concept_ids": [
+      "cpi-surprise",
+      "priced-in"
+     ]
+    },
+    {
+     "name": "Fed path view",
+     "idea": "Form a view on whether the market is pricing too many or too few rate cuts versus what the Fed is signalling.",
+     "how_expressed": "Rates desks express it with short-dated rate futures or 2-year notes; if you think the market prices too many cuts, you expect short yields to rise.",
+     "what_breaks_it": "Data turns the other way, or the Fed changes its reaction function.",
+     "concept_ids": [
+      "rate-expectations"
+     ]
+    },
+    {
+     "name": "Morning meeting narrative",
+     "idea": "Every S&T morning starts with 'what happened overnight, what's on the calendar, what's priced'.",
+     "how_expressed": "Summarise the macro story in 3 sentences, name the key release today and say how you'd expect rates, the dollar and stocks to react to an upside or downside surprise.",
+     "what_breaks_it": "Anchoring on one story and ignoring evidence against it.",
+     "concept_ids": [
+      "st-morning-meeting"
+     ]
+    }
+   ],
+   "watch": [
+    "Next CPI / jobs report vs consensus",
+    "FOMC statement wording and the dot plot",
+    "Speeches by the Fed chair and voting members"
+   ],
+   "glossary": {
+    "FOMC": "Federal Open Market Committee, the Fed group that votes on rates.",
+    "Dot plot": "Each Fed official's projection for future rates, published quarterly.",
+    "Consensus": "The average economist forecast for a data release."
+   },
+   "concept_ids": [
+    "rate-expectations",
+    "cpi-surprise",
+    "priced-in",
+    "st-morning-meeting"
+   ],
+   "mental_model": "The Fed sets the price of money. Every other market is quietly asking one question all day: will money be cheaper or more expensive next year than we thought yesterday?",
+   "rules": [
+    {
+     "when": "Inflation or jobs data comes in hotter than forecast",
+     "then": "Rate-cut hopes fade and short-term yields rise",
+     "why": "The Fed is less likely to ease while prices or wages are heating up.",
+     "exception": "If traders had already priced in the hot number, the reaction can be small or even reversed."
+    },
+    {
+     "when": "The Fed sounds more cautious (hawkish) than expected",
+     "then": "The dollar and short yields rise while growth stocks wobble",
+     "why": "Higher-for-longer rates raise what cash earns and shrink the value of far-off profits.",
+     "exception": "If the message was fully expected, nothing much moves."
+    },
+    {
+     "when": "Economic data is weak",
+     "then": "Yields fall and rate-cut hopes rise, but stocks may still fall",
+     "why": "Bad news for growth helps the case for cuts but hurts company profits; which effect wins depends on what the market is worried about.",
+     "exception": "When inflation is the main fear, bad news can actually lift stocks."
+    }
+   ],
+   "mistakes": [
+    "Treating the data point itself as the news, when only the surprise versus the forecast moves prices.",
+    "Assuming the Fed 'causes' every move. Markets price the Fed months ahead, so decision day is often a non-event.",
+    "Listening to the Fed's words and ignoring the 2-year yield, which is the market's own live read of the rate path."
+   ],
+   "interview": [
+    "Walk me through what happens across markets if CPI beats forecasts by 0.2%.",
+    "What is the difference between what the Fed does and what the market has priced?",
+    "Why do stocks sometimes rally on bad economic news?"
+   ]
+  },
+  {
+   "id": "rates",
+   "group": "macro",
+   "title": "Rates & bonds",
+   "tagline": "Government bond yields: the price of money for different lengths of time.",
+   "desk": "Rates desk: Treasuries, interest-rate swaps and futures. Often the largest flow desk at a bank.",
+   "how_it_works": [
+    "A bond pays fixed coupons. When market yields rise, existing bonds with lower coupons become less attractive, so their prices fall. Yield up = price down, always.",
+    "The yield curve plots yields from short (3 months) to long (30 years). Short yields follow Fed expectations; long yields add expectations about growth, inflation and a 'term premium' for locking money up longer.",
+    "The 2s10s spread (10-year minus 2-year) summarises the curve's shape. An inverted curve (short above long) has often come before recessions because it signals markets expect future rate cuts."
+   ],
+   "key_drivers": [
+    {
+     "name": "Fed expectations",
+     "why": "Drive the front end (2-year and shorter)."
+    },
+    {
+     "name": "Inflation expectations",
+     "why": "Investors demand higher yields to hold bonds when inflation erodes their fixed payments."
+    },
+    {
+     "name": "Supply and deficits",
+     "why": "More government borrowing means more bonds to absorb, which can push long yields up."
+    },
+    {
+     "name": "Risk sentiment",
+     "why": "In a panic, investors buy Treasuries as a safe haven and yields fall."
+    }
+   ],
+   "transmission": [
+    {
+     "from_": "Rates rise",
+     "to": "Bond prices fall",
+     "why": "Fixed coupons are worth less when new bonds pay more."
+    },
+    {
+     "from_": "Long bonds have high duration",
+     "to": "They fall the most",
+     "why": "Duration measures price sensitivity to yield changes; longer maturity = more sensitivity."
+    },
+    {
+     "from_": "Higher long yields",
+     "to": "Higher mortgage and corporate borrowing costs",
+     "why": "Many loans are priced off Treasury yields."
+    }
+   ],
+   "strategies": [
+    {
+     "name": "Duration (long or short)",
+     "idea": "A directional view on yields.",
+     "how_expressed": "Long duration (own bonds or bond futures) benefits if yields fall; short duration benefits if yields rise. Size is measured in DV01: money made or lost per 1bp move.",
+     "what_breaks_it": "Inflation or supply surprises push yields against you.",
+     "concept_ids": [
+      "duration",
+      "bond-price-yield"
+     ]
+    },
+    {
+     "name": "Curve steepener / flattener",
+     "idea": "A view on the SHAPE of the curve, not its level.",
+     "how_expressed": "A 2s10s steepener buys 2-year and sells 10-year (DV01-matched), profiting if the spread widens, e.g. when the Fed is expected to cut. A flattener is the opposite.",
+     "what_breaks_it": "Long yields fall faster than short (bull flattening) or the Fed turns hawkish.",
+     "concept_ids": [
+      "yield-curve"
+     ]
+    },
+    {
+     "name": "Carry and roll-down",
+     "idea": "Earn the yield of a bond plus the price gain as it 'rolls down' a sloped curve toward lower yields over time.",
+     "how_expressed": "Hold bonds on a steep part of the curve, funded at a lower short rate.",
+     "what_breaks_it": "A sharp rise in yields wipes out months of carry in days.",
+     "concept_ids": [
+      "yield-curve",
+      "duration"
+     ]
+    }
+   ],
+   "watch": [
+    "2-year yield on data days",
+    "10-year yield vs mortgage rates",
+    "Treasury auction demand",
+    "2s10s curve shape"
+   ],
+   "glossary": {
+    "bp": "Basis point = 0.01 percentage point. A yield going from 4.00% to 4.10% is +10bp.",
+    "Duration": "Approximate % price change of a bond for a 1 percentage point move in yield.",
+    "DV01": "Dollar value of a 1bp move."
+   },
+   "concept_ids": [
+    "bond-price-yield",
+    "duration",
+    "yield-curve",
+    "real-yields"
+   ],
+   "mental_model": "A bond is a promise of fixed cash. When the going rate on new promises rises, your old promise is worth less. Yield up means price down, every time. Duration tells you by how much.",
+   "rules": [
+    {
+     "when": "Yields rise",
+     "then": "Bond prices fall, and long bonds fall the most",
+     "why": "Long bonds have more duration: their fixed payments are far away, so a small change in the discount rate changes their value a lot.",
+     "exception": "None. It is arithmetic; only the size varies."
+    },
+    {
+     "when": "The Fed is expected to cut rates",
+     "then": "The curve steepens (short yields fall faster than long ones)",
+     "why": "The front end follows the policy rate; the long end also reflects growth and inflation, which a cut does not change right away.",
+     "exception": "If cuts are a sign of recession fear, long yields fall too and the curve flattens."
+    },
+    {
+     "when": "Inflation fears rise",
+     "then": "Long yields rise more than short ones and mortgage rates follow",
+     "why": "Long bonds are hurt most by inflation eroding their fixed payments.",
+     "exception": "A strong Fed response can lift short yields more and flatten the curve."
+    }
+   ],
+   "mistakes": [
+    "Mixing up the direction of price and yield.",
+    "Confusing the LEVEL of the curve with its SLOPE: yields can all rise while the curve flattens.",
+    "Forgetting that 1bp is 0.01%. A 10bp move in the 10-year is big; the same number on a stock would be nothing."
+   ],
+   "interview": [
+    "If yields rise 25bp, roughly what happens to the price of a 10-year bond?",
+    "What is a curve steepener, and when would you put one on?",
+    "Why is the 2-year more sensitive to the Fed than the 10-year?"
+   ]
+  },
+  {
+   "id": "fx",
+   "group": "macro",
+   "title": "Currencies (FX)",
+   "tagline": "Exchange rates move with interest-rate gaps between countries and risk appetite.",
+   "desk": "FX desk: spot, forwards and options in currency pairs. The biggest, most liquid market in the world.",
+   "how_it_works": [
+    "A currency pair like EUR/USD tells you how many dollars one euro buys. If EUR/USD rises, the euro strengthened (or the dollar weakened).",
+    "The main driver is the interest-rate differential: money flows toward the currency that pays more. If US yields rise relative to Europe or Japan, the dollar usually strengthens.",
+    "The dollar is also a safe haven. In global stress, investors buy dollars (and often the yen and Swiss franc), so the dollar can rise even on bad US news."
+   ],
+   "key_drivers": [
+    {
+     "name": "Rate differentials",
+     "why": "The gap between US and foreign yields steers capital flows."
+    },
+    {
+     "name": "Central bank divergence",
+     "why": "If the Fed stays tight while the ECB or BoJ eases, the dollar tends to rise."
+    },
+    {
+     "name": "Risk appetite",
+     "why": "Risk-off episodes favour USD, JPY and CHF; risk-on favours commodity and emerging-market currencies."
+    },
+    {
+     "name": "Trade and policy",
+     "why": "Tariffs, interventions and capital controls can override the usual relationships."
+    }
+   ],
+   "transmission": [
+    {
+     "from_": "US yields rise vs the rest of the world",
+     "to": "Dollar strengthens",
+     "why": "Higher returns on dollar assets attract flows."
+    },
+    {
+     "from_": "Stronger dollar",
+     "to": "Pressure on dollar-priced commodities and US multinationals' foreign earnings",
+     "why": "Overseas revenue translates into fewer dollars; commodities cost more abroad."
+    }
+   ],
+   "strategies": [
+    {
+     "name": "Carry trade",
+     "idea": "Borrow in a low-yielding currency and hold a high-yielding one, earning the rate gap.",
+     "how_expressed": "Classic example: fund in yen, hold dollars. Positive carry each day as long as the exchange rate is stable.",
+     "what_breaks_it": "A sudden risk-off move or policy shift unwinds carry trades violently: 'up the stairs, down the elevator'.",
+     "concept_ids": [
+      "usd-rate-differentials",
+      "risk-on-off"
+     ]
+    },
+    {
+     "name": "Policy divergence",
+     "idea": "Trade the pair where two central banks are moving in opposite directions.",
+     "how_expressed": "If the Fed is expected to hold while another central bank cuts, a desk expects the dollar to gain vs that currency.",
+     "what_breaks_it": "The other central bank surprises hawkishly, or US data weakens.",
+     "concept_ids": [
+      "usd-rate-differentials",
+      "rate-expectations"
+     ]
+    }
+   ],
+   "watch": [
+    "Dollar index (DXY) vs 2-year yield",
+    "USD/JPY and Bank of Japan decisions",
+    "EUR/USD around ECB meetings"
+   ],
+   "glossary": {
+    "DXY": "Index of the dollar against a basket of six major currencies.",
+    "Carry": "The return from the interest-rate gap between two currencies."
+   },
+   "concept_ids": [
+    "usd-rate-differentials",
+    "risk-on-off"
+   ],
+   "mental_model": "A currency is the price of a country's money. Money flows to where it earns more and feels safer, so watch interest-rate gaps and fear.",
+   "rules": [
+    {
+     "when": "US yields rise relative to other countries",
+     "then": "The dollar strengthens",
+     "why": "Global investors buy dollars to earn the higher yield.",
+     "exception": "If yields rise because investors worry about US finances, the dollar can fall instead."
+    },
+    {
+     "when": "Fear spikes (risk-off)",
+     "then": "The dollar and the yen strengthen",
+     "why": "Safe-haven demand, and yen-funded carry trades get unwound.",
+     "exception": "If the shock is centred on the US, the dollar can lose its safe-haven role."
+    },
+    {
+     "when": "The dollar strengthens broadly",
+     "then": "Gold and oil come under pressure",
+     "why": "They are priced in dollars, so they get pricier for buyers elsewhere.",
+     "exception": "Supply shocks or fear can override the dollar effect."
+    }
+   ],
+   "mistakes": [
+    "Forgetting a pair has two sides: EUR/USD falling can be euro weakness OR dollar strength.",
+    "Focusing on one headline and ignoring the rate differential.",
+    "Treating 'the dollar' as one number: it can rise against the yen and fall against the pound the same day."
+   ],
+   "interview": [
+    "What is a carry trade and how does it lose money?",
+    "EUR/USD fell 1% today. Give me three possible reasons.",
+    "Why does the dollar tend to rise in a global sell-off?"
+   ]
+  },
+  {
+   "id": "commodities",
+   "group": "macro",
+   "title": "Commodities",
+   "tagline": "Oil, gas, gold and copper: supply shocks, global demand and the dollar.",
+   "desk": "Commodities desk: energy, metals and agriculture futures, plus hedging for producers and airlines.",
+   "how_it_works": [
+    "Commodities are physical goods, so supply matters as much as demand: OPEC+ output decisions, inventories, weather and geopolitics can move oil sharply.",
+    "Copper is sometimes called 'Dr. Copper' because demand tracks global industrial growth. Oil feeds straight into inflation through fuel prices.",
+    "Gold pays no interest, so it competes with bonds: when real (inflation-adjusted) yields fall, gold tends to rise. It also rises on fear and when central banks buy it."
+   ],
+   "key_drivers": [
+    {
+     "name": "Supply decisions and shocks",
+     "why": "OPEC+ quotas, outages and conflicts change available supply."
+    },
+    {
+     "name": "Global growth",
+     "why": "Industrial activity, especially China's, drives demand for oil and metals."
+    },
+    {
+     "name": "The dollar",
+     "why": "Most commodities are priced in dollars; a strong dollar is a headwind."
+    },
+    {
+     "name": "Real yields (gold)",
+     "why": "Lower real yields reduce the cost of holding a non-yielding asset."
+    }
+   ],
+   "transmission": [
+    {
+     "from_": "Oil price jumps",
+     "to": "Headline inflation rises",
+     "why": "Gasoline and transport costs feed into CPI."
+    },
+    {
+     "from_": "Higher inflation",
+     "to": "Fewer Fed cuts priced",
+     "why": "Energy-driven inflation can keep the Fed cautious."
+    },
+    {
+     "from_": "Higher fuel costs",
+     "to": "Airlines and transport stocks pressured; energy producers helped",
+     "why": "Fuel is a cost for one group and revenue for the other."
+    }
+   ],
+   "strategies": [
+    {
+     "name": "Supply-shock trade",
+     "idea": "Physical disruptions tighten markets quickly.",
+     "how_expressed": "Desks watch inventory data and OPEC+ headlines; a view on tightening supply is expressed through oil futures or the spread between nearby and later contracts.",
+     "what_breaks_it": "Demand weakens, or spare capacity comes online.",
+     "concept_ids": [
+      "oil-drivers"
+     ]
+    },
+    {
+     "name": "Gold vs real yields",
+     "idea": "Gold tends to move inversely to real yields.",
+     "how_expressed": "A view that real yields will fall is sometimes expressed through gold.",
+     "what_breaks_it": "The relationship breaks when central bank buying or geopolitical demand dominates.",
+     "concept_ids": [
+      "gold-real-yields",
+      "real-yields"
+     ]
+    },
+    {
+     "name": "Producer and consumer hedging",
+     "idea": "Much commodity flow is hedging, not speculation.",
+     "how_expressed": "An airline locks in fuel costs; a miner locks in selling prices. Sales teams structure these hedges for corporate clients.",
+     "what_breaks_it": "Hedges cap upside as well as downside, which is the point.",
+     "concept_ids": [
+      "correlation"
+     ]
+    }
+   ],
+   "watch": [
+    "OPEC+ meetings and weekly US inventory data",
+    "Gold vs 10-year real yields",
+    "Copper as a growth signal"
+   ],
+   "glossary": {
+    "WTI / Brent": "The US and international oil benchmarks.",
+    "Futures": "Contracts to buy or sell a commodity at a set price on a future date."
+   },
+   "concept_ids": [
+    "oil-drivers",
+    "gold-real-yields",
+    "real-yields"
+   ],
+   "mental_model": "Commodities are physical, so supply shocks matter as much as demand. Oil feeds inflation, gold is the asset that pays no interest, and copper is a thermometer for global growth.",
+   "rules": [
+    {
+     "when": "Oil rises sharply",
+     "then": "Inflation expectations rise, energy stocks gain and airlines fall",
+     "why": "Fuel is a cost for airlines and revenue for producers, and it feeds into consumer prices.",
+     "exception": "If oil rises because demand is strong, the broad market can rise too."
+    },
+    {
+     "when": "Real (inflation-adjusted) yields fall",
+     "then": "Gold rises",
+     "why": "Gold pays nothing, so it looks better when bonds pay less after inflation.",
+     "exception": "Central-bank buying or geopolitical fear can move gold on its own."
+    },
+    {
+     "when": "Copper rises",
+     "then": "Markets are pricing better global growth",
+     "why": "Copper is used in construction, wiring and manufacturing, so demand tracks the industrial cycle.",
+     "exception": "Supply disruptions at mines can lift copper without any growth change."
+    }
+   ],
+   "mistakes": [
+    "Calling every oil move a demand story. OPEC+ decisions and outages often dominate.",
+    "Expecting gold to always rise when stocks fall.",
+    "Comparing prices without thinking about which contract month you are looking at."
+   ],
+   "interview": [
+    "Why does gold tend to fall when real yields rise?",
+    "How does a big move in oil reach inflation and the Fed?",
+    "How would an airline hedge fuel costs, and what does it give up?"
+   ]
+  },
+  {
+   "id": "equities",
+   "group": "macro",
+   "title": "Stock market & risk mood",
+   "tagline": "Indices and the VIX: is the market in risk-on or risk-off mode?",
+   "desk": "Equity index / delta-one and equity derivatives desks trade index futures, ETFs and volatility.",
+   "how_it_works": [
+    "A stock index (S&P 500, Nasdaq, Dow, Russell 2000) is a basket that shows the direction of the whole market. The S&P 500 is weighted by company size, so a few giant tech companies can move it a lot.",
+    "Stocks are worth their future profits discounted to today. Two things move an index: expected earnings (growth) and the discount rate (interest rates and the risk premium investors demand).",
+    "The VIX measures the volatility options traders expect over the next 30 days. It usually jumps when stocks fall sharply, which is why it is nicknamed the fear gauge."
+   ],
+   "key_drivers": [
+    {
+     "name": "Earnings growth",
+     "why": "Rising profit expectations lift prices."
+    },
+    {
+     "name": "Interest rates",
+     "why": "Higher yields lower the present value of future profits, especially for growth stocks."
+    },
+    {
+     "name": "Risk appetite",
+     "why": "In risk-on periods investors buy stocks and small caps; in risk-off they sell and buy safe havens."
+    },
+    {
+     "name": "Positioning and liquidity",
+     "why": "Crowded positions and thin trading can exaggerate moves."
+    }
+   ],
+   "transmission": [
+    {
+     "from_": "Yields rise sharply",
+     "to": "Nasdaq underperforms the Dow",
+     "why": "Tech-heavy indices hold more long-duration growth companies."
+    },
+    {
+     "from_": "Stocks fall fast",
+     "to": "VIX rises",
+     "why": "Investors pay up for protection (put options)."
+    },
+    {
+     "from_": "Small caps (Russell 2000) rally",
+     "to": "Signal of improving domestic growth or lower rate expectations",
+     "why": "Smaller firms rely more on borrowing and the US economy."
+    }
+   ],
+   "strategies": [
+    {
+     "name": "Risk-on / risk-off regime",
+     "idea": "Identify the regime and which assets lead in it.",
+     "how_expressed": "Desks compare stocks, VIX, Treasuries, the dollar and gold on the same day to label the mood and spot assets that don't fit the story.",
+     "what_breaks_it": "Correlations can flip, e.g. stocks and bonds falling together when inflation is the problem.",
+     "concept_ids": [
+      "risk-on-off",
+      "correlation",
+      "market-regime"
+     ]
+    },
+    {
+     "name": "Momentum (trend-following)",
+     "idea": "Assets that have risen recently tend to keep rising for a while.",
+     "how_expressed": "Systematic strategies buy recent winners and sell losers across indices or stocks.",
+     "what_breaks_it": "Momentum crashes: sharp reversals after a sell-off, when beaten-down assets rebound fastest.",
+     "concept_ids": [
+      "momentum-strategy",
+      "momentum-crashes"
+     ]
+    },
+    {
+     "name": "Hedging with volatility",
+     "idea": "Options let investors buy protection; their price reflects expected volatility.",
+     "how_expressed": "When a portfolio manager fears a drop, they buy index puts. Equity derivatives desks make markets in them and manage the resulting risk.",
+     "what_breaks_it": "Protection costs money every day it is not needed.",
+     "concept_ids": [
+      "vix",
+      "position-sizing"
+     ]
+    }
+   ],
+   "watch": [
+    "S&P 500 vs Nasdaq (growth vs broad market)",
+    "Russell 2000 on rate news",
+    "VIX spikes"
+   ],
+   "glossary": {
+    "Index": "A basket of stocks tracking a market.",
+    "VIX": "Market-implied 30-day volatility of the S&P 500.",
+    "Risk-off": "Investors selling risky assets and buying safe ones."
+   },
+   "concept_ids": [
+    "risk-on-off",
+    "vix",
+    "discount-rates-equities",
+    "long-duration-equities",
+    "momentum-strategy"
+   ],
+   "mental_model": "A stock index is the market's estimate of future profits, discounted at today's interest rates and mood. Two dials: expected profits, and the discount rate (rates plus how much risk investors will take).",
+   "rules": [
+    {
+     "when": "Yields rise sharply",
+     "then": "Growth-heavy indices like the Nasdaq underperform the Dow",
+     "why": "Growth companies' profits are further in the future, so they lose more value when the discount rate rises.",
+     "exception": "Strong earnings can outweigh the rate effect."
+    },
+    {
+     "when": "The VIX spikes",
+     "then": "Stocks fall and Treasuries usually rally",
+     "why": "Investors pay for protection and move into safe assets.",
+     "exception": "In an inflation scare stocks and bonds can fall together."
+    },
+    {
+     "when": "Small caps (Russell 2000) outperform",
+     "then": "The market expects lower rates or a stronger domestic economy",
+     "why": "Small firms borrow more and depend on the US economy.",
+     "exception": "It can also be a short squeeze or rotation with no macro message."
+    }
+   ],
+   "mistakes": [
+    "Reading a headline index move as 'the whole market' when a handful of mega-cap stocks drive it.",
+    "Treating the VIX as a forecast. It is the price of insurance, and it tends to revert.",
+    "Assuming stocks and bonds always diversify each other."
+   ],
+   "interview": [
+    "Why can the S&P 500 be up on a day when most stocks fall?",
+    "The market is rising and so is the VIX. What does that tell you?",
+    "The Nasdaq is up and the Dow is down. What might explain it?"
+   ]
+  },
+  {
+   "id": "sectors",
+   "group": "micro",
+   "title": "Sectors & industries",
+   "tagline": "Micro analysis: which industries win or lose from today's macro story.",
+   "desk": "Equity sales & trading sector specialists, plus research analysts who cover an industry.",
+   "how_it_works": [
+    "The stock market is split into sectors: technology, financials, energy, health care and so on. Each has its own economics, so the same macro news helps some and hurts others.",
+    "Banks earn more when the gap between long and short rates widens. Energy follows oil. Utilities and real estate behave like bonds and suffer when yields rise. Tech and other growth sectors are sensitive to the discount rate.",
+    "Cyclical sectors (industrials, materials, consumer discretionary) do well when the economy accelerates; defensive sectors (staples, utilities, health care) hold up better in slowdowns."
+   ],
+   "key_drivers": [
+    {
+     "name": "Interest rates",
+     "why": "Hurt rate-sensitive sectors (utilities, real estate, growth tech), can help banks."
+    },
+    {
+     "name": "Commodity prices",
+     "why": "Oil helps energy producers, hurts airlines and chemical makers."
+    },
+    {
+     "name": "Economic cycle",
+     "why": "Early cycle favours cyclicals; late cycle favours defensives."
+    },
+    {
+     "name": "Industry themes",
+     "why": "AI spending, regulation, or a supply chain shift can drive one industry independently."
+    }
+   ],
+   "transmission": [
+    {
+     "from_": "Curve steepens",
+     "to": "Bank stocks outperform",
+     "why": "Banks borrow short and lend long, so a steeper curve widens their margin."
+    },
+    {
+     "from_": "Oil falls",
+     "to": "Airlines up, energy down",
+     "why": "Fuel is a large airline cost and a producer's revenue."
+    },
+    {
+     "from_": "Yields fall",
+     "to": "Utilities and real estate rally",
+     "why": "Their steady dividends look more attractive vs bonds."
+    }
+   ],
+   "strategies": [
+    {
+     "name": "Sector rotation",
+     "idea": "Move money into the sectors best positioned for the next phase of the cycle.",
+     "how_expressed": "Overweight cyclicals when growth is accelerating, defensives when slowing, typically via sector ETFs.",
+     "what_breaks_it": "Calling the cycle wrong, or a theme (like AI) overriding the macro.",
+     "concept_ids": [
+      "sector-rotation",
+      "market-regime"
+     ]
+    },
+    {
+     "name": "Relative value (long one, short another)",
+     "idea": "Isolate a view on one sector vs another while cancelling out the whole-market move.",
+     "how_expressed": "E.g. long banks vs short utilities as a view on higher rates, sized so the pair is roughly market-neutral.",
+     "what_breaks_it": "The two legs don't move as expected; correlation breaks.",
+     "concept_ids": [
+      "correlation",
+      "diversification"
+     ]
+    }
+   ],
+   "watch": [
+    "Which sectors led and lagged today",
+    "Banks vs the 2s10s curve",
+    "Energy vs oil, airlines vs oil"
+   ],
+   "glossary": {
+    "Cyclical": "Business tied to the economic cycle.",
+    "Defensive": "Steady demand in any economy (food, utilities, health care).",
+    "ETF": "A fund that trades like a stock, often tracking a sector."
+   },
+   "concept_ids": [
+    "sector-rotation",
+    "discount-rates-equities",
+    "correlation"
+   ],
+   "mental_model": "Sectors are the same macro news seen through different balance sheets. For any sector ask: does it borrow, does it sell into the economic cycle, and what is its biggest cost or revenue driver?",
+   "rules": [
+    {
+     "when": "The yield curve steepens",
+     "then": "Banks tend to outperform",
+     "why": "They borrow at short rates and lend at long rates, so a wider gap widens their margin.",
+     "exception": "If steepening comes with credit worries, banks fall."
+    },
+    {
+     "when": "Long-term yields rise",
+     "then": "Utilities and real estate lag",
+     "why": "Their steady dividends compete with bonds, and they carry a lot of debt.",
+     "exception": "In a growth scare they can outperform as 'defensives'."
+    },
+    {
+     "when": "Oil rises",
+     "then": "Energy stocks gain and airlines lose",
+     "why": "Fuel is revenue for one and a major cost for the other.",
+     "exception": "Hedged airlines feel it less; energy stocks also follow the broad market."
+    }
+   ],
+   "mistakes": [
+    "Treating a sector ETF like one company. The largest holdings drive it.",
+    "Rotating on the basis of one day's move.",
+    "Missing that utilities behave like bonds while tech behaves like long-duration growth."
+   ],
+   "interview": [
+    "What macro conditions favour bank stocks?",
+    "Explain sector rotation with an example.",
+    "Why might utilities fall when yields rise?"
+   ]
+  },
+  {
+   "id": "companies",
+   "group": "company",
+   "title": "Company analysis",
+   "tagline": "Single stocks: earnings, guidance and what's already priced in.",
+   "desk": "Single-stock / cash equities trading, equity research and event-driven desks.",
+   "how_it_works": [
+    "A company's stock moves for two reasons: the whole market or its sector moved (beta), and news specific to the company (earnings, guidance, deals, management). Good analysis separates the two.",
+    "Earnings season happens every quarter. The market compares results to analyst expectations, but guidance (what management says about the future) often matters more than the quarter just reported.",
+    "Valuation asks what is already priced in. A great company can fall on good news if investors expected even better. Common tools: price-to-earnings multiples, growth rates and comparison with peers."
+   ],
+   "key_drivers": [
+    {
+     "name": "Earnings vs expectations",
+     "why": "Beats and misses relative to consensus drive the day's reaction."
+    },
+    {
+     "name": "Guidance",
+     "why": "Forward outlook changes the expected profits the stock is valued on."
+    },
+    {
+     "name": "Sector and market moves",
+     "why": "Most stocks move with their sector on macro days."
+    },
+    {
+     "name": "Corporate actions",
+     "why": "Mergers, buybacks, leadership changes and regulation."
+    }
+   ],
+   "transmission": [
+    {
+     "from_": "Company raises guidance",
+     "to": "Analysts raise earnings estimates",
+     "why": "Future profit expectations go up."
+    },
+    {
+     "from_": "Higher estimates",
+     "to": "Stock re-rates higher, peers may move too",
+     "why": "Investors read one company's news as a signal for the industry."
+    }
+   ],
+   "strategies": [
+    {
+     "name": "Earnings event trading",
+     "idea": "Stocks can gap sharply on results.",
+     "how_expressed": "Options desks price the expected earnings move; investors decide whether the market is over- or under-estimating it.",
+     "what_breaks_it": "The reaction depends on guidance and positioning, not just the headline numbers.",
+     "concept_ids": [
+      "earnings-vs-guidance",
+      "priced-in"
+     ]
+    },
+    {
+     "name": "Pairs trade",
+     "idea": "Long one company, short a close peer, to bet on relative performance only.",
+     "how_expressed": "E.g. long the company you think executes better, short its competitor, sized to cancel out sector moves.",
+     "what_breaks_it": "Company-specific news hits the short leg, or the pair's correlation breaks.",
+     "concept_ids": [
+      "correlation",
+      "limits-to-arbitrage"
+     ]
+    },
+    {
+     "name": "Post-earnings drift",
+     "idea": "Research shows prices often keep drifting in the direction of an earnings surprise for weeks, because investors underreact.",
+     "how_expressed": "Systematic funds build strategies around surprises and estimate revisions.",
+     "what_breaks_it": "Crowding, costs and faster markets have reduced the effect.",
+     "concept_ids": [
+      "earnings-momentum",
+      "underreaction-overreaction"
+     ]
+    }
+   ],
+   "watch": [
+    "Upcoming earnings dates for your companies",
+    "Guidance language vs last quarter",
+    "Moves vs the company's sector ETF"
+   ],
+   "glossary": {
+    "Guidance": "Management's forecast for future results.",
+    "Beta": "How much a stock tends to move with the overall market.",
+    "P/E": "Share price divided by earnings per share."
+   },
+   "concept_ids": [
+    "earnings-vs-guidance",
+    "priced-in",
+    "earnings-momentum"
+   ],
+   "mental_model": "A stock price reflects what the market EXPECTS, not what the company did. The move is the gap between results and outlook and what was already priced in.",
+   "rules": [
+    {
+     "when": "A company beats earnings but guides lower",
+     "then": "The stock often falls",
+     "why": "Price is about future profits, and guidance updates the future.",
+     "exception": "If the market feared much worse guidance, it can still rise."
+    },
+    {
+     "when": "The whole sector moves sharply",
+     "then": "Most single stocks move with it",
+     "why": "A large share of a stock's day is market and sector movement (beta), not company news.",
+     "exception": "Stocks with big company-specific news can move against the sector."
+    },
+    {
+     "when": "A peer reports strong results",
+     "then": "Related stocks often rise in sympathy",
+     "why": "Investors read one company's numbers as a signal for the industry.",
+     "exception": "If the strength came from taking market share, rivals can fall."
+    }
+   ],
+   "mistakes": [
+    "Confusing a good company with a good stock at the current price.",
+    "Explaining a single-stock move without checking the sector and market first.",
+    "Reading only the headline EPS beat and not revenue, margins or guidance."
+   ],
+   "interview": [
+    "Pitch me a stock: what is the catalyst and what is priced in?",
+    "The stock fell 5% on an earnings beat. Why?",
+    "How do you separate market moves from company-specific ones?"
+   ]
+  },
+  {
+   "id": "portfolio",
+   "group": "portfolio",
+   "title": "Your portfolio",
+   "tagline": "How today's moves flowed through your holdings, calculated rather than guessed.",
+   "desk": "Risk management: every trader and portfolio manager starts the day by knowing their exposures.",
+   "how_it_works": [
+    "Your daily return is the sum of each holding's weight times its return. A small position that moves a lot can matter less than a big one that moves a little.",
+    "Exposures tell you what you're really betting on. Holding several tech names plus a long-bond ETF is, underneath, a big bet on falling interest rates.",
+    "Diversification works when holdings don't move together. On macro days, correlations often rise and diversification helps less than expected."
+   ],
+   "key_drivers": [
+    {
+     "name": "Position size",
+     "why": "Weight decides how much each move matters."
+    },
+    {
+     "name": "Factor exposure",
+     "why": "Rates, oil, the dollar and growth drive groups of holdings together."
+    },
+    {
+     "name": "Correlation",
+     "why": "Holdings that fall together concentrate risk."
+    }
+   ],
+   "transmission": [
+    {
+     "from_": "Macro move (e.g. yields up)",
+     "to": "Several holdings react together",
+     "why": "They share an exposure to the same driver."
+    },
+    {
+     "from_": "Shared exposure",
+     "to": "Portfolio moves more than any single idea suggests",
+     "why": "Correlated positions add up."
+    }
+   ],
+   "strategies": [
+    {
+     "name": "Position sizing",
+     "idea": "Size positions by how much they can move, not by conviction alone.",
+     "how_expressed": "Traders cap risk per position so no single idea can dominate the book.",
+     "what_breaks_it": "Volatility rises suddenly and old sizes become too big.",
+     "concept_ids": [
+      "position-sizing"
+     ]
+    },
+    {
+     "name": "Hedging an exposure",
+     "idea": "Neutralise a risk you don't want to keep.",
+     "how_expressed": "E.g. if a book is heavily exposed to rates, a desk might offset some of it with bond futures.",
+     "what_breaks_it": "Hedges cost money and can be imperfect (basis risk).",
+     "concept_ids": [
+      "diversification",
+      "correlation"
+     ]
+    }
+   ],
+   "watch": [
+    "Top contributors and detractors today",
+    "Your biggest shared exposure",
+    "Headlines about the companies you hold"
+   ],
+   "glossary": {
+    "Weight": "A holding's share of total portfolio value.",
+    "Contribution": "Weight x return: how much a holding added to or subtracted from the total."
+   },
+   "concept_ids": [
+    "diversification",
+    "position-sizing",
+    "correlation"
+   ],
+   "mental_model": "Your return is each holding's weight times its move. Hidden risk is what your holdings share: several tickers can be one bet.",
+   "rules": [
+    {
+     "when": "Interest rates rise",
+     "then": "Tech, long bonds and real estate holdings may all fall together",
+     "why": "They share the same exposure: sensitivity to the discount rate.",
+     "exception": "If earnings are strong, the equity holdings may hold up."
+    },
+    {
+     "when": "One position becomes a large share of the book",
+     "then": "The portfolio behaves more and more like that one stock",
+     "why": "Weight decides how much each move matters.",
+     "exception": "If the position is hedged, the net exposure is smaller."
+    },
+    {
+     "when": "Markets sell off sharply",
+     "then": "Correlations between holdings jump",
+     "why": "Investors sell everything liquid, so diversification helps less exactly when you need it.",
+     "exception": "True safe havens (like Treasuries, usually) can still diversify."
+    }
+   ],
+   "mistakes": [
+    "Counting tickers instead of counting independent bets.",
+    "Judging a position by its return instead of its contribution (weight x return).",
+    "Sizing by conviction rather than by how much the position can lose."
+   ],
+   "interview": [
+    "Your book is up 0.2% today. How would you explain it in two sentences?",
+    "How would you measure how concentrated a portfolio is?",
+    "How would you hedge a portfolio that is long tech and long duration?"
+   ]
+  },
+  {
+   "id": "desk",
+   "group": "foundations",
+   "title": "How a desk makes money",
+   "tagline": "Sales, trading and market-making: who does what and how the desk earns.",
+   "desk": "Every sales & trading (S&T) desk at a bank.",
+   "how_it_works": [
+    "Sales talks to clients (asset managers, hedge funds, corporates), shares ideas and takes orders. Trading prices and executes and manages the bank's risk. Structuring builds custom products; research writes views; quants build the models.",
+    "Market-making: the desk quotes a BID (where it will buy) and an ASK (where it will sell). The gap is the spread, the core income of flow trading. Profit is volume times spread, minus losses when prices move against the inventory it holds.",
+    "Flow versus prop: 'flow' trading serves client orders. 'Prop' trading (the bank's own money for profit) is largely restricted for banks since the Volcker Rule, so modern desks earn from flow, financing and hedged positions.",
+    "Risk limits govern everything. Traders have limits on position size, sensitivity (such as DV01, the loss per 1bp) and daily loss. A desk that cannot state what it is exposed to is not trading, it is gambling."
+   ],
+   "key_drivers": [
+    {
+     "name": "Client flow and volume",
+     "why": "More client trading means more spread income."
+    },
+    {
+     "name": "Volatility",
+     "why": "Moves spreads wider and activity higher, but makes inventory riskier."
+    },
+    {
+     "name": "Balance sheet and funding cost",
+     "why": "Holding inventory costs money; cheaper funding means tighter prices."
+    },
+    {
+     "name": "Risk limits and regulation",
+     "why": "They cap how much risk the desk can carry."
+    }
+   ],
+   "transmission": [
+    {
+     "from_": "A client wants to sell a large block",
+     "to": "The desk buys it at its bid",
+     "why": "The desk takes on inventory to give the client liquidity."
+    },
+    {
+     "from_": "The desk is now holding inventory",
+     "to": "It hedges or sells it on",
+     "why": "Hedging (for example with futures) removes market risk the desk never wanted to keep."
+    },
+    {
+     "from_": "The desk sells at its ask",
+     "to": "It earns the spread",
+     "why": "Profit is the spread minus hedging costs and any price move while it held the position."
+    }
+   ],
+   "strategies": [
+    {
+     "name": "Market making",
+     "idea": "Quote two-way prices and earn the spread.",
+     "how_expressed": "Tight quotes on liquid products; skew quotes to lean against inventory.",
+     "what_breaks_it": "A one-way price move while holding inventory, or liquidity drying up.",
+     "concept_ids": [
+      "market-liquidity",
+      "transaction-costs"
+     ]
+    },
+    {
+     "name": "Hedged client facilitation",
+     "idea": "Take the client's risk, then offset it in the market.",
+     "how_expressed": "Buy the client's bonds, then sell Treasury futures to hedge the rate risk.",
+     "what_breaks_it": "The hedge does not match the position (basis risk).",
+     "concept_ids": [
+      "duration",
+      "correlation"
+     ]
+    }
+   ],
+   "watch": [
+    "Bid-ask spreads widening (a sign of liquidity stress)",
+    "Trading volumes and volatility",
+    "Bank earnings: fixed income versus equities trading revenue"
+   ],
+   "glossary": {
+    "Bid / Ask": "The price a dealer will pay / charge.",
+    "Spread": "Ask minus bid; the dealer's fee for providing liquidity.",
+    "Inventory": "Positions the desk is holding.",
+    "Flow": "Trading done for clients, as opposed to the bank's own bets."
+   },
+   "concept_ids": [
+    "st-morning-meeting",
+    "market-liquidity",
+    "transaction-costs"
+   ],
+   "mental_model": "A trading desk is a shop: it stands ready to buy from and sell to clients, earns the small gap between its buy and sell prices, and manages the risk it holds in between.",
+   "rules": [
+    {
+     "when": "Volatility rises",
+     "then": "Bid-ask spreads widen",
+     "why": "Dealers hold riskier inventory and demand more to compensate.",
+     "exception": "Highly liquid products (like Treasuries) can stay tight."
+    },
+    {
+     "when": "Everyone wants to sell the same thing",
+     "then": "Liquidity vanishes and prices gap",
+     "why": "Dealers cannot absorb one-way flow without taking losses.",
+     "exception": "Central-bank support can restore liquidity."
+    }
+   ],
+   "mistakes": [
+    "Thinking traders make money by predicting direction, when flow desks mostly earn spreads and manage risk.",
+    "Ignoring that inventory risk can wipe out many days of spread income.",
+    "Forgetting that a desk's risk limits are part of the job, not an obstacle."
+   ],
+   "interview": [
+    "How does a market-maker make money?",
+    "What is the difference between sales and trading?",
+    "A client wants to sell $50m of a bond you do not own. What do you do?"
+   ]
+  },
+  {
+   "id": "valuation",
+   "group": "foundations",
+   "title": "Business & valuation basics",
+   "tagline": "How to read a company: profits, cash, debt, and what the price already assumes.",
+   "desk": "Equity research, single-stock trading and event-driven desks.",
+   "how_it_works": [
+    "Three statements: the income statement (profit over a period), the balance sheet (what the company owns and owes at one moment) and the cash-flow statement (actual cash in and out). Profit is not the same as cash.",
+    "Quality of a business shows in growth, margins, and returns on the capital it invests. Debt shows how fragile it is if things go wrong.",
+    "Valuation multiples compare price with a fundamental. P/E is price divided by earnings per share. A high P/E means the market expects strong growth or sees low risk; compare it with peers and the company's own history.",
+    "A DCF (discounted cash flow) forecasts cash flows and discounts them at a rate reflecting risk. Small changes in the discount rate or growth assumption swing the answer a lot, which is exactly why interest rates matter so much for stocks."
+   ],
+   "key_drivers": [
+    {
+     "name": "Revenue growth",
+     "why": "The engine of future profits."
+    },
+    {
+     "name": "Margins",
+     "why": "How much of each dollar of sales becomes profit."
+    },
+    {
+     "name": "Debt and capital needs",
+     "why": "Interest costs and refinancing risk."
+    },
+    {
+     "name": "The discount rate / multiple",
+     "why": "What the market is willing to pay for each dollar of profit."
+    }
+   ],
+   "transmission": [
+    {
+     "from_": "Revenue grows faster than expected",
+     "to": "Earnings estimates rise",
+     "why": "More sales at similar margins means more profit."
+    },
+    {
+     "from_": "Higher expected earnings",
+     "to": "The share price rises",
+     "why": "The price reflects the present value of those profits."
+    },
+    {
+     "from_": "Interest rates rise",
+     "to": "Multiples compress",
+     "why": "A higher discount rate lowers today's value of the same future profits."
+    }
+   ],
+   "strategies": [
+    {
+     "name": "Relative value",
+     "idea": "Compare a company's multiple with similar companies.",
+     "how_expressed": "Buy the cheaper of two similar businesses versus the more expensive one, hedged.",
+     "what_breaks_it": "The 'cheap' company is cheap for a reason (weaker growth, more debt).",
+     "concept_ids": [
+      "earnings-vs-guidance",
+      "priced-in"
+     ]
+    },
+    {
+     "name": "Quality versus value",
+     "idea": "Pay up for excellent businesses, or buy ordinary businesses cheaply.",
+     "how_expressed": "Screen on returns on capital and growth versus multiples.",
+     "what_breaks_it": "Regimes change: rising rates favour cheap, cash-generating firms.",
+     "concept_ids": [
+      "discount-rates-equities"
+     ]
+    }
+   ],
+   "watch": [
+    "Earnings dates and guidance changes",
+    "Analyst estimate revisions",
+    "Net debt and interest coverage"
+   ],
+   "glossary": {
+    "EPS": "Earnings per share.",
+    "P/E": "Price divided by earnings per share.",
+    "Free cash flow": "Cash left after running the business and investing in it.",
+    "Guidance": "Management's forecast."
+   },
+   "concept_ids": [
+    "discount-rates-equities",
+    "earnings-vs-guidance",
+    "priced-in"
+   ],
+   "mental_model": "A business is worth the cash it will generate in the future, discounted for time and risk. Multiples like P/E are just shortcuts for that idea.",
+   "rules": [
+    {
+     "when": "A company grows faster than its peers",
+     "then": "It usually trades on a higher multiple",
+     "why": "Investors pay more for each dollar of profit that is growing.",
+     "exception": "If growth is expected to slow, the premium can vanish quickly."
+    },
+    {
+     "when": "Interest rates rise",
+     "then": "High-multiple growth stocks fall more than low-multiple ones",
+     "why": "More of their value sits in distant profits, which are discounted harder.",
+     "exception": "Very strong earnings can offset it."
+    }
+   ],
+   "mistakes": [
+    "Treating a low P/E as automatically cheap.",
+    "Looking only at profit and ignoring cash flow and debt.",
+    "Judging a stock by the news instead of by the news versus expectations."
+   ],
+   "interview": [
+    "What does a P/E ratio tell you, and what does it leave out?",
+    "Why do higher interest rates hurt growth-stock valuations?",
+    "A company has rising profit but falling cash flow. Why might that worry you?"
+   ]
+  },
+  {
+   "id": "risk",
+   "group": "foundations",
+   "title": "Risk, sizing & market structure",
+   "tagline": "How traders stay in the game: position size, correlation, liquidity and tail risk.",
+   "desk": "Risk management, and every trader's daily routine.",
+   "how_it_works": [
+    "Position sizing: decide size by how much you could lose (volatility times size), not by how confident you feel. A common rule is to risk a small fixed fraction of capital on any one idea.",
+    "Correlation: holdings that move together are effectively one bet. In a crisis correlations jump towards 1, so diversification fails when you need it most.",
+    "Liquidity: the ability to exit at a fair price. Illiquid positions may be marked at one price and sell for another, and exits get harder exactly when everyone wants out.",
+    "Tail risk: most days are small, a few days are huge. Measures like Value-at-Risk estimate a typical bad day but say nothing about how bad the tail can be, which is why traders also run stress tests."
+   ],
+   "key_drivers": [
+    {
+     "name": "Volatility",
+     "why": "Bigger swings mean bigger potential losses per unit of position."
+    },
+    {
+     "name": "Correlation",
+     "why": "Determines whether diversification really works."
+    },
+    {
+     "name": "Liquidity",
+     "why": "Decides whether you can get out at a reasonable price."
+    },
+    {
+     "name": "Leverage",
+     "why": "Multiplies both gains and losses."
+    }
+   ],
+   "transmission": [
+    {
+     "from_": "Volatility rises",
+     "to": "The same position now risks more",
+     "why": "Expected daily loss scales with volatility."
+    },
+    {
+     "from_": "Risk per position exceeds the limit",
+     "to": "Trader cuts the position",
+     "why": "Sizing rules keep any single idea from being fatal."
+    },
+    {
+     "from_": "Many traders cut at once",
+     "to": "Prices gap and liquidity dries up",
+     "why": "Forced selling amplifies the move."
+    }
+   ],
+   "strategies": [
+    {
+     "name": "Volatility-based sizing",
+     "idea": "Size each position so a normal bad day costs the same.",
+     "how_expressed": "Halve the position when volatility doubles.",
+     "what_breaks_it": "Volatility jumps overnight (gaps) before you can adjust.",
+     "concept_ids": [
+      "position-sizing",
+      "vix"
+     ]
+    },
+    {
+     "name": "Diversifying and hedging",
+     "idea": "Combine bets that do not move together, and hedge unwanted exposure.",
+     "how_expressed": "Add uncorrelated positions or offset a rates exposure with futures.",
+     "what_breaks_it": "Correlations rise in a crisis.",
+     "concept_ids": [
+      "diversification",
+      "correlation"
+     ]
+    }
+   ],
+   "watch": [
+    "The VIX and realised volatility",
+    "Correlation between your holdings",
+    "Bid-ask spreads and trading volume"
+   ],
+   "glossary": {
+    "Leverage": "Using borrowed money to increase position size.",
+    "Tail risk": "The chance of a rare, very large loss.",
+    "VaR": "Value-at-Risk: an estimated loss not exceeded on most days.",
+    "Stress test": "Simulating a bad scenario to see the loss."
+   },
+   "concept_ids": [
+    "position-sizing",
+    "correlation",
+    "diversification",
+    "market-liquidity",
+    "vix"
+   ],
+   "mental_model": "Making money is optional, surviving is not. Risk is how much you can lose, how fast, and how correlated your bets are when things go wrong.",
+   "rules": [
+    {
+     "when": "Volatility doubles",
+     "then": "The safe position size roughly halves",
+     "why": "Risk is size times volatility, so to keep risk constant, size must shrink.",
+     "exception": "If the position is hedged, less shrinking is needed."
+    },
+    {
+     "when": "A crisis hits",
+     "then": "Correlations between assets jump",
+     "why": "Everyone sells what they can, not what they want to.",
+     "exception": "Genuine safe havens can still diversify."
+    }
+   ],
+   "mistakes": [
+    "Sizing by confidence instead of by risk.",
+    "Assuming diversification will hold in a crisis.",
+    "Ignoring liquidity until you need to exit."
+   ],
+   "interview": [
+    "How do you decide how big a position should be?",
+    "What is the difference between volatility and tail risk?",
+    "Why did diversification fail in past crises?"
+   ]
+  }
+ ],
+ "relationships": [
+  {
+   "cause": "UST10Y",
+   "cause_dir": "up",
+   "effect": "TLT",
+   "effect_dir": "down",
+   "why": "Bond prices and yields move in opposite directions, and a long-bond fund has a lot of duration.",
+   "exception": "None: it is arithmetic. Only the size varies.",
+   "concept_ids": [
+    "bond-price-yield",
+    "duration"
+   ]
+  },
+  {
+   "cause": "UST2Y",
+   "cause_dir": "up",
+   "effect": "DX-Y.NYB",
+   "effect_dir": "up",
+   "why": "Higher US short-term yields attract global money into dollars.",
+   "exception": "If yields rise abroad by as much, or fear about US finances is the cause, the dollar may not rise.",
+   "concept_ids": [
+    "usd-rate-differentials",
+    "rate-expectations"
+   ]
+  },
+  {
+   "cause": "UST10Y",
+   "cause_dir": "up",
+   "effect": "XLK",
+   "effect_dir": "down",
+   "why": "Tech profits are far in the future, so a higher discount rate hits them hardest.",
+   "exception": "Strong earnings or an AI-spending boom can outweigh the rate effect.",
+   "concept_ids": [
+    "discount-rates-equities",
+    "long-duration-equities"
+   ]
+  },
+  {
+   "cause": "UST10Y",
+   "cause_dir": "up",
+   "effect": "XLU",
+   "effect_dir": "down",
+   "why": "Utilities pay steady dividends that compete with bonds and carry a lot of debt.",
+   "exception": "In a growth scare, utilities can rise as a defensive sector even as yields fall or rise.",
+   "concept_ids": [
+    "sector-rotation",
+    "bond-price-yield"
+   ]
+  },
+  {
+   "cause": "UST10Y",
+   "cause_dir": "up",
+   "effect": "XLRE",
+   "effect_dir": "down",
+   "why": "Real estate is financed with debt and valued off yields, so higher rates hurt it.",
+   "exception": "Strong rental growth can offset rate pressure.",
+   "concept_ids": [
+    "discount-rates-equities",
+    "sector-rotation"
+   ]
+  },
+  {
+   "cause": "DX-Y.NYB",
+   "cause_dir": "up",
+   "effect": "GC=F",
+   "effect_dir": "down",
+   "why": "Gold is priced in dollars, so a stronger dollar makes it pricier for buyers elsewhere.",
+   "exception": "Fear or central-bank buying can lift gold even when the dollar rises.",
+   "concept_ids": [
+    "gold-real-yields",
+    "usd-rate-differentials"
+   ]
+  },
+  {
+   "cause": "DX-Y.NYB",
+   "cause_dir": "up",
+   "effect": "EURUSD=X",
+   "effect_dir": "down",
+   "why": "The euro is the largest weight in the dollar index, so the two are nearly mirror images.",
+   "exception": "Rarely: a big move in the yen or pound can move the index without the euro.",
+   "concept_ids": [
+    "usd-rate-differentials"
+   ]
+  },
+  {
+   "cause": "CL=F",
+   "cause_dir": "up",
+   "effect": "XLE",
+   "effect_dir": "up",
+   "why": "Energy producers earn more for each barrel they sell.",
+   "exception": "Energy stocks also follow the broad market, so a big market fall can outweigh oil.",
+   "concept_ids": [
+    "oil-drivers"
+   ]
+  },
+  {
+   "cause": "CL=F",
+   "cause_dir": "up",
+   "effect": "DAL",
+   "effect_dir": "down",
+   "why": "Fuel is one of an airline's biggest costs.",
+   "exception": "Airlines that hedge their fuel are less sensitive; strong travel demand can offset it.",
+   "concept_ids": [
+    "oil-drivers",
+    "sector-rotation"
+   ]
+  },
+  {
+   "cause": "^VIX",
+   "cause_dir": "up",
+   "effect": "^GSPC",
+   "effect_dir": "down",
+   "why": "Investors buy protection when they fear falls, and forced selling pushes prices down.",
+   "exception": "The VIX can rise slightly while stocks rise (fear of missing out on hedges), especially before events.",
+   "concept_ids": [
+    "vix",
+    "risk-on-off"
+   ]
+  },
+  {
+   "cause": "^VIX",
+   "cause_dir": "up",
+   "effect": "UST10Y",
+   "effect_dir": "down",
+   "why": "Fear sends investors into safe government bonds, pushing yields down.",
+   "exception": "In an inflation scare, bonds and stocks fall together and yields rise.",
+   "concept_ids": [
+    "risk-on-off",
+    "correlation"
+   ]
+  },
+  {
+   "cause": "US2S10S",
+   "cause_dir": "up",
+   "effect": "XLF",
+   "effect_dir": "up",
+   "why": "Banks borrow at short rates and lend at long rates, so a steeper curve widens their margin.",
+   "exception": "If steepening reflects credit fears or recession risk, banks fall anyway.",
+   "concept_ids": [
+    "yield-curve",
+    "sector-rotation"
+   ]
+  },
+  {
+   "cause": "UST2Y",
+   "cause_dir": "up",
+   "effect": "US2S10S",
+   "effect_dir": "down",
+   "why": "Short yields react most to Fed repricing, so they usually rise faster than long yields, which flattens the curve.",
+   "exception": "If long yields rise faster (inflation or supply worries), the curve steepens.",
+   "concept_ids": [
+    "yield-curve",
+    "rate-expectations"
+   ]
+  },
+  {
+   "cause": "UST10Y",
+   "cause_dir": "up",
+   "effect": "GC=F",
+   "effect_dir": "down",
+   "why": "Higher yields mean bonds pay more, and gold pays nothing.",
+   "exception": "If yields rise only because inflation expectations rise, real yields may not rise and gold can hold up.",
+   "concept_ids": [
+    "gold-real-yields",
+    "real-yields"
+   ]
+  }
+ ],
+ "scenarios": [
+  {
+   "id": "fed_cut",
+   "section_id": "macro",
+   "title": "The Fed cuts instead of holding",
+   "premise": "Suppose the Fed surprises markets by cutting its policy rate by a quarter point and signals that more cuts are likely.",
+   "shock": "Surprise Fed cut and a dovish signal",
+   "effects": [
+    {
+     "label": "2-year Treasury yield",
+     "dir": "down",
+     "why": "The 2-year tracks the expected policy rate, so it falls the most.",
+     "symbol": "UST2Y"
+    },
+    {
+     "label": "US dollar",
+     "dir": "down",
+     "why": "A lower US rate narrows the gap with other countries, so dollar assets earn less.",
+     "symbol": "DX-Y.NYB"
+    },
+    {
+     "label": "Tech stocks",
+     "dir": "up",
+     "why": "Lower rates raise the value of far-off profits, which helps growth stocks most.",
+     "symbol": "XLK"
+    },
+    {
+     "label": "Gold",
+     "dir": "up",
+     "why": "Real yields fall and gold pays nothing, so it becomes more attractive.",
+     "symbol": "GC=F"
+    },
+    {
+     "label": "10-year Treasury yield",
+     "dir": "flat",
+     "why": "It falls much less than the 2-year, and can even hold steady if traders read the cut as a sign of future inflation.",
+     "symbol": "UST10Y"
+    }
+   ],
+   "chain": [
+    {
+     "from_": "Fed cuts and signals more",
+     "to": "Expected policy rate falls",
+     "why": "Markets reprice the whole path of rates, not just today's."
+    },
+    {
+     "from_": "Expected policy rate falls",
+     "to": "Short yields and the dollar fall",
+     "why": "The front end follows the policy rate; a smaller rate gap weakens the dollar."
+    },
+    {
+     "from_": "Lower discount rates",
+     "to": "Growth stocks and gold rise",
+     "why": "Far-off profits are worth more today, and gold's opportunity cost drops."
+    }
+   ],
+   "twist": "If the cut is read as a panic response to a weakening economy, stocks can fall even though rates fall.",
+   "concept_ids": [
+    "rate-expectations",
+    "discount-rates-equities",
+    "gold-real-yields"
+   ],
+   "level": 1
+  },
+  {
+   "id": "fed_hawkish",
+   "section_id": "macro",
+   "title": "The Fed hikes and warns of more",
+   "premise": "Suppose the Fed raises rates by a quarter point and says more hikes are likely if inflation stays high.",
+   "shock": "Hawkish Fed hike",
+   "effects": [
+    {
+     "label": "2-year Treasury yield",
+     "dir": "up",
+     "why": "Traders push up the expected path of the policy rate.",
+     "symbol": "UST2Y"
+    },
+    {
+     "label": "US dollar",
+     "dir": "up",
+     "why": "Higher US rates attract global money into dollars.",
+     "symbol": "DX-Y.NYB"
+    },
+    {
+     "label": "Tech stocks",
+     "dir": "down",
+     "why": "A higher discount rate cuts the value of far-off profits.",
+     "symbol": "XLK"
+    },
+    {
+     "label": "Gold",
+     "dir": "down",
+     "why": "Bonds pay more and gold pays nothing.",
+     "symbol": "GC=F"
+    },
+    {
+     "label": "Small-cap stocks (Russell 2000)",
+     "dir": "down",
+     "why": "Small firms borrow more, so higher rates hurt them more.",
+     "symbol": "^RUT"
+    }
+   ],
+   "chain": [
+    {
+     "from_": "Fed hikes and warns of more",
+     "to": "Expected policy rate rises",
+     "why": "The market prices a higher path."
+    },
+    {
+     "from_": "Expected policy rate rises",
+     "to": "Short yields and the dollar rise",
+     "why": "Higher yields attract capital into dollars."
+    },
+    {
+     "from_": "Higher discount rates",
+     "to": "Growth stocks, small caps and gold fall",
+     "why": "Profits are worth less today and cash competes with gold."
+    }
+   ],
+   "twist": "If traders had already priced in an even more aggressive Fed, a 'smaller than feared' hike can lift stocks.",
+   "concept_ids": [
+    "rate-expectations",
+    "discount-rates-equities",
+    "usd-rate-differentials"
+   ],
+   "level": 1
+  },
+  {
+   "id": "cpi_hot",
+   "section_id": "macro",
+   "title": "Inflation comes in hotter than forecast",
+   "premise": "Suppose the monthly inflation report (CPI) comes in well above what economists forecast.",
+   "shock": "Hot inflation surprise",
+   "effects": [
+    {
+     "label": "2-year Treasury yield",
+     "dir": "up",
+     "why": "Rate cuts look less likely, so short yields rise.",
+     "symbol": "UST2Y"
+    },
+    {
+     "label": "Long-bond ETF (TLT)",
+     "dir": "down",
+     "why": "Yields up means bond prices down, and long bonds fall the most.",
+     "symbol": "TLT"
+    },
+    {
+     "label": "US dollar",
+     "dir": "up",
+     "why": "Higher expected US rates support the dollar.",
+     "symbol": "DX-Y.NYB"
+    },
+    {
+     "label": "Tech stocks",
+     "dir": "down",
+     "why": "Higher yields shrink the value of far-off profits.",
+     "symbol": "XLK"
+    },
+    {
+     "label": "Gold",
+     "dir": "down",
+     "why": "Real yields rise, making a zero-yield asset less attractive.",
+     "symbol": "GC=F"
+    }
+   ],
+   "chain": [
+    {
+     "from_": "CPI surprises to the upside",
+     "to": "Fewer or later Fed cuts priced",
+     "why": "The Fed is less likely to ease while inflation is hot."
+    },
+    {
+     "from_": "Fewer cuts priced",
+     "to": "Yields rise and bond prices fall",
+     "why": "Yields and bond prices move in opposite directions."
+    },
+    {
+     "from_": "Higher yields",
+     "to": "Dollar up; growth stocks and gold down",
+     "why": "Rate gaps widen and discount rates rise."
+    }
+   ],
+   "twist": "If the market had already priced in a hot number, the reaction can be small or even reversed.",
+   "concept_ids": [
+    "cpi-surprise",
+    "bond-price-yield",
+    "priced-in"
+   ],
+   "level": 1
+  },
+  {
+   "id": "jobs_weak",
+   "section_id": "macro",
+   "title": "The jobs report misses badly",
+   "premise": "Suppose the monthly jobs report shows far fewer jobs created than forecast and unemployment rising.",
+   "shock": "Weak jobs data",
+   "effects": [
+    {
+     "label": "2-year Treasury yield",
+     "dir": "down",
+     "why": "Weak jobs make Fed cuts more likely.",
+     "symbol": "UST2Y"
+    },
+    {
+     "label": "US dollar",
+     "dir": "down",
+     "why": "Lower expected US rates narrow the rate gap.",
+     "symbol": "DX-Y.NYB"
+    },
+    {
+     "label": "Utilities stocks",
+     "dir": "up",
+     "why": "Defensive, bond-like stocks benefit from falling yields and a slowdown.",
+     "symbol": "XLU"
+    },
+    {
+     "label": "VIX (fear gauge)",
+     "dir": "up",
+     "why": "Growth worries raise demand for protection.",
+     "symbol": "^VIX"
+    },
+    {
+     "label": "Overall stock market (S&P 500)",
+     "dir": "flat",
+     "why": "Cut hopes help, but weaker growth hurts profits. Which effect wins depends on what the market fears most.",
+     "symbol": "^GSPC"
+    }
+   ],
+   "chain": [
+    {
+     "from_": "Jobs data disappoints",
+     "to": "Rate-cut expectations rise",
+     "why": "A weaker labour market gives the Fed room to ease."
+    },
+    {
+     "from_": "Rate-cut expectations rise",
+     "to": "Short yields and the dollar fall",
+     "why": "The expected policy rate moves down."
+    },
+    {
+     "from_": "Growth worries",
+     "to": "Defensives up, fear gauge up, stocks mixed",
+     "why": "Bad news for profits offsets good news for rates."
+    }
+   ],
+   "twist": "In a market that fears inflation more than recession, bad economic news can lift stocks.",
+   "concept_ids": [
+    "rate-expectations",
+    "risk-on-off",
+    "sector-rotation"
+   ],
+   "level": 2
+  },
+  {
+   "id": "oil_spike",
+   "section_id": "commodities",
+   "title": "OPEC+ surprises with a big output cut",
+   "premise": "Suppose the big oil producers announce a surprise cut in output while demand is unchanged.",
+   "shock": "Oil supply shock",
+   "effects": [
+    {
+     "label": "Oil price",
+     "dir": "up",
+     "why": "Less supply against the same demand raises the price.",
+     "symbol": "CL=F"
+    },
+    {
+     "label": "Airline stocks (Delta)",
+     "dir": "down",
+     "why": "Fuel is one of an airline's largest costs.",
+     "symbol": "DAL"
+    },
+    {
+     "label": "Energy stocks",
+     "dir": "up",
+     "why": "Producers earn more for every barrel.",
+     "symbol": "XLE"
+    },
+    {
+     "label": "2-year Treasury yield",
+     "dir": "up",
+     "why": "Higher energy costs raise inflation risk, so the Fed is less likely to cut.",
+     "symbol": "UST2Y"
+    },
+    {
+     "label": "US dollar",
+     "dir": "flat",
+     "why": "No clear direction: it helps energy exporters and hurts importers, and the effects offset.",
+     "symbol": "DX-Y.NYB"
+    }
+   ],
+   "chain": [
+    {
+     "from_": "Oil supply is cut",
+     "to": "Oil price rises",
+     "why": "Supply falls while demand stays put."
+    },
+    {
+     "from_": "Oil price rises",
+     "to": "Energy stocks up, airlines down",
+     "why": "Fuel is revenue for producers and a cost for airlines."
+    },
+    {
+     "from_": "Higher energy costs",
+     "to": "Inflation worries lift short yields",
+     "why": "Fuel feeds into consumer prices."
+    }
+   ],
+   "twist": "If airlines have hedged their fuel, the hit to their stocks is smaller and slower.",
+   "concept_ids": [
+    "oil-drivers",
+    "sector-rotation",
+    "rate-expectations"
+   ],
+   "level": 2
+  },
+  {
+   "id": "risk_off",
+   "section_id": "equities",
+   "title": "A geopolitical shock hits",
+   "premise": "Suppose a sudden geopolitical crisis makes investors rush to reduce risk.",
+   "shock": "Risk-off shock",
+   "effects": [
+    {
+     "label": "VIX (fear gauge)",
+     "dir": "up",
+     "why": "Investors pay up for protection.",
+     "symbol": "^VIX"
+    },
+    {
+     "label": "US stock market (S&P 500)",
+     "dir": "down",
+     "why": "Investors sell risky assets.",
+     "symbol": "^GSPC"
+    },
+    {
+     "label": "10-year Treasury yield",
+     "dir": "down",
+     "why": "Safe government bonds are bought, pushing yields down.",
+     "symbol": "UST10Y"
+    },
+    {
+     "label": "US dollar",
+     "dir": "up",
+     "why": "The dollar is a safe haven in global stress.",
+     "symbol": "DX-Y.NYB"
+    },
+    {
+     "label": "Gold",
+     "dir": "up",
+     "why": "Fear supports gold as a store of value.",
+     "symbol": "GC=F"
+    }
+   ],
+   "chain": [
+    {
+     "from_": "A shock raises fear",
+     "to": "Investors sell risky assets",
+     "why": "They cut risk and raise cash."
+    },
+    {
+     "from_": "Investors sell risk",
+     "to": "Stocks fall and the VIX rises",
+     "why": "Selling lowers prices; insurance gets pricier."
+    },
+    {
+     "from_": "Investors buy safety",
+     "to": "Treasuries, the dollar and gold rise",
+     "why": "Safe havens attract the money leaving stocks."
+    }
+   ],
+   "twist": "If the shock is an inflation scare, bonds can fall alongside stocks and yields rise.",
+   "concept_ids": [
+    "risk-on-off",
+    "vix",
+    "correlation"
+   ],
+   "level": 1
+  },
+  {
+   "id": "dollar_surge",
+   "section_id": "fx",
+   "title": "The dollar rallies against everything",
+   "premise": "Suppose the US dollar rises sharply against all major currencies.",
+   "shock": "Broad dollar rally",
+   "effects": [
+    {
+     "label": "EUR/USD",
+     "dir": "down",
+     "why": "The euro buys fewer dollars when the dollar strengthens.",
+     "symbol": "EURUSD=X"
+    },
+    {
+     "label": "Gold",
+     "dir": "down",
+     "why": "Gold is priced in dollars, so it gets pricier for everyone else.",
+     "symbol": "GC=F"
+    },
+    {
+     "label": "Oil price",
+     "dir": "down",
+     "why": "Oil is priced in dollars too, which weakens demand abroad.",
+     "symbol": "CL=F"
+    },
+    {
+     "label": "USD/JPY",
+     "dir": "up",
+     "why": "It takes more yen to buy a dollar.",
+     "symbol": "USDJPY=X"
+    }
+   ],
+   "chain": [
+    {
+     "from_": "Dollar strengthens broadly",
+     "to": "Other currencies fall against it",
+     "why": "EUR/USD falls and USD/JPY rises."
+    },
+    {
+     "from_": "Dollar strengthens",
+     "to": "Dollar-priced commodities get pricier abroad",
+     "why": "Non-US buyers pay more in their own currency."
+    },
+    {
+     "from_": "Weaker foreign demand",
+     "to": "Gold and oil face pressure",
+     "why": "Higher local prices reduce buying."
+    }
+   ],
+   "twist": "Supply shocks or fear can push gold and oil up even as the dollar rises.",
+   "concept_ids": [
+    "usd-rate-differentials",
+    "gold-real-yields",
+    "oil-drivers"
+   ],
+   "level": 2
+  },
+  {
+   "id": "curve_growth",
+   "section_id": "rates",
+   "title": "Long yields rise faster than short yields",
+   "premise": "Suppose growth data strengthens, so 10-year yields rise faster than 2-year yields.",
+   "shock": "Curve steepens on growth",
+   "effects": [
+    {
+     "label": "2s10s curve (10-year minus 2-year)",
+     "dir": "up",
+     "why": "The long end rises more than the short end.",
+     "symbol": "US2S10S"
+    },
+    {
+     "label": "Bank stocks",
+     "dir": "up",
+     "why": "Banks borrow short and lend long, so a steeper curve widens their margin.",
+     "symbol": "XLF"
+    },
+    {
+     "label": "Long-bond ETF (TLT)",
+     "dir": "down",
+     "why": "Long yields up means long bond prices down.",
+     "symbol": "TLT"
+    },
+    {
+     "label": "Utilities stocks",
+     "dir": "down",
+     "why": "Bond-like dividends look less attractive next to higher yields.",
+     "symbol": "XLU"
+    }
+   ],
+   "chain": [
+    {
+     "from_": "Growth strengthens",
+     "to": "Long yields rise faster than short yields",
+     "why": "The long end reflects growth and inflation expectations."
+    },
+    {
+     "from_": "The curve steepens",
+     "to": "Banks' margins widen",
+     "why": "They earn the gap between long lending rates and short funding costs."
+    },
+    {
+     "from_": "Higher long yields",
+     "to": "Long bonds and utilities fall",
+     "why": "Their value is most sensitive to long rates."
+    }
+   ],
+   "twist": "If the steepening comes from credit worries or recession fear, banks can fall despite the wider gap.",
+   "concept_ids": [
+    "yield-curve",
+    "sector-rotation",
+    "duration"
+   ],
+   "level": 3
+  },
+  {
+   "id": "earnings_guide",
+   "section_id": "companies",
+   "title": "A chip giant beats earnings but cuts its outlook",
+   "premise": "Suppose a large chip company reports better-than-expected quarterly results but lowers its forecast for next quarter.",
+   "shock": "Beat and guide down",
+   "effects": [
+    {
+     "label": "The chip company's own stock",
+     "dir": "down",
+     "why": "Price follows expected future profits, and the outlook just got worse.",
+     "symbol": null
+    },
+    {
+     "label": "Semiconductor ETF",
+     "dir": "down",
+     "why": "Investors read one leader's outlook as a signal for the industry.",
+     "symbol": "SMH"
+    },
+    {
+     "label": "Analysts' profit estimates for the company",
+     "dir": "down",
+     "why": "Analysts adjust to the new guidance.",
+     "symbol": null
+    },
+    {
+     "label": "Overall stock market (S&P 500)",
+     "dir": "flat",
+     "why": "One company rarely moves the whole market.",
+     "symbol": "^GSPC"
+    }
+   ],
+   "chain": [
+    {
+     "from_": "Guidance is lowered",
+     "to": "Analysts cut profit estimates",
+     "why": "The forecast is what the market prices."
+    },
+    {
+     "from_": "Estimates fall",
+     "to": "The stock falls despite the beat",
+     "why": "Expectations for the future dropped."
+    },
+    {
+     "from_": "One leader warns",
+     "to": "Peers and the sector ETF fall in sympathy",
+     "why": "Investors extrapolate to the industry."
+    }
+   ],
+   "twist": "If investors feared far worse guidance, the stock can rise even with a cut.",
+   "concept_ids": [
+    "earnings-vs-guidance",
+    "priced-in",
+    "sector-rotation"
+   ],
+   "level": 2
+  },
+  {
+   "id": "vol_double",
+   "section_id": "risk",
+   "title": "Volatility doubles overnight",
+   "premise": "Suppose market volatility suddenly doubles.",
+   "shock": "Volatility doubling",
+   "effects": [
+    {
+     "label": "Dealers' bid-ask spreads",
+     "dir": "up",
+     "why": "Dealers hold riskier inventory and want more compensation.",
+     "symbol": null
+    },
+    {
+     "label": "The safe position size for a trader",
+     "dir": "down",
+     "why": "Risk is size times volatility, so size must shrink to keep risk constant.",
+     "symbol": null
+    },
+    {
+     "label": "Correlation between assets",
+     "dir": "up",
+     "why": "In stress, investors sell everything liquid.",
+     "symbol": null
+    },
+    {
+     "label": "Market liquidity",
+     "dir": "down",
+     "why": "Fewer buyers are willing to step in at fair prices.",
+     "symbol": null
+    }
+   ],
+   "chain": [
+    {
+     "from_": "Volatility doubles",
+     "to": "Each position risks more",
+     "why": "Expected daily loss scales with volatility."
+    },
+    {
+     "from_": "Risk limits bind",
+     "to": "Traders cut position sizes",
+     "why": "Sizing rules keep any idea from becoming fatal."
+    },
+    {
+     "from_": "Many traders cut at once",
+     "to": "Liquidity drops and spreads widen",
+     "why": "Forced selling meets thin buying."
+    }
+   ],
+   "twist": "Highly liquid products like Treasuries can stay tight even in stress.",
+   "concept_ids": [
+    "vix",
+    "position-sizing",
+    "market-liquidity"
+   ],
+   "level": 2
+  },
+  {
+   "id": "client_block",
+   "section_id": "desk",
+   "title": "A client wants to sell a large block of bonds",
+   "premise": "Suppose a big client asks a dealer to buy a large block of bonds right now.",
+   "shock": "Large client sale",
+   "effects": [
+    {
+     "label": "The dealer's bid price",
+     "dir": "down",
+     "why": "The dealer asks for a discount to take on the inventory risk.",
+     "symbol": null
+    },
+    {
+     "label": "The dealer's inventory risk",
+     "dir": "up",
+     "why": "It now holds a large position it did not choose.",
+     "symbol": null
+    },
+    {
+     "label": "The dealer's hedging activity",
+     "dir": "up",
+     "why": "It sells futures or similar bonds to remove market risk.",
+     "symbol": null
+    }
+   ],
+   "chain": [
+    {
+     "from_": "Client sells a block",
+     "to": "Dealer buys at a lower bid",
+     "why": "It is paid for providing liquidity and taking risk."
+    },
+    {
+     "from_": "Dealer holds inventory",
+     "to": "Dealer hedges",
+     "why": "It offsets the market risk it never wanted."
+    },
+    {
+     "from_": "Dealer sells the inventory on",
+     "to": "Dealer earns the spread",
+     "why": "Profit is the spread minus hedging costs and price moves."
+    }
+   ],
+   "twist": "If the market moves against the dealer before it can hedge, the trade loses money.",
+   "concept_ids": [
+    "market-liquidity",
+    "transaction-costs",
+    "st-morning-meeting"
+   ],
+   "level": 2
+  },
+  {
+   "id": "rates_up_valuation",
+   "section_id": "valuation",
+   "title": "Interest rates rise by a full percentage point",
+   "premise": "Suppose interest rates rise by one percentage point across the economy.",
+   "shock": "Higher interest rates",
+   "effects": [
+    {
+     "label": "Fair value of a high-growth stock",
+     "dir": "down",
+     "why": "Most of its value is far in the future, so a higher discount rate hits hard.",
+     "symbol": null
+    },
+    {
+     "label": "Price of existing bonds",
+     "dir": "down",
+     "why": "Yields up means prices down.",
+     "symbol": null
+    },
+    {
+     "label": "What cash and T-bills earn",
+     "dir": "up",
+     "why": "New short-term rates rise.",
+     "symbol": null
+    },
+    {
+     "label": "Interest costs for companies with floating-rate debt",
+     "dir": "up",
+     "why": "Their borrowing costs reset higher.",
+     "symbol": null
+    }
+   ],
+   "chain": [
+    {
+     "from_": "Rates rise",
+     "to": "Discount rates rise",
+     "why": "Future cash flows are worth less today."
+    },
+    {
+     "from_": "Discount rates rise",
+     "to": "Valuations of long-duration assets fall",
+     "why": "Growth stocks and long bonds are hit hardest."
+    },
+    {
+     "from_": "Rates rise",
+     "to": "Borrowers pay more, savers earn more",
+     "why": "Floating-rate costs and cash yields both reset."
+    }
+   ],
+   "twist": "If the rise comes with much stronger earnings growth, valuations can hold up.",
+   "concept_ids": [
+    "discount-rates-equities",
+    "bond-price-yield",
+    "long-duration-equities"
+   ],
+   "level": 2
+  },
+  {
+   "id": "port_yields",
+   "section_id": "portfolio",
+   "title": "Yields jump in a portfolio of tech stocks and long bonds",
+   "premise": "Suppose you hold mostly tech stocks and a long-bond fund, and yields jump sharply.",
+   "shock": "Sharp rise in yields",
+   "effects": [
+    {
+     "label": "The tech holding",
+     "dir": "down",
+     "why": "Higher discount rates hit long-duration growth.",
+     "symbol": "XLK"
+    },
+    {
+     "label": "The long-bond fund",
+     "dir": "down",
+     "why": "Yields up means bond prices down.",
+     "symbol": "TLT"
+    },
+    {
+     "label": "The diversification benefit between them",
+     "dir": "down",
+     "why": "They fell together because they share a rates exposure.",
+     "symbol": null
+    }
+   ],
+   "chain": [
+    {
+     "from_": "Yields jump",
+     "to": "Both holdings fall",
+     "why": "They share sensitivity to the discount rate."
+    },
+    {
+     "from_": "Both fall",
+     "to": "The portfolio moves as one bet",
+     "why": "The holdings look different but behave alike."
+    },
+    {
+     "from_": "Shared exposure",
+     "to": "Diversification fails",
+     "why": "Different tickers are not independent bets."
+    }
+   ],
+   "twist": "If earnings are strong, the tech holding can hold up while the bonds still fall.",
+   "concept_ids": [
+    "diversification",
+    "correlation",
+    "duration"
+   ],
+   "level": 2
+  }
+ ]
 }

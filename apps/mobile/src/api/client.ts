@@ -244,8 +244,11 @@ export type MarketSectionId =
   | 'equities'
   | 'sectors'
   | 'companies'
-  | 'portfolio';
-export type MarketGroup = 'macro' | 'micro' | 'company' | 'portfolio';
+  | 'portfolio'
+  | 'desk'
+  | 'valuation'
+  | 'risk';
+export type MarketGroup = 'macro' | 'micro' | 'company' | 'portfolio' | 'foundations';
 export type ProviderStatus = 'ok' | 'partial' | 'failed' | 'skipped';
 
 export type Move = {
@@ -299,6 +302,10 @@ export type SectionGuide = {
   watch: string[];
   glossary: Record<string, string>;
   concept_ids: string[];
+  mental_model: string;
+  rules: { when: string; then: string; why: string; exception: string }[];
+  mistakes: string[];
+  interview: string[];
 };
 
 export type MarketSection = {
@@ -394,3 +401,77 @@ export type OverviewResponse = {
 
 export const getMarketOverview = (body: { level: Level; interests: MarketSectionId[]; watch: string[] }) =>
   request<OverviewResponse>('/v1/markets/overview', body);
+
+
+// ---- Market Lab ----
+export type LabKind = 'predict' | 'driver' | 'chain' | 'explain' | 'scenario';
+
+export type LabQuestion = {
+  id: string;
+  kind: LabKind;
+  section_id: MarketSectionId;
+  title?: string | null;
+  prompt: string;
+  context?: string | null;
+  facts: Move[];
+  options: { id: string; text: string }[];
+  items: { id: string; text: string }[];
+  parts: { id: string; label: string }[];
+  hint?: string | null;
+  word_range?: [number, number] | null;
+  concept_ids: string[];
+  difficulty: number;
+  surprise: boolean;
+};
+
+export type LabSet = { as_of: string | null; data_mode: DataMode; questions: LabQuestion[] };
+
+export type LabFeedback = {
+  question_id: string;
+  correct: boolean;
+  observed: Observed;
+  score: number;
+  explanation: string;
+  strengths: string[];
+  gaps: string[];
+  reveal: {
+    facts: Move[];
+    facts_note?: string | null;
+    shock?: string | null;
+    chain: { from_: string; to: string; why: string }[];
+    parts: {
+      id: string;
+      label: string;
+      expected: 'up' | 'down' | 'flat';
+      picked?: string | null;
+      correct: boolean;
+      why: string;
+      fact_id?: string | null;
+    }[];
+    textbook?: string | null;
+    followed?: boolean | null;
+    exception?: string | null;
+    correct_order: string[];
+    model_answer?: string | null;
+  };
+  mastery: { concept_id: string; mastery_before: number; mastery_after: number }[];
+  graded_by: 'rule' | 'llm' | 'fallback';
+  concept_ids: string[];
+};
+
+export const getMarketLab = (body: {
+  level: Level;
+  kinds?: LabKind[];
+  section?: MarketSectionId;
+  interests: MarketSectionId[];
+  watch: string[];
+  count?: number;
+}) => request<LabSet>('/v1/markets/lab', body);
+
+export const answerMarketLab = (body: {
+  question_id: string;
+  answer: string | string[] | Record<string, string>;
+  level: Level;
+  section?: MarketSectionId;
+  watch: string[];
+}) => request<LabFeedback>('/v1/markets/lab/answer', body);

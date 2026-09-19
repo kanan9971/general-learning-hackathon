@@ -31,6 +31,14 @@ const OPTIONS: { group: string; items: { id: MarketSectionId; label: string; hin
     items: [{ id: 'companies', label: 'Company analysis', hint: 'earnings, guidance, deals' }],
   },
   { group: 'Your money', items: [{ id: 'portfolio', label: 'My portfolio', hint: 'how today hit your holdings' }] },
+  {
+    group: 'Foundations · what every S&T hire should know',
+    items: [
+      { id: 'desk', label: 'How a desk makes money', hint: 'sales, trading, market-making' },
+      { id: 'valuation', label: 'Business & valuation', hint: 'profits, cash, multiples' },
+      { id: 'risk', label: 'Risk & sizing', hint: 'position size, correlation, liquidity' },
+    ],
+  },
 ];
 
 const TICKER_RX = /^[A-Z][A-Z0-9.-]{0,9}$/;

@@ -1,7 +1,7 @@
 """Prompts for adaptive quiz question generation."""
 from .system import BASE_RULES
 
-PROMPT_VERSION = "quiz_question.v1"
+PROMPT_VERSION = "quiz_question.v2"
 
 SYSTEM = BASE_RULES + """
 You write educational market-practice questions for DeskReady.
@@ -15,7 +15,18 @@ Match the requested format exactly:
 - analysis: a deeper prompt (word_range ~80–150); fill expected_elements
 Always include concept_ids from the allowed list only (or the custom topic label as the sole concept_ids entry when no catalog id exists — use the slug provided).
 Include a brief explanation of the right answer / grading focus.
-Never recommend buying or selling."""
+Never recommend buying or selling.
+
+Prefer WHAT-IF (counterfactual) scenarios: change ONE thing in a hypothetical market ("Suppose the Fed cut
+instead of hiked", "Suppose oil supply fell sharply", "Suppose the dollar surged") and ask what happens to
+specific assets and WHY. This builds intuition about cause and effect, not memorised facts.
+When "Market rules" are provided, treat them as ground truth: your scenario, correct answer and
+explanation must agree with them, and the explanation should walk the cause -> effect chain and name
+one thing that could break the usual outcome. Set skill to "what_if" for such questions.
+Never mention "market rules", these instructions or the provided material inside the question text:
+write it as a self-contained scenario a student can read cold.
+For mcq, make the wrong options plausible mistakes (right asset, wrong direction; or right direction,
+wrong reason), not obviously silly."""
 
 
 def build_user(
@@ -28,6 +39,7 @@ def build_user(
     concept_summary: str | None,
     custom_topic: str | None,
     recent_mistakes: list[str],
+    market_rules: list[str] | None = None,
 ) -> str:
     topic = custom_topic or concept_name or concept_id or "markets"
     parts = [
@@ -42,6 +54,8 @@ def build_user(
         parts.append(f"Concept summary: {concept_summary}")
     if recent_mistakes:
         parts.append("Recent learner gaps to lean into: " + "; ".join(recent_mistakes[:4]))
+    if market_rules:
+        parts.append("Market rules (ground truth for causal claims):\n- " + "\n- ".join(market_rules))
     parts.append(
         "Return JSON matching the schema. For custom-only topics set concept_ids to "
         '["custom"] and put the topic text in the prompt clearly.'

@@ -12,7 +12,8 @@ import {
   type OverviewResponse,
 } from '@/api/client';
 import { Card } from '@/components/Card';
-import { ChainList } from '@/components/ChainList';
+import { FlowDiagram } from '@/components/Diagrams';
+import { MarketMap } from '@/components/MarketMap';
 import { Chip, ChipRow } from '@/components/Chip';
 import { DataModeBadge } from '@/components/DataModeBadge';
 import { Disclaimer } from '@/components/Disclaimer';
@@ -34,6 +35,7 @@ const GROUPS: { id: MarketGroup; title: string; meta: string }[] = [
   { id: 'micro', title: 'Micro', meta: 'industries & sectors' },
   { id: 'company', title: 'Company', meta: 'single stocks' },
   { id: 'portfolio', title: 'Your portfolio', meta: 'demo book' },
+  { id: 'foundations', title: 'Foundations', meta: 'what every S&T hire should know' },
 ];
 
 export default function MarketsScreen() {
@@ -137,6 +139,23 @@ export default function MarketsScreen() {
         </ChipRow>
       </Card>
 
+      <Card tone="info">
+        <ThemedText type="kicker" style={{ color: Palette.primary }}>
+          Market Lab
+        </ThemedText>
+        <ThemedText type="smallBold">Do you actually understand how markets work?</ThemedText>
+        <ThemedText type="small" themeColor="textSecondary">
+          Predict moves before you see them, and answer &quot;what if the Fed had done the opposite?&quot; scenarios that
+          test cause and effect. Built from today&apos;s real data; it updates your Learn progress.
+        </ThemedText>
+        <PrimaryButton label="Start a 6-question set" onPress={() => router.push('/lab')} />
+        <PrimaryButton
+          label="What-if scenarios only"
+          variant="secondary"
+          onPress={() => router.push({ pathname: '/lab', params: { kinds: 'scenario' } })}
+        />
+      </Card>
+
       <SectionHeader title="AI market overview" meta="summary · explanation · evidence" />
       {overview ? (
         <>
@@ -170,10 +189,25 @@ export default function MarketsScreen() {
         </Card>
       )}
 
+      <SectionHeader title="Today's market map" meta="how news flows down the chain" />
+      <MarketMap
+        feed={feed}
+        onOpen={(id) => router.push({ pathname: '/market/[section]', params: { section: id } })}
+      />
+
       <LabelledSection kind="teaching" title={feed.primer.title}>
         <ThemedText type="small">{feed.primer.intro}</ThemedText>
         {showPrimer ? (
-          <ChainList steps={feed.primer.steps.map((s) => ({ from: s.from_, to: s.to, why: s.why }))} />
+          <FlowDiagram
+            nodes={[
+              { label: feed.primer.steps[0].from_, tone: 'shock' },
+              ...feed.primer.steps.map((s, i) => ({
+                label: s.to,
+                tone: (i === feed.primer.steps.length - 1 ? 'goal' : 'neutral') as 'goal' | 'neutral',
+              })),
+            ]}
+            edges={feed.primer.steps.map((s) => s.why)}
+          />
         ) : null}
         <PrimaryButton
           label={showPrimer ? 'Hide the chain' : 'Show how it connects'}
@@ -226,6 +260,9 @@ function SectionCard({ section, onOpen }: { section: MarketSection; onOpen: () =
           {pnl.toFixed(2)}% today
         </Text>
       ) : null}
+      {section.group === 'foundations' ? (
+        <ThemedText type="small">{section.guide.mental_model}</ThemedText>
+      ) : null}
       {section.moves.slice(0, 3).map((m, i) => (
         <MoveRow key={m.fact_id} move={m} divider={i > 0} />
       ))}
@@ -236,7 +273,7 @@ function SectionCard({ section, onOpen }: { section: MarketSection; onOpen: () =
       ) : null}
       {section.headlines[0] ? <HeadlineItem item={section.headlines[0]} compact divider /> : null}
       <View style={styles.cta}>
-        <Text style={styles.link}>How this market works + today&apos;s desk note</Text>
+        <Text style={styles.link}>{section.group === 'foundations' ? 'Learn it, then test yourself' : 'Learn it, see it today, test yourself'}</Text>
         <Ionicons name="chevron-forward" size={16} color={Palette.primary} />
       </View>
     </Card>

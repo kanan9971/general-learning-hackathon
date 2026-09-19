@@ -1,12 +1,9 @@
 """Markets feed orchestration: snapshot (market) + headlines (news) + positions (broker/portfolio)
 + static teaching guide, ordered by the learner's interests. Plus the on-demand desk note (llm)."""
 import asyncio
-import json
 import re
 import time
 from datetime import datetime, timezone
-from functools import lru_cache
-from pathlib import Path
 
 from ..broker import get_portfolio_source
 from ..config import get_settings
@@ -17,6 +14,7 @@ from ..llm.client import LLMError
 from ..llm.prompts import market_overview as overview_prompt
 from ..llm.prompts import market_section as prompt
 from ..llm.structured import generate
+from ..market.guide import load_guide
 from ..market.snapshot import get_snapshot, load_golden
 from ..market.universe import DEFAULT_COMPANIES, INSTRUMENTS, company_sector
 from ..news import feeds as news_feeds
@@ -26,11 +24,10 @@ from ..rag.context import build_news_context
 from ..schemas.ai import MarketOverviewLLM, MarketSectionLLM
 from ..schemas.markets import (
     DeskView, Evidence, ExplainDriver, ExplainSectionResponse, GuideStep, Headline, InterestOption, MarketOverview,
-    MarketSection, MarketsFeed, MarketsGuide, Move, OverviewDeskView, OverviewLink, OverviewPoint, OverviewResponse,
+    MarketSection, MarketsFeed, Move, OverviewDeskView, OverviewLink, OverviewPoint, OverviewResponse,
     ProvidersStatus, SectionExplanation,
 )
 
-GUIDE_PATH = Path(__file__).resolve().parents[1] / "data" / "markets_guide.json"
 HEADLINES_PER_SECTION = 6
 AI_CACHE_SECONDS = 15 * 60  # same data -> same note; don't re-bill the LLM on every tap
 OVERVIEW_FACTS_PER_SECTION = 5
@@ -45,13 +42,14 @@ NUMBER_RX = re.compile(
 )
 
 
-@lru_cache
-def guide() -> MarketsGuide:
-    return MarketsGuide.model_validate(json.loads(GUIDE_PATH.read_text()))
+def guide():
+    return load_guide()
 
 
 def allowed_concepts() -> list[str]:
     ids = [c for g in guide().sections for c in g.concept_ids + [x for s in g.strategies for x in s.concept_ids]]
+    ids += [c for r in guide().relationships for c in r.concept_ids]
+    ids += [c for sc in guide().scenarios for c in sc.concept_ids]
     return list(dict.fromkeys(ids))
 
 
@@ -128,7 +126,7 @@ async def build_feed(user_id: str, interests: list[str], watch: list[str]) -> Ma
         else:
             moves = [by_sym[i.symbol] for i in INSTRUMENTS if i.section == g.id and i.symbol in by_sym]
             tickers = set()
-        if not moves and note is None:
+        if not moves and note is None and g.group != "foundations":
             note = "Prices for this section are unavailable right now (provider unreachable). The guide and headlines still apply."
         sections.append(MarketSection(
             id=g.id, group=g.group, title=g.title, tagline=g.tagline, pinned=g.id in interests, moves=moves,

@@ -10,7 +10,9 @@ from ..db.client import service_client, user_client
 from ..db.memory_quiz import STORE, deep, new_id
 from ..errors import ApiError
 from ..learning.adaptive import ConceptState, recommend_concepts, select_targets
+from ..learning.market_lab import scenario_quiz_draft
 from ..learning.mastery import apply_observation, overall_level_from_mastery
+from ..market.guide import load_guide, rules_for_concept
 from ..learning.seals import seal_option, verify_option
 from ..llm import structured
 from ..llm.client import LLMError
@@ -407,6 +409,7 @@ def _generate_batch(
             concept_summary=meta.get("summary"),
             custom_topic=t.custom_topic,
             recent_mistakes=[m for m in mistake_ids[:3]],
+            market_rules=rules_for_concept(t.concept_id),
         )
         qid = new_id()
         public_payload, private_payload = _split_payload(s, qid, draft)
@@ -458,6 +461,11 @@ def _draft_question(
                 raise LLMError("correct option missing")
         return draft, "llm", result.model
     except (LLMError, Exception):
+        # No LLM: a deterministic what-if from the market scenario library when one teaches this concept.
+        whatif = scenario_quiz_draft(load_guide(), kwargs.get("concept_id"), kwargs["format"], kwargs["difficulty"],
+                                     seed=str(kwargs.get("recent_mistakes")))
+        if whatif is not None:
+            return whatif, "fallback", None
         fb = quiz_fallback.fallback_question(
             format=kwargs["format"],
             concept_id=kwargs.get("concept_id"),
@@ -638,6 +646,11 @@ def _apply_mastery(
             mastery_after=result["mastery_after"],
         ))
     return updates
+
+
+def record_observation(user_id: str, token: str | None, concept_ids: list[str], observed: str):
+    """Update concept mastery from an answer given outside a quiz session (e.g. the Market Lab)."""
+    return _apply_mastery(user_id, token, get_settings(), {"concept_ids": concept_ids}, observed, None)  # type: ignore[arg-type]
 
 
 # ---------- public helpers ----------

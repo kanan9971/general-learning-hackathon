@@ -3,11 +3,13 @@ from typing import Annotated
 
 from fastapi import APIRouter, Query
 
-from ..deps import CurrentUser
+from ..deps import BearerToken, CurrentUser
 from ..schemas.markets import (
-    ExplainSectionRequest, ExplainSectionResponse, MarketsFeed, OverviewRequest, OverviewResponse, SectionId,
+    ExplainSectionRequest, ExplainSectionResponse, LabAnswerRequest, LabFeedback, LabRequest, LabSet, MarketsFeed,
+    OverviewRequest, OverviewResponse, SectionId,
 )
 from ..services import markets as markets_service
+from ..services import markets_lab
 
 router = APIRouter(prefix="/v1", tags=["markets"])
 
@@ -34,4 +36,15 @@ async def explain_section(section_id: SectionId, req: ExplainSectionRequest, use
 async def market_overview(req: OverviewRequest, user_id: CurrentUser) -> OverviewResponse:
     """AI summary of the whole market; every key point carries its evidence (fact_ids + headline ids)."""
     return await markets_service.market_overview(user_id, req.level, list(req.interests), req.watch)
+
+
+@router.post("/markets/lab", response_model=LabSet)
+async def lab_questions(req: LabRequest, user_id: CurrentUser) -> LabSet:
+    """Understanding-check questions built from today's real data. Answers are not included."""
+    return await markets_lab.get_lab(req)
+
+
+@router.post("/markets/lab/answer", response_model=LabFeedback)
+async def lab_answer(req: LabAnswerRequest, user_id: CurrentUser, token: BearerToken) -> LabFeedback:
+    return await markets_lab.answer(user_id, token, req)
 

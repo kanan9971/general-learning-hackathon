@@ -145,6 +145,24 @@ export default function QuizLauncherScreen() {
         </ThemedText>
       </Card>
 
+      <Card tone="accent">
+        <ThemedText type="kicker" style={{ color: Palette.warning }}>
+          Markets × quiz
+        </ThemedText>
+        <ThemedText type="smallBold">What if the Fed had done the opposite?</ThemedText>
+        <ThemedText type="small" themeColor="textSecondary">
+          Change one thing (a Fed cut, an oil shock, a stronger dollar) and predict what happens to rates, stocks,
+          gold and more. Built from today&apos;s real market moves, and it feeds the same progress as your quiz. The
+          adaptive questions below are also written as what-if scenarios.
+        </ThemedText>
+        <PrimaryButton
+          label="Try what-if scenarios"
+          variant="secondary"
+          onPress={() => router.push({ pathname: '/lab', params: { kinds: 'scenario' } })}
+        />
+        <PrimaryButton label="Open today's market map" variant="ghost" onPress={() => router.push('/markets')} />
+      </Card>
+
       <SectionHeader title="Question types" meta="pick at least one" />
       <FormatSelector
         formats={prefs?.available_formats ?? []}

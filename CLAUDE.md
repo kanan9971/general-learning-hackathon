@@ -33,6 +33,8 @@ Feature freeze at H13. P0 = the "magic moment" loop in docs/PLAN.md §18.
 - Live Supabase check (creates/deletes temp users): `cd backend && PYTHONPATH=. .venv/bin/python ../scripts/check_supabase.py`
 - Generate daily brief locally: `scripts/run_cron_local.sh --date YYYY-MM-DD`
 - Markets feed / AI overview (dev bypass): `curl 'localhost:8000/v1/markets/feed?interests=macro,rates&watch=TSLA'` · `curl -X POST localhost:8000/v1/markets/overview -H 'content-type: application/json' -d '{"level":"beginner"}'` (set `DATA_MODE=live` for real-time data)
+- What-if scenarios only: `curl -X POST localhost:8000/v1/markets/lab -H 'content-type: application/json' -d '{"level":"beginner","count":5,"kinds":["scenario"]}'`
+- Market Lab questions (dev bypass): `curl -X POST localhost:8000/v1/markets/lab -H 'content-type: application/json' -d '{"level":"beginner","count":6}'` (answers via `/v1/markets/lab/answer`)
 - Re-capture the golden demo day from live providers (real numbers only): `cd backend && .venv/bin/python -m app.market.capture --replace`
 - Mobile: `cd apps/mobile && npm install && npx expo start` (press `w` for web on localhost:8081; `--tunnel` for phones). Routes live in `apps/mobile/src/app`
 - Regenerate API types after changing backend schemas: `scripts/gen_types.sh`

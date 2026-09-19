@@ -13,17 +13,19 @@ import {
   type Move,
 } from '@/api/client';
 import { Card } from '@/components/Card';
-import { ChainList } from '@/components/ChainList';
+import { StepsDiagram } from '@/components/Diagrams';
 import { Chip, ChipRow } from '@/components/Chip';
 import { DataModeBadge } from '@/components/DataModeBadge';
-import { Evidence } from '@/components/Evidence';
 import { Disclaimer } from '@/components/Disclaimer';
+import { Evidence } from '@/components/Evidence';
 import { HeadlineItem } from '@/components/HeadlineItem';
 import { LabelledSection } from '@/components/LabelledSection';
 import { MoveRow } from '@/components/MoveRow';
 import { PrimaryButton } from '@/components/PrimaryButton';
+import { RuleCard } from '@/components/RuleCard';
 import { Screen } from '@/components/Screen';
 import { SectionHeader } from '@/components/SectionHeader';
+import { StepHeader } from '@/components/StepHeader';
 import { ThemedText } from '@/components/themed-text';
 import { Palette } from '@/constants/theme';
 import { asOfLabel, signed } from '@/lib/format';
@@ -77,11 +79,9 @@ export default function MarketSectionScreen() {
   }
 
   const g = section.guide;
-  const practice = () =>
-    router.push({
-      pathname: '/quiz',
-      params: { formats: 'mcq,case_study', concepts: g.concept_ids.join(','), customs: '', level },
-    });
+  const hasData = g.group !== 'foundations'; // foundations teach concepts; there are no prices to look at
+  let step = 1;
+  const openLab = () => router.push({ pathname: '/lab', params: { section: g.id } });
 
   return (
     <Screen
@@ -90,62 +90,33 @@ export default function MarketSectionScreen() {
       safeEdges={['bottom']}
       footer={
         <>
-          <PrimaryButton label="Practice this section" onPress={practice} />
+          <PrimaryButton label="Test my understanding" onPress={openLab} />
+          <PrimaryButton
+            label="Concept quiz"
+            variant="secondary"
+            onPress={() =>
+              router.push({
+                pathname: '/quiz',
+                params: { formats: 'mcq,case_study', concepts: g.concept_ids.join(','), customs: '', level },
+              })
+            }
+          />
           <Disclaimer />
         </>
       }
     >
       <Stack.Screen options={{ title: g.title }} />
-      <DataModeBadge mode={feed.data_mode} asOf={asOfLabel(feed.as_of)} />
+      {hasData ? <DataModeBadge mode={feed.data_mode} asOf={asOfLabel(feed.as_of)} /> : null}
 
-      <Card tone="info">
-        <ThemedText type="kicker" style={{ color: Palette.primary }}>
-          Who trades this
+      <LabelledSection kind="teaching" title="The big idea">
+        <Text style={styles.bigIdea}>{g.mental_model}</Text>
+        <ThemedText type="caption" themeColor="textSecondary">
+          Who works on this: {g.desk}
         </ThemedText>
-        <ThemedText type="small">{g.desk}</ThemedText>
-      </Card>
-
-      {section.id === 'portfolio' ? <PortfolioBlock section={section} source={feed.portfolio_source} /> : null}
-
-      <SectionHeader title="Today's numbers" meta={section.moves.length ? '1-day change · 5-day' : undefined} />
-      <LabelledSection kind="fact">
-        {section.moves.length ? (
-          section.moves.map((m, i) => <MoveRow key={m.fact_id} move={m} showFiveDay divider={i > 0} />)
-        ) : (
-          <ThemedText type="small" themeColor="textSecondary">
-            {section.note ?? 'No prices available.'}
-          </ThemedText>
-        )}
       </LabelledSection>
 
-      <SectionHeader title="Today's desk note" meta="AI · on demand" />
-      {note ? (
-        <DeskNote note={note} />
-      ) : (
-        <Card>
-          <ThemedText type="small" themeColor="textSecondary">
-            An AI explanation of what moved in this section and why, how a trading desk might think about it,
-            and what to watch next. It only references the numbers above; it never makes up its own.
-          </ThemedText>
-          {noteError ? (
-            <ThemedText type="small" style={{ color: Palette.error }}>
-              {noteError}
-            </ThemedText>
-          ) : null}
-          {noteLoading ? (
-            <View style={styles.loadingRow}>
-              <ActivityIndicator color={Palette.primary} />
-              <ThemedText type="small" themeColor="textSecondary">
-                Reading today&apos;s headlines… (~10s)
-              </ThemedText>
-            </View>
-          ) : (
-            <PrimaryButton label="Explain today" variant="secondary" onPress={() => void loadNote()} />
-          )}
-        </Card>
-      )}
-
-      <SectionHeader title="How this market works" />
+      {/* 1 · UNDERSTAND */}
+      <StepHeader n={step++} title="Understand" subtitle="How it works, and the rules traders carry in their heads" />
       <LabelledSection kind="teaching">
         {g.how_it_works.map((p, i) => (
           <ThemedText key={i} type="small">
@@ -153,6 +124,11 @@ export default function MarketSectionScreen() {
           </ThemedText>
         ))}
       </LabelledSection>
+
+      <SectionHeader title="Rules of thumb" meta="if → then, and when they fail" />
+      {g.rules.map((r) => (
+        <RuleCard key={r.when} rule={r} />
+      ))}
 
       <SectionHeader title="What moves it" />
       <Card>
@@ -164,10 +140,103 @@ export default function MarketSectionScreen() {
         ))}
       </Card>
 
-      <SectionHeader title="The chain reaction" meta="typical cause → effect" />
-      <ChainList steps={g.transmission.map((s) => ({ from: s.from_, to: s.to, why: s.why }))} />
+      <SectionHeader title="The chain reaction" meta="cause → effect, in order" />
+      <StepsDiagram steps={g.transmission.map((s) => ({ from: s.from_, to: s.to, why: s.why }))} />
 
-      <SectionHeader title="How desks trade it" meta="educational archetypes" />
+      {/* 2 · SEE IT TODAY */}
+      {hasData ? (
+        <>
+          <StepHeader n={step++} title="See it today" subtitle="Real numbers, an AI explanation with evidence, headlines" />
+          {section.id === 'portfolio' ? <PortfolioBlock section={section} source={feed.portfolio_source} /> : null}
+
+          <LabelledSection kind="fact" title="Today's numbers">
+            {section.moves.length ? (
+              section.moves.map((m, i) => <MoveRow key={m.fact_id} move={m} showFiveDay divider={i > 0} />)
+            ) : (
+              <ThemedText type="small" themeColor="textSecondary">
+                {section.note ?? 'No prices available.'}
+              </ThemedText>
+            )}
+          </LabelledSection>
+
+          {note ? (
+            <DeskNote note={note} />
+          ) : (
+            <Card>
+              <ThemedText type="smallBold">Why did it move? Ask the desk note.</ThemedText>
+              <ThemedText type="small" themeColor="textSecondary">
+                An AI explanation of today&apos;s moves in this section, with the data and headlines it relies on. Read
+                the numbers above first and form your own view; then compare.
+              </ThemedText>
+              {noteError ? (
+                <ThemedText type="small" style={{ color: Palette.error }}>
+                  {noteError}
+                </ThemedText>
+              ) : null}
+              {noteLoading ? (
+                <View style={styles.loadingRow}>
+                  <ActivityIndicator color={Palette.primary} />
+                  <ThemedText type="small" themeColor="textSecondary">
+                    Reading today&apos;s headlines… (~10s)
+                  </ThemedText>
+                </View>
+              ) : (
+                <PrimaryButton label="Explain today" variant="secondary" onPress={() => void loadNote()} />
+              )}
+            </Card>
+          )}
+
+          <SectionHeader title="Headlines" meta="Fed · WSJ · Yahoo Finance" />
+          <Card style={{ paddingVertical: 4, gap: 0 }}>
+            {section.headlines.length ? (
+              section.headlines.map((h, i) => <HeadlineItem key={h.id} item={h} divider={i > 0} />)
+            ) : (
+              <ThemedText type="small" themeColor="textSecondary" style={{ paddingVertical: 12 }}>
+                No recent headlines for this section.
+              </ThemedText>
+            )}
+          </Card>
+        </>
+      ) : null}
+
+      {/* 3 · TEST YOURSELF */}
+      <StepHeader
+        n={step++}
+        title="Test yourself"
+        subtitle={hasData ? "Not recall: reasoning, on today's real data" : 'Check you can reason with it, not just recite it'}
+      />
+      <Card tone="info">
+        <ThemedText type="smallBold">The Market Lab checks you actually understand:</ThemedText>
+        {(hasData
+          ? [
+              ['What if?', 'change one thing (a Fed cut, an oil shock) and predict the ripple across assets'],
+              ['Predict', "call the direction before seeing what happened, then compare with today's real move"],
+              ['Pick the driver', 'tell real drivers from ones that belong to other markets'],
+              ['Order the chain', 'put a cause-and-effect chain back in sequence'],
+              ['Explain', 'write the mechanism in your own words; AI grades it against the evidence'],
+            ]
+          : [
+              ['What if?', 'change one thing and predict the ripple'],
+              ['Pick the driver', 'tell real drivers from lookalikes'],
+              ['Order the chain', 'put a cause-and-effect chain back in sequence'],
+              ['Explain', 'answer interview-style questions in your own words'],
+            ]
+        ).map(([k, v]) => (
+          <ThemedText key={k} type="small">
+            <Text style={styles.bold}>{k}</Text> · {v}
+          </ThemedText>
+        ))}
+        <PrimaryButton label="Start the Market Lab" onPress={openLab} />
+        <PrimaryButton
+          label="What-if scenarios only"
+          variant="secondary"
+          onPress={() => router.push({ pathname: '/lab', params: { section: g.id, kinds: 'scenario' } })}
+        />
+      </Card>
+
+      {/* 4 · THINK LIKE A DESK */}
+      <StepHeader n={step++} title="Think like a desk" subtitle="How professionals use this, and where beginners slip" />
+      <SectionHeader title="How desks trade it" meta="educational archetypes, not advice" first />
       {g.strategies.map((s) => (
         <Card key={s.name}>
           <Text style={styles.stratTitle}>{s.name}</Text>
@@ -188,16 +257,31 @@ export default function MarketSectionScreen() {
         </Card>
       ))}
 
-      <SectionHeader title="Headlines" meta="Fed · WSJ · Yahoo Finance" />
-      <Card style={{ paddingVertical: 4, gap: 0 }}>
-        {section.headlines.length ? (
-          section.headlines.map((h, i) => <HeadlineItem key={h.id} item={h} divider={i > 0} />)
-        ) : (
-          <ThemedText type="small" themeColor="textSecondary" style={{ paddingVertical: 12 }}>
-            No recent headlines for this section.
+      {g.mistakes.length ? (
+        <Card tone="accent">
+          <ThemedText type="kicker" style={{ color: Palette.warning }}>
+            Classic beginner mistakes
           </ThemedText>
-        )}
-      </Card>
+          {g.mistakes.map((m) => (
+            <ThemedText key={m} type="small">
+              • {m}
+            </ThemedText>
+          ))}
+        </Card>
+      ) : null}
+
+      {g.interview.length ? (
+        <Card tone="info">
+          <ThemedText type="kicker" style={{ color: Palette.primary }}>
+            Interview questions to practise out loud
+          </ThemedText>
+          {g.interview.map((m) => (
+            <ThemedText key={m} type="small">
+              • {m}
+            </ThemedText>
+          ))}
+        </Card>
+      ) : null}
 
       <SectionHeader title="What to watch" />
       <Card>
@@ -231,7 +315,7 @@ function DeskNote({ note }: { note: ExplainSectionResponse }) {
   const byHeadline = new Map(note.headlines.map((h) => [h.id, h]));
   return (
     <>
-      <LabelledSection kind="interpretation" title="What happened">
+      <LabelledSection kind="interpretation" title="What happened (AI desk note)">
         <ThemedText>{e.summary}</ThemedText>
         <View style={styles.confRow}>
           <Chip label={`${e.confidence} confidence`} tone="accent" size="sm" />
@@ -255,7 +339,7 @@ function DeskNote({ note }: { note: ExplainSectionResponse }) {
         ))}
       </LabelledSection>
 
-      <ChainList steps={e.chain.map((s) => ({ from: s.from_, to: s.to, why: s.why }))} />
+      <StepsDiagram steps={e.chain.map((s) => ({ from: s.from_, to: s.to, why: s.why }))} />
 
       <LabelledSection kind="interpretation" title="How a desk might think about it">
         {e.desk_views.map((v) => (
@@ -321,6 +405,8 @@ function PortfolioBlock({ section, source }: { section: MarketSection; source: s
 }
 
 const styles = StyleSheet.create({
+  bigIdea: { color: Palette.text, fontSize: 18, lineHeight: 27, fontWeight: '600' },
+  bold: { fontWeight: '800', color: Palette.text },
   loadingRow: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 8 },
   item: { gap: 2, paddingVertical: 8 },
   divider: { borderTopWidth: 1, borderTopColor: Palette.border },
