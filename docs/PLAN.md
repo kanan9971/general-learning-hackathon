@@ -18,7 +18,7 @@ On approval, implementation starts by committing this plan to `docs/PLAN.md` and
 | DB / vectors / auth | **Supabase Postgres + pgvector + Supabase Auth** | Auth, RLS, storage, vectors and full-text in one managed DB → hybrid search is one SQL function. Separate vector DB = extra service + awkward joins. |
 | API hosting | **Vercel serverless Python** | Free, git-push deploys, built-in cron. **Mitigations for its weaknesses:** brief generation pre-computed by cron (never on request path), LLM work split into short requests (<30s each), tiny dependency footprint (250 MB limit, no local ML models), `maxDuration` raised in `vercel.json`, warm-up ping before demo. |
 | LLM | **xAI Grok** via `openai` Python SDK (`base_url=https://api.x.ai/v1`) | User choice. OpenAI-compatible + structured outputs. Model IDs kept in env vars (`XAI_MODEL_FAST`, `XAI_MODEL_REASONING`) — confirm current IDs in the xAI console at hour 0. |
-| Embeddings | **OpenAI `text-embedding-3-small` (1536-d)** | Same `openai` SDK (different key/base URL), ~cents to embed the whole KB. No reranker → we rerank deterministically (RRF + metadata boosts). |
+| Embeddings | **Alibaba Qwen `text-embedding-v4` via DashScope (1536-d)** | OpenAI is blocked in Hong Kong. DashScope has a HK region and an OpenAI-compatible endpoint, so the `openai` SDK works with a different `base_url`/key; dimension is selectable (1536 keeps the schema). Batch limit 10. No reranker: we rerank with RRF + boosts. |
 | Market data | **Yahoo Finance prices, live-first with cache fallback** (+ seeded "golden day" as last resort); FRED only for the 2Y yield, curve and macro releases Yahoo lacks | Yahoo covers real indices, yields, FX and futures with no key. It is unofficial, so cache + golden day are mandatory. Every screen shows a `LIVE / CACHED / DEMO DAY` badge + as-of timestamp. |
 | News | **WSJ public RSS feeds + Yahoo Finance ticker headlines** | Recognisable, credible publisher for judges. Store **headline + RSS summary + URL + timestamp only**, link out; WSJ article bodies are paywalled, so we never scrape them. |
 | Auth | **Full sign-up (email + password)** | User choice. Password over magic-link because mobile deep links are fragile live. **Pre-created judge account** (`judge@deskready.app`) printed on the demo card. |
@@ -96,7 +96,7 @@ Open questions (defaults in bold, change any time):
 │ Vercel Cron (daily, post-close) → /v1/cron/daily: snapshot → rank → brief → ingest  │
 └───────────────┬───────────────────────────────┬──────────────────────┬───────────────┘
                 │                               │                      │
-     Supabase Postgres (+pgvector, FTS,   xAI Grok API          OpenAI embeddings
+     Supabase Postgres (+pgvector, FTS,   xAI Grok API          Qwen embeddings
      Auth, RLS, SQL RPC match_chunks)              Yahoo Finance · FRED · WSJ/Yahoo RSS
                 ▲
      Local CLI: python -m app.rag.ingest content/  (KB ingestion runs on laptops, not Vercel)
@@ -135,7 +135,7 @@ Rationale: A and B share an index shape but differ in filters/freshness, so one 
 3. **Clean** — normalize whitespace, strip HTML, remove nav/boilerplate, **flag/neutralize instruction-like lines** (see injection).
 4. **Section split** — by Markdown headings; lesson template enforces sections: `Definition · Intuition · Mechanism · Worked example · Common misconception · How it shows up in markets · Interview angle`.
 5. **Chunk** — **one section = one chunk** (target 120–400 tokens); oversize sections split on paragraph boundaries with 1-paragraph overlap; each chunk prefixed with `Title > Section` heading path. News: 1 article = 1 chunk.
-6. **Embed** — batch `text-embedding-3-small` (heading path + content).
+6. **Embed** — batch Qwen `text-embedding-v4` (1536-d, ≤10 per request) (heading path + content).
 7. **Store** — upsert `documents` by `(id, version)` using content checksum; replace chunks for changed docs only.
 8. **Retrieve** — `match_chunks` RPC (below).
 9. **Rerank** — RRF + boosts.
@@ -274,7 +274,7 @@ All tables in `public`, UUID PKs unless noted, `created_at timestamptz default n
 | `PUT /v1/portfolio/positions`, `POST /v1/portfolio/import-csv` | positions / CSV ≤100 rows | `Portfolio` | ticker whitelist, numeric checks | P2 |
 | `DELETE /v1/me` | — | 204 | cascades | P1 |
 
-**External APIs:** xAI (chat/structured outputs) · OpenAI embeddings · Yahoo Finance chart endpoint (unofficial, no key) · WSJ RSS + Yahoo headline RSS · FRED (`series/observations`) · Supabase (PostgREST/Auth). **Retries:** `httpx` with 2 retries + jittered backoff for data providers; LLM: 1 retry on 5xx/timeout, 1 repair retry on schema failure. **Timeouts:** providers 5s, LLM 25s. **Rate limiting (P1):** per-user daily cap on LLM routes via a counter query on `llm_calls`. **Type sharing:** `scripts/gen_types.sh` → `openapi-typescript $API_URL/openapi.json -o apps/mobile/src/api/schema.d.ts`.
+**External APIs:** xAI (chat/structured outputs) · Alibaba DashScope embeddings · Yahoo Finance chart endpoint (unofficial, no key) · WSJ RSS + Yahoo headline RSS · FRED (`series/observations`) · Supabase (PostgREST/Auth). **Retries:** `httpx` with 2 retries + jittered backoff for data providers; LLM: 1 retry on 5xx/timeout, 1 repair retry on schema failure. **Timeouts:** providers 5s, LLM 25s. **Rate limiting (P1):** per-user daily cap on LLM routes via a counter query on `llm_calls`. **Type sharing:** `scripts/gen_types.sh` → `openapi-typescript $API_URL/openapi.json -o apps/mobile/src/api/schema.d.ts`.
 
 ## 10. AI prompt architecture
 
@@ -408,7 +408,7 @@ Each case: `id, query, learner_level, layer_expected, expected_doc_ids, expected
 ## 17. Deployment plan
 
 - **Local:** `cd backend && python -m venv .venv && pip install -r requirements-dev.txt && uvicorn app.main:app --reload`; `cd apps/mobile && npm i && npx expo start` (phone on same Wi-Fi or `--tunnel`); Supabase cloud project (no local Docker needed) — optional `supabase start` for those with Docker.
-- **Env vars (backend):** `XAI_API_KEY`, `XAI_BASE_URL=https://api.x.ai/v1`, `XAI_MODEL_FAST`, `XAI_MODEL_REASONING`, `OPENAI_API_KEY`, `EMBEDDING_MODEL=text-embedding-3-small`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_JWT_SECRET`, `FRED_API_KEY`, `WSJ_RSS_FEEDS` (comma-separated URLs), `YAHOO_USER_AGENT`, `CRON_SECRET`, `DATA_MODE=live|cache|demo`, `DEMO_DATE=YYYY-MM-DD`, `ALLOWED_ORIGINS`. **Mobile:** `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`, `EXPO_PUBLIC_API_URL`. Secrets only in `.env` (gitignored) / Vercel env; `.env.example` committed.
+- **Env vars (backend):** `XAI_API_KEY`, `XAI_BASE_URL=https://api.x.ai/v1`, `XAI_MODEL_FAST`, `XAI_MODEL_REASONING`, `EMBEDDING_API_KEY`, `EMBEDDING_BASE_URL`, `EMBEDDING_MODEL=text-embedding-v4`, `EMBEDDING_DIMS=1536`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_JWT_SECRET`, `FRED_API_KEY`, `WSJ_RSS_FEEDS` (comma-separated URLs), `YAHOO_USER_AGENT`, `CRON_SECRET`, `DATA_MODE=live|cache|demo`, `DEMO_DATE=YYYY-MM-DD`, `ALLOWED_ORIGINS`. **Mobile:** `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`, `EXPO_PUBLIC_API_URL`. Secrets only in `.env` (gitignored) / Vercel env; `.env.example` committed.
 - **Migrations:** `supabase db push` (CLI linked to project) or paste SQL in dashboard in order 0001→0004. Enable `vector` extension first.
 - **Seed:** `psql $DB_URL -f supabase/seed/seed.sql` (concepts, tickers) → `python -m app.rag.ingest content/` → `python supabase/seed/create_judge_user.py` → `scripts/run_cron_local.sh --date $DEMO_DATE` (golden brief).
 - **Deploy:** Vercel project root = `backend/`, Python runtime, env vars set, `vercel.json` with `functions.maxDuration` and `crons`. Mobile: Expo Go via `npx expo start --tunnel`; optional `eas update --channel demo`.
@@ -484,7 +484,7 @@ Full plan: docs/PLAN.md. Deadline-driven: prefer working + simple over clever.
 - apps/mobile — Expo (React Native, TypeScript), Expo Router, NativeWind, TanStack Query, supabase-js
 - backend — Python FastAPI deployed on Vercel serverless (entry: backend/api/index.py)
 - supabase — Postgres + pgvector + Auth (email/password) + RLS; SQL migrations in supabase/migrations
-- LLM: xAI Grok via `openai` SDK (base_url https://api.x.ai/v1); embeddings: OpenAI text-embedding-3-small (1536-d)
+- LLM: xAI Grok via `openai` SDK (base_url https://api.x.ai/v1); embeddings: Alibaba Qwen text-embedding-v4 (1536-d)
 - Market data: Yahoo Finance chart endpoint (prices) + FRED (2Y/curve/macro); news: WSJ + Yahoo RSS headlines only; fallback chain live → cached snapshot → golden demo day
 
 ## Commands

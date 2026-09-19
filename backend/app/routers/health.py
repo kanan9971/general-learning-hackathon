@@ -12,7 +12,7 @@ def health(settings: Settings = Depends(get_settings)) -> Health:
     checks = {
         "supabase_configured": bool(settings.supabase_url),
         "llm_configured": bool(settings.xai_api_key),
-        "embeddings_configured": bool(settings.openai_api_key),
+        "embeddings_configured": bool(settings.embedding_api_key),
     }
     return Health(
         status="ok", data_mode=settings.data_mode, version=settings.app_version, checks=checks

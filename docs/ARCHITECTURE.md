@@ -15,7 +15,7 @@ The product/scope plan lives in `PLAN.md`; this file is the structural contract.
    ├── market/   ──► Yahoo chart endpoint, FRED       (deterministic facts)
    ├── news/     ──► WSJ RSS, Yahoo RSS               (headlines only)
    ├── llm/      ──► xAI Grok                          (structured JSON only)
-   └── rag/      ──► OpenAI embeddings + pgvector     (retrieval)
+   └── rag/      ──► Alibaba Qwen embeddings (DashScope) + pgvector     (retrieval)
  IBKR (later)  ──► broker/ adapter → portfolio tables only, read-only
 ```
 
@@ -87,7 +87,7 @@ Allowed direction is **left → right** ("may import / call"). Anything not list
 `content/sources/research_papers.yaml` (manifest: id, title, authors, publisher, canonical `source_url`, `pdf_url`, concept_ids) →
 `rag/extract.py` (PDF→text; refuses scanned PDFs) → `rag/clean.py` (running headers/footers, references, equation/table debris, injection flag) →
 `rag/chunk.py` (section-aware, ≤350-token target / 500 max, 1-sentence overlap, `Title > Section` path) →
-`llm/embed.py` (OpenAI embeddings) → `db/knowledge.py` (upsert `documents` + `chunks`, layer=`foundation`, content_type=`research`).
+`llm/embed.py` (Alibaba Qwen text-embedding-v4, 1536-d, batch ≤10) → `db/knowledge.py` (upsert `documents` + `chunks`, layer=`foundation`, content_type=`research`).
 Run: `python -m app.rag.ingest ../content/sources/research_papers.yaml` (dry run, writes `content/processed/*.jsonl`) or add `--store`.
 **Rules:** PDFs (`content/raw/`) and extracted text (`content/processed/`) are gitignored, not redistributed. The UI shows short excerpts and always links to `source_url`. Papers are difficulty 3 / trust_level 2 and are only retrieved for advanced learners or explicit momentum/strategy topics, never for beginner misconception lessons.
 
