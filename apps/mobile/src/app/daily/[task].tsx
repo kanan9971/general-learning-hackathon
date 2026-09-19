@@ -22,7 +22,7 @@ import { RuleCard } from '@/components/RuleCard';
 import { Screen } from '@/components/Screen';
 import { SectionHeader } from '@/components/SectionHeader';
 import { ThemedText } from '@/components/themed-text';
-import { Palette, Radius } from '@/constants/theme';
+import { Fonts, Palette, Radius } from '@/constants/theme';
 import { localToday, useDaily } from '@/lib/daily';
 import { conceptLabel, getPlan } from '@/lib/learner';
 import { useMarketsFeed } from '@/lib/useMarketsFeed';
@@ -159,7 +159,8 @@ function Brief({ today, level, setToday, back, done, result }: P) {
           <Err text={err} />
           <PrimaryButton
             label={busy ? 'Saving…' : 'Lock in my read'}
-            disabled={busy || call.trim().length < 20}
+            disabled={call.trim().length < 20}
+            loading={busy}
             onPress={() => void run(() => completeDailyTask('brief', { level, today: localToday(), call }))}
           />
         </>
@@ -218,7 +219,7 @@ function Focus({ today, level, setToday, back, done }: P) {
         <ActivityIndicator color={Palette.primary} />
       ) : null}
       <Err text={err} />
-      {done ? <Done text="Focus done" back={back} /> : <PrimaryButton label={busy ? 'Saving…' : "I've read this"} disabled={busy} onPress={complete} />}
+      {done ? <Done text="Focus done" back={back} /> : <PrimaryButton label={busy ? 'Saving…' : "I've read this"} icon="checkmark" loading={busy} onPress={complete} />}
     </>
   );
 }
@@ -362,7 +363,7 @@ function Analysis({ today, level, setToday, back, done, result }: P) {
         </View>
       ))}
       <Err text={err} />
-      <PrimaryButton label={busy ? 'Grading… (~10s)' : done ? 'Submit a new version' : 'Submit my note'} disabled={busy || !ready} onPress={() => void submit()} />
+      <PrimaryButton label={busy ? 'Grading… (~10s)' : done ? 'Submit a new version' : 'Submit my note'} disabled={!ready} loading={busy} onPress={() => void submit()} />
     </>
   );
 }
@@ -431,7 +432,7 @@ function Review({ today, level, setToday, back, done, result }: P) {
         <>
           <Input value={watch} onChange={setWatch} placeholder="One thing you will watch next: a data release, a level, a headline…" />
           <Err text={err} />
-          <PrimaryButton label={busy ? 'Saving…' : 'Save and finish'} disabled={busy || watch.trim().length < 5} onPress={() => void run(() => completeDailyTask('review', { level, today: localToday(), watch }))} />
+          <PrimaryButton label={busy ? 'Saving…' : 'Save and finish'} disabled={watch.trim().length < 5} loading={busy} onPress={() => void run(() => completeDailyTask('review', { level, today: localToday(), watch }))} />
         </>
       )}
     </>
@@ -464,26 +465,26 @@ function Recap({ today, level, setToday, back, done }: P) {
         </ThemedText>
       </Card>
       <Err text={err} />
-      {done ? <Done text="Recap done" back={back} /> : <PrimaryButton label={busy ? 'Saving…' : 'Mark recap done'} disabled={busy} onPress={() => void run(() => completeDailyTask('recap', { level, today: localToday() }))} />}
+      {done ? <Done text="Recap done" back={back} /> : <PrimaryButton label={busy ? 'Saving…' : 'Mark recap done'} icon="checkmark" loading={busy} onPress={() => void run(() => completeDailyTask('recap', { level, today: localToday() }))} />}
     </>
   );
 }
 
 const styles = StyleSheet.create({
   between: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 },
-  big: { color: Palette.text, fontSize: 22, fontWeight: '800', lineHeight: 28 },
+  big: { color: Palette.text, fontFamily: Fonts.displaySemi, fontSize: 22, fontWeight: '600', lineHeight: 28, letterSpacing: -0.4 },
   idea: { color: Palette.text, fontSize: 17, lineHeight: 25, fontWeight: '600' },
-  score: { color: Palette.text, fontSize: 44, fontWeight: '800', fontVariant: ['tabular-nums'] },
-  pTitle: { color: Palette.text, fontSize: 15, fontWeight: '800' },
-  pScore: { color: Palette.muted, fontSize: 13, fontWeight: '800', fontVariant: ['tabular-nums'] },
-  track: { height: 6, borderRadius: 3, backgroundColor: Palette.border, overflow: 'hidden' },
+  score: { color: Palette.text, fontFamily: Fonts.display, fontSize: 44, fontWeight: '700', letterSpacing: -1.2, fontVariant: ['tabular-nums'] },
+  pTitle: { color: Palette.text, fontSize: 15, fontWeight: '700' },
+  pScore: { color: Palette.muted, fontSize: 13, fontWeight: '700', fontVariant: ['tabular-nums'] },
+  track: { height: 6, borderRadius: 3, backgroundColor: Palette.surfaceSunken, overflow: 'hidden' },
   fill: { height: 6, borderRadius: 3 },
   input: {
     minHeight: 76,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: Palette.border,
     borderRadius: Radius.md,
-    padding: 12,
+    padding: 14,
     fontSize: 15,
     lineHeight: 22,
     color: Palette.text,

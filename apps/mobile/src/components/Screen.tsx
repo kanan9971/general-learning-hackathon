@@ -2,8 +2,9 @@ import { useEffect, useRef } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView, type Edge } from 'react-native-safe-area-context';
 
+import { Reveal } from '@/components/Motion';
 import { ThemedText } from '@/components/themed-text';
-import { Layout, MaxContentWidth, Palette, Spacing } from '@/constants/theme';
+import { Elevation, Layout, MaxContentWidth, Palette, Spacing } from '@/constants/theme';
 
 /**
  * Page shell. Every screen uses it so titles, gutters and the primary action line up.
@@ -43,19 +44,23 @@ export function Screen({
   const body = (
     <View style={styles.content}>
       {title || subtitle ? (
-        <View style={styles.headerRow}>
-          <View style={styles.header}>
-            {title ? <ThemedText type="title">{title}</ThemedText> : null}
-            {subtitle ? (
-              <ThemedText type="small" themeColor="textSecondary">
-                {subtitle}
-              </ThemedText>
-            ) : null}
+        <Reveal index={0}>
+          <View style={styles.headerRow}>
+            <View style={styles.header}>
+              {title ? <ThemedText type="title">{title}</ThemedText> : null}
+              {subtitle ? (
+                <ThemedText type="small" themeColor="textSecondary">
+                  {subtitle}
+                </ThemedText>
+              ) : null}
+            </View>
+            {right}
           </View>
-          {right}
-        </View>
+        </Reveal>
       ) : null}
-      {children}
+      <Reveal index={1} style={styles.body}>
+        {children}
+      </Reveal>
     </View>
   );
 
@@ -88,17 +93,19 @@ const styles = StyleSheet.create({
   content: {
     padding: Layout.screenPadding,
     paddingBottom: Spacing.five,
-    gap: Spacing.three,
+    gap: Spacing.four,
     width: '100%',
     maxWidth: MaxContentWidth,
     alignSelf: 'center',
   },
   headerRow: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: Spacing.two },
-  header: { flex: 1, gap: Spacing.one, marginBottom: Spacing.one },
+  header: { flex: 1, gap: Spacing.two, marginBottom: Spacing.one },
+  body: { gap: Spacing.three, width: '100%' },
   footer: {
     borderTopWidth: 1,
     borderTopColor: Palette.border,
     backgroundColor: Palette.surface,
+    ...Elevation.footer,
   },
   footerInner: {
     width: '100%',

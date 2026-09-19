@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 
-import { Palette } from '@/constants/theme';
+import { Fonts, Palette } from '@/constants/theme';
 
 /** Step indicator: growing dots on the left, "n / total" on the right, in one row. */
 export function ProgressDots({ total, current }: { total: number; current: number }) {
@@ -18,7 +18,7 @@ export function ProgressDots({ total, current }: { total: number; current: numbe
               styles.dot,
               {
                 backgroundColor: i <= current ? Palette.primary : Palette.border,
-                width: i === current ? 24 : 8,
+                transform: [{ scaleX: i === current ? 3 : 1 }],
               },
             ]}
           />
@@ -34,6 +34,12 @@ export function ProgressDots({ total, current }: { total: number; current: numbe
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 },
   dots: { flexDirection: 'row', alignItems: 'center', gap: 6, flex: 1, flexWrap: 'wrap' },
-  dot: { height: 8, borderRadius: 4 },
-  count: { color: Palette.muted, fontSize: 13, fontWeight: '700', fontVariant: ['tabular-nums'] },
+  dot: { height: 8, width: 8, borderRadius: 4, transformOrigin: 'left center' },
+  count: {
+    fontFamily: Fonts.mono,
+    color: Palette.muted,
+    fontSize: 13,
+    fontWeight: '500',
+    fontVariant: ['tabular-nums'],
+  },
 });

@@ -1,3 +1,4 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 
@@ -5,24 +6,31 @@ import type { CycleStatus, Roadmap } from '@/api/client';
 import { Card } from '@/components/Card';
 import { Chip } from '@/components/Chip';
 import { Disclaimer } from '@/components/Disclaimer';
+import { HeroCard } from '@/components/HeroCard';
+import { Reveal } from '@/components/Motion';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { ProfileButton } from '@/components/ProfileButton';
+import { ProgressBar } from '@/components/ProgressBar';
 import { RoadmapTree } from '@/components/Roadmap';
 import { Screen } from '@/components/Screen';
 import { SectionHeader } from '@/components/SectionHeader';
 import { ThemedText } from '@/components/themed-text';
-import { Palette, Radius } from '@/constants/theme';
+import { Elevation, Fonts, OnDark, Palette, Radius } from '@/constants/theme';
 import { localToday, useCycle } from '@/lib/daily';
 import { openNode, testOut, useRoadmap } from '@/lib/useRoadmap';
 import { restartDailyCycle } from '@/api/client';
 
-const DAY_COLOR: Record<string, string> = {
-  met: Palette.success,
-  partial: Palette.warning,
-  missed: Palette.error,
-  today: Palette.primary,
-  rest: Palette.border,
-  future: Palette.border,
+/**
+ * Calendar day looks. Hits are solid, misses are a soft tint (a missed day is information, not an
+ * alarm), today is an outlined ring, rest/future days recede.
+ */
+const DAY_LOOK: Record<string, { bg: string; fg: string; border: string }> = {
+  met: { bg: Palette.success, fg: Palette.white, border: Palette.success },
+  partial: { bg: Palette.warning, fg: Palette.white, border: Palette.warning },
+  missed: { bg: Palette.softError, fg: Palette.error, border: Palette.softError },
+  today: { bg: Palette.surface, fg: Palette.primary, border: Palette.primary },
+  rest: { bg: Palette.surfaceSunken, fg: Palette.subtle, border: Palette.surfaceSunken },
+  future: { bg: Palette.surface, fg: Palette.subtle, border: Palette.border },
 };
 
 /**
@@ -98,9 +106,9 @@ function CycleCard({ cycle, onRestart }: { cycle: CycleStatus; onRestart: () => 
   const verdictText = cycle.verdict === 'on_track' ? 'On track' : cycle.verdict === 'slipping' ? `${cycle.behind_by} days behind` : `${cycle.behind_by} days behind`;
   return (
     <>
-      <Card tone={cycle.complete ? 'success' : 'info'}>
+      <HeroCard tone={cycle.complete ? 'success' : 'primary'}>
         <View style={styles.between}>
-          <ThemedText type="kicker" style={{ color: Palette.primary }}>
+          <ThemedText type="kicker" style={{ color: OnDark.muted }}>
             {cycle.complete ? 'Cycle complete' : `Day ${cycle.day_number} of ${cycle.total_days}`}
           </ThemedText>
           <Chip label={verdictText} tone={verdictTone} size="sm" />
@@ -108,34 +116,38 @@ function CycleCard({ cycle, onRestart }: { cycle: CycleStatus; onRestart: () => 
         <Text style={styles.phase}>
           Week {cycle.phase_index + 1}: {cycle.phase_title}
         </Text>
-        <View style={styles.track}>
-          <View style={[styles.fill, { width: `${Math.max(pct, 3)}%` }]} />
-        </View>
+        <ProgressBar percent={pct} color={OnDark.accent} trackColor={OnDark.track} />
         <View style={styles.between}>
-          <ThemedText type="caption" themeColor="textSecondary">
+          <ThemedText type="caption" style={{ color: OnDark.muted }}>
             {cycle.completed_days} goal days done · {cycle.week_minutes} min this week
           </ThemedText>
-          <Text style={styles.streak}>
-            🔥 {cycle.streak} · best {cycle.best_streak}
-          </Text>
+          <View style={styles.streakRow}>
+            <Ionicons name="flame" size={14} color={cycle.streak ? OnDark.accent : OnDark.faint} />
+            <Text style={styles.streak}>
+              {cycle.streak} · best {cycle.best_streak}
+            </Text>
+          </View>
         </View>
-        {cycle.complete ? <PrimaryButton label="Start the next cycle" onPress={onRestart} /> : null}
-      </Card>
+        {cycle.complete ? <PrimaryButton variant="inverted" icon="arrow-forward" label="Start the next cycle" onPress={onRestart} /> : null}
+      </HeroCard>
 
       <SectionHeader title="Last 14 days" meta="a green day = goal hit" first />
       <View style={styles.calendar}>
-        {cycle.calendar.map((d) => (
-          <View key={d.date} style={styles.day}>
-            <View style={[styles.dayDot, { backgroundColor: DAY_COLOR[d.status], opacity: d.status === 'rest' || d.status === 'future' ? 0.5 : 1 }]}>
-              <Text style={styles.dayNum}>{d.date.slice(-2)}</Text>
-            </View>
-            <Text style={styles.dayLabel}>{d.weekday.slice(0, 1)}</Text>
-          </View>
-        ))}
+        {cycle.calendar.map((d, i) => {
+          const look = DAY_LOOK[d.status] ?? DAY_LOOK.future;
+          return (
+            <Reveal key={d.date} index={i} style={styles.day}>
+              <View style={[styles.dayDot, { backgroundColor: look.bg, borderColor: look.border }, d.status === 'today' && styles.dayToday]}>
+                <Text style={[styles.dayNum, { color: look.fg }]}>{d.date.slice(-2)}</Text>
+              </View>
+              <Text style={[styles.dayLabel, d.status === 'today' && { color: Palette.primary }]}>{d.weekday.slice(0, 1)}</Text>
+            </Reveal>
+          );
+        })}
       </View>
 
       <SectionHeader title="Your 8-week path" />
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} snapToInterval={140} decelerationRate="fast" contentContainerStyle={{ gap: 8, paddingRight: 8 }}>
         {cycle.phases.map((p) => (
           <View
             key={p.index}
@@ -151,9 +163,11 @@ function CycleCard({ cycle, onRestart }: { cycle: CycleStatus; onRestart: () => 
             <Text style={styles.phaseTitle} numberOfLines={2}>
               {p.title}
             </Text>
-            <View style={styles.miniTrack}>
-              <View style={[styles.miniFill, { width: `${(p.days_done / p.days_total) * 100}%`, backgroundColor: p.state === 'done' ? Palette.success : Palette.primary }]} />
-            </View>
+            <ProgressBar
+              percent={(p.days_done / Math.max(p.days_total, 1)) * 100}
+              color={p.state === 'done' ? Palette.success : Palette.primary}
+              height={5}
+            />
             <Text style={styles.phaseMeta}>
               {p.days_done}/{p.days_total} days
             </Text>
@@ -166,27 +180,40 @@ function CycleCard({ cycle, onRestart }: { cycle: CycleStatus; onRestart: () => 
 
 const styles = StyleSheet.create({
   between: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 },
-  phase: { color: Palette.text, fontSize: 20, fontWeight: '800', lineHeight: 26 },
-  track: { height: 8, borderRadius: Radius.sm, backgroundColor: Palette.border, overflow: 'hidden' },
-  fill: { height: 8, borderRadius: Radius.sm, backgroundColor: Palette.primary },
-  streak: { color: Palette.text, fontSize: 13, fontWeight: '800' },
+  phase: {
+    color: OnDark.fg,
+    fontFamily: Fonts.displaySemi,
+    fontSize: 24,
+    fontWeight: '600',
+    lineHeight: 30,
+    letterSpacing: -0.5,
+  },
+  streakRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  streak: { color: OnDark.fg, fontSize: 13, fontWeight: '700', fontVariant: ['tabular-nums'] },
   calendar: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, justifyContent: 'space-between' },
   day: { alignItems: 'center', gap: 3, width: '12.5%' },
-  dayDot: { width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center' },
-  dayNum: { color: Palette.white, fontSize: 11, fontWeight: '800' },
+  dayDot: { width: 34, height: 34, borderRadius: 17, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
+  dayToday: { borderWidth: 2, ...Elevation.card },
+  dayNum: { fontSize: 11, fontWeight: '700', fontVariant: ['tabular-nums'] },
   dayLabel: { color: Palette.muted, fontSize: 10, fontWeight: '700' },
   phaseCard: {
-    width: 128,
-    padding: 10,
-    gap: 4,
+    width: 132,
+    padding: 12,
+    gap: 6,
     borderRadius: Radius.md,
     borderWidth: 1,
     borderColor: Palette.border,
     backgroundColor: Palette.surface,
+    ...Elevation.card,
   },
-  phaseWeek: { color: Palette.muted, fontSize: 10, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.4 },
-  phaseTitle: { color: Palette.text, fontSize: 13, fontWeight: '800', lineHeight: 17, minHeight: 34 },
-  miniTrack: { height: 5, borderRadius: 3, backgroundColor: Palette.border, overflow: 'hidden' },
-  miniFill: { height: 5, borderRadius: 3 },
-  phaseMeta: { color: Palette.muted, fontSize: 10.5, fontWeight: '600' },
+  phaseWeek: {
+    fontFamily: Fonts.mono,
+    color: Palette.muted,
+    fontSize: 10,
+    fontWeight: '500',
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+  },
+  phaseTitle: { color: Palette.text, fontSize: 13, fontWeight: '700', lineHeight: 17, minHeight: 34, letterSpacing: -0.2 },
+  phaseMeta: { color: Palette.muted, fontSize: 10.5, fontWeight: '600', fontVariant: ['tabular-nums'] },
 });

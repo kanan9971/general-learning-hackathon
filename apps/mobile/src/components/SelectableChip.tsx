@@ -1,6 +1,7 @@
-import { Pressable, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 
 import { Chip, type ChipTone } from '@/components/Chip';
+import { AnimatedPressable } from '@/components/Motion';
 import { Radius } from '@/constants/theme';
 
 /** Selectable chip — wraps Chip visuals with press + selected state. */
@@ -16,14 +17,16 @@ export function SelectableChip({
   tone?: ChipTone;
 }) {
   return (
-    <Pressable
+    <AnimatedPressable
       accessibilityRole="checkbox"
       accessibilityState={{ checked: selected }}
       onPress={onPress}
+      haptic="selection"
+      pressScale={0.94}
       style={[styles.wrap, selected && styles.selected]}
     >
       <Chip label={selected ? `✓ ${label}` : label} tone={selected ? tone : 'neutral'} outlined={!selected} />
-    </Pressable>
+    </AnimatedPressable>
   );
 }
 

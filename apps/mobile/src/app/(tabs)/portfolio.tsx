@@ -1,5 +1,5 @@
-import { useCallback, useState } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { useCallback, useEffect, useState } from 'react';
+import { ActivityIndicator, StyleSheet, TextInput, View } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import * as WebBrowser from 'expo-web-browser';
@@ -7,9 +7,12 @@ import * as WebBrowser from 'expo-web-browser';
 import {
   ApiError,
   cancelPaperOrder,
+  getChartHistory,
   getPaperAnalysis,
   getPaperBook,
   submitPaperOrder,
+  type ChartHistory,
+  type ChartTimeframe,
   type ListedOption,
   type PaperAnalysis,
   type PaperBook,
@@ -20,14 +23,18 @@ import { Card } from '@/components/Card';
 import { Chip, ChipRow } from '@/components/Chip';
 import { DataModeBadge } from '@/components/DataModeBadge';
 import { Disclaimer } from '@/components/Disclaimer';
+import { HeroCard } from '@/components/HeroCard';
 import { LabelledSection } from '@/components/LabelledSection';
+import { AnimatedPressable } from '@/components/Motion';
+import { OrderChart, buildSeries, seriesKey } from '@/components/OrderChart';
+import { FillsBlotter, PositionsTable } from '@/components/PaperBlotter';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { ProfileButton } from '@/components/ProfileButton';
 import { Screen } from '@/components/Screen';
 import { SectionHeader } from '@/components/SectionHeader';
 import { SelectableChip } from '@/components/SelectableChip';
 import { ThemedText } from '@/components/themed-text';
-import { Palette, Radius } from '@/constants/theme';
+import { Layout, OnDark, Palette, Radius } from '@/constants/theme';
 import { getPlan } from '@/lib/learner';
 
 const usd = (n: number, digits = 0) =>
@@ -49,6 +56,12 @@ export default function PortfolioTab() {
   const [option, setOption] = useState<ListedOption | null>(null);
   const [analysis, setAnalysis] = useState<PaperAnalysis | null>(null);
   const [customDraft, setCustomDraft] = useState('');
+  // Chart view state only: which instrument is plotted and which fill is highlighted.
+  const [chartKey, setChartKey] = useState<string | null>(null);
+  const [selectedFillId, setSelectedFillId] = useState<string | null>(null);
+  const [timeframe, setTimeframe] = useState<ChartTimeframe>('1M');
+  const [history, setHistory] = useState<ChartHistory | null>(null);
+  const [histBusy, setHistBusy] = useState(false);
 
   const loadBook = useCallback(async () => {
     setError(null);
@@ -99,6 +112,9 @@ export default function PortfolioTab() {
       });
       setBook(res.book);
       setAnalysis(null);
+      // Show the new ticket on the chart straight away.
+      setChartKey(seriesKey(res.fill));
+      setSelectedFillId(res.fill.id);
     } catch (e) {
       setError(e instanceof ApiError ? e.message : 'Ticket failed');
     } finally {
@@ -130,6 +146,35 @@ export default function PortfolioTab() {
     }
   };
 
+  const series = book ? buildSeries(book) : [];
+  const overlaySeries =
+    series.find((s) => s.key === chartKey) ??
+    (chartKey ? { key: chartKey, label: chartKey, fills: [], lot: null } : (series[0] ?? null));
+  const optionSeries = Boolean(overlaySeries?.fills[0]?.option_right || overlaySeries?.lot?.option_right);
+  const chartSymbol = optionSeries ? null : (overlaySeries?.key ?? option?.underlying ?? symbol);
+
+  useEffect(() => {
+    if (!chartSymbol) {
+      setHistory(null);
+      return;
+    }
+    let cancelled = false;
+    setHistBusy(true);
+    void getChartHistory(chartSymbol, timeframe)
+      .then((h) => {
+        if (!cancelled) setHistory(h);
+      })
+      .catch(() => {
+        if (!cancelled) setHistory(null);
+      })
+      .finally(() => {
+        if (!cancelled) setHistBusy(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [chartSymbol, timeframe]);
+
   if (!book && !error) {
     return (
       <Screen title="Portfolio" subtitle="Paper classroom" right={<ProfileButton />}>
@@ -142,19 +187,21 @@ export default function PortfolioTab() {
     <Screen title="Portfolio" subtitle="Paper classroom · simulated fills" right={<ProfileButton />} footer={<Disclaimer />}>
       {book ? <DataModeBadge mode={book.data_mode} asOf={book.as_of ?? undefined} /> : null}
 
-      <Card tone="info">
-        <ThemedText type="kicker" style={{ color: Palette.secondary }}>
+      <HeroCard tone="ink">
+        <ThemedText type="kicker" style={{ color: OnDark.accent }}>
           Classroom cash · {book?.level}
         </ThemedText>
-        <ThemedText type="display">{usd(book?.nav ?? 0)}</ThemedText>
-        <ThemedText type="small" themeColor="textSecondary">
+        <ThemedText type="display" style={{ color: OnDark.fg, fontVariant: ['tabular-nums'] }}>
+          {usd(book?.nav ?? 0)}
+        </ThemedText>
+        <ThemedText type="small" style={{ color: OnDark.muted }}>
           Cash {usd(book?.cash_usd ?? 0)} · holdings {usd(book?.equity_value ?? 0)} · started at{' '}
           {usd(book?.starting_cash ?? 0)}
         </ThemedText>
-        <ThemedText type="caption" themeColor="textSecondary">
+        <ThemedText type="caption" style={{ color: OnDark.faint }}>
           {book?.educational}
         </ThemedText>
-      </Card>
+      </HeroCard>
 
       {error ? (
         <ThemedText type="small" style={styles.error}>
@@ -162,7 +209,7 @@ export default function PortfolioTab() {
         </ThemedText>
       ) : null}
 
-      <SectionHeader title="Holdings" meta={book?.lots.length ? `${book.lots.length}` : 'cash only'} />
+      <SectionHeader title="Positions" meta={book?.lots.length ? `${book.lots.length} open` : 'cash only'} />
       {!book?.lots.length ? (
         <Card>
           <ThemedText type="small" themeColor="textSecondary">
@@ -170,23 +217,42 @@ export default function PortfolioTab() {
           </ThemedText>
         </Card>
       ) : (
-        book.lots.map((lot) => (
-          <Card key={lot.id}>
-            <View style={styles.row}>
-              <ThemedText type="sectionTitle">
-                {lot.symbol}
-                {lot.kind === 'option' ? ` ${lot.option_right} ${lot.option_strike}` : ''}
-              </ThemedText>
-              <ThemedText type="smallBold">{lot.market_value != null ? usd(lot.market_value) : '—'}</ThemedText>
-            </View>
-            <ThemedText type="caption" themeColor="textSecondary">
-              {lot.quantity} × {lot.market_price != null ? usd(lot.market_price, 2) : 'no mark'} · cost{' '}
-              {usd(lot.cost_basis, 2)}
-              {lot.unrealized_pct != null ? ` · ${lot.unrealized_pct.toFixed(1)}% vs cost` : ''}
-            </ThemedText>
-          </Card>
-        ))
+        <PositionsTable
+          lots={book.lots}
+          onOpen={(lot) => {
+            setChartKey(seriesKey(lot));
+            setSelectedFillId(null);
+          }}
+        />
       )}
+
+      <SectionHeader title="Chart" meta={history ? `${history.candles.length} bars · ${history.label}` : 'Yahoo candles'} />
+      {series.length > 1 ? (
+        <ChipRow>
+          {series.map((s) => (
+            <SelectableChip
+              key={s.key}
+              label={s.label}
+              selected={s.key === overlaySeries?.key}
+              onPress={() => {
+                setChartKey(s.key);
+                setSelectedFillId(null);
+              }}
+            />
+          ))}
+        </ChipRow>
+      ) : null}
+      <OrderChart
+        series={overlaySeries}
+        history={optionSeries ? null : history}
+        timeframe={timeframe}
+        onTimeframe={setTimeframe}
+        loading={histBusy}
+        selectedFillId={selectedFillId}
+        onSelectFill={setSelectedFillId}
+        onCancel={(id) => void cancel(id)}
+        busy={busy}
+      />
 
       {book?.attribution ? (
         <LabelledSection kind="fact" title="Today's classroom P&L">
@@ -201,7 +267,7 @@ export default function PortfolioTab() {
         <ThemedText type="kicker">Name</ThemedText>
         <View style={styles.pickedRow}>
           <ThemedText type="sectionTitle">{option ? option.underlying : symbol}</ThemedText>
-          <Pressable
+          <AnimatedPressable
             accessibilityRole="link"
             accessibilityLabel={`Yahoo Finance chart for ${option ? option.underlying : symbol}`}
             onPress={() =>
@@ -209,11 +275,13 @@ export default function PortfolioTab() {
                 `https://finance.yahoo.com/chart/${encodeURIComponent(option ? option.underlying : symbol)}`,
               )
             }
+            haptic="selection"
+            pressScale={0.95}
             style={styles.yahooLink}
           >
             <ThemedText type="linkPrimary">Chart on Yahoo</ThemedText>
             <Ionicons name="open-outline" size={16} color={Palette.primary} />
-          </Pressable>
+          </AnimatedPressable>
         </View>
         <ChipRow>
           {(book?.whitelist ?? []).map((w) => (
@@ -224,6 +292,8 @@ export default function PortfolioTab() {
               onPress={() => {
                 setSymbol(w.symbol);
                 setOption(null);
+                setChartKey(w.symbol);
+                setSelectedFillId(null);
               }}
             />
           ))}
@@ -242,6 +312,8 @@ export default function PortfolioTab() {
                   if (next) {
                     setSymbol(next);
                     setOption(null);
+                    setChartKey(next);
+                    setSelectedFillId(null);
                   }
                 }}
                 placeholder="Custom ticker, e.g. NFLX"
@@ -258,6 +330,8 @@ export default function PortfolioTab() {
                   if (next) {
                     setSymbol(next);
                     setOption(null);
+                    setChartKey(next);
+                    setSelectedFillId(null);
                   }
                 }}
                 style={{ minWidth: 80 }}
@@ -334,10 +408,10 @@ export default function PortfolioTab() {
             Shorts, limits and listed options unlock at higher classroom levels.
           </ThemedText>
         )}
-        <PrimaryButton label={busy ? 'Working…' : 'Simulate fill'} onPress={submit} disabled={busy} />
+        <PrimaryButton label={busy ? 'Working…' : 'Simulate fill'} onPress={submit} loading={busy} />
       </Card>
 
-      <SectionHeader title="Fills" meta={book?.fills.length ? `${book.fills.length}` : undefined} />
+      <SectionHeader title="Blotter" meta={book?.fills.length ? `${book.fills.length} ticket${book.fills.length === 1 ? '' : 's'} · newest first` : undefined} />
       {!book?.fills.length ? (
         <Card>
           <ThemedText type="small" themeColor="textSecondary">
@@ -345,29 +419,22 @@ export default function PortfolioTab() {
           </ThemedText>
         </Card>
       ) : (
-        book.fills.map((f) => (
-          <Card key={f.id}>
-            <View style={styles.row}>
-              <ThemedText type="sectionTitle">
-                {f.side} {f.quantity} {f.symbol}
-              </ThemedText>
-              <Chip label={f.status} size="sm" tone={f.status === 'filled' ? 'success' : f.status === 'working' ? 'accent' : 'neutral'} />
-            </View>
-            <ThemedText type="caption" themeColor="textSecondary">
-              {f.ticket_kind}
-              {f.fill_price != null ? ` · ${usd(f.fill_price, 2)}` : ''}
-              {f.analysis_ready ? ' · analysis ready' : ''}
-            </ThemedText>
-            {f.status === 'working' ? (
-              <PrimaryButton label="Cancel resting ticket" variant="secondary" onPress={() => cancel(f.id)} disabled={busy} />
-            ) : null}
-          </Card>
-        ))
+        <FillsBlotter
+          fills={book.fills}
+          selectedId={selectedFillId}
+          onSelect={(id) => {
+            setSelectedFillId(id);
+            const f = id ? book.fills.find((x) => x.id === id) : null;
+            if (f) setChartKey(seriesKey(f));
+          }}
+          onCancel={(id) => void cancel(id)}
+          busy={busy}
+        />
       )}
 
       <SectionHeader title="Analysis overview" />
       {book?.analysis_available ? (
-        <PrimaryButton label={analysis ? 'Refresh analysis' : 'Write the overview'} onPress={runAnalysis} disabled={busy} />
+        <PrimaryButton label={analysis ? 'Refresh analysis' : 'Write the overview'} onPress={runAnalysis} loading={busy} />
       ) : (
         <Card>
           <ThemedText type="small" themeColor="textSecondary">
@@ -412,16 +479,15 @@ export default function PortfolioTab() {
 }
 
 const styles = StyleSheet.create({
-  row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 },
   pickedRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' },
   yahooLink: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   customRow: { flexDirection: 'row', gap: 8, alignItems: 'center' },
   input: {
-    height: 48,
-    borderWidth: 1,
+    height: Layout.controlHeight,
+    borderWidth: 1.5,
     borderColor: Palette.border,
-    borderRadius: Radius.sm,
-    paddingHorizontal: 12,
+    borderRadius: Radius.md,
+    paddingHorizontal: 14,
     fontSize: 16,
     color: Palette.text,
     backgroundColor: Palette.surface,

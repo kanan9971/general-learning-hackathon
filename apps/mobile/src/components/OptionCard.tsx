@@ -1,5 +1,7 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+import Animated from 'react-native-reanimated';
 
+import { AnimatedPressable, useSelectionPop } from '@/components/Motion';
 import { Layout, Palette, Radius } from '@/constants/theme';
 
 type State = 'idle' | 'correct' | 'incorrect' | 'missed';
@@ -44,27 +46,33 @@ export function OptionCard({
           ? LETTERS[index] ?? ''
           : '';
 
+  const pop = useSelectionPop(selected);
+
   return (
-    <Pressable
-      accessibilityRole="radio"
-      accessibilityState={{ selected }}
-      onPress={onPress}
-      style={({ pressed }) => [
-        styles.card,
-        { borderColor: tone.border, backgroundColor: tone.bg },
-        pressed && !selected && state === 'idle' && styles.pressed,
-      ]}
-    >
-      <View
-        style={[
-          styles.badge,
-          { borderColor: tone.badge, backgroundColor: filled ? tone.badge : Palette.surface },
+    <Animated.View style={pop}>
+      <AnimatedPressable
+        accessibilityRole="radio"
+        accessibilityState={{ selected }}
+        onPress={onPress}
+        haptic="selection"
+        pressScale={0.985}
+        style={({ hovered }) => [
+          styles.card,
+          { borderColor: tone.border, backgroundColor: tone.bg },
+          hovered && state === 'idle' && !selected && { borderColor: Palette.subtle },
         ]}
       >
-        <Text style={[styles.badgeText, { color: filled ? Palette.white : Palette.muted }]}>{glyph}</Text>
-      </View>
-      <Text style={[styles.label, selected && styles.labelSelected]}>{label}</Text>
-    </Pressable>
+        <View
+          style={[
+            styles.badge,
+            { borderColor: tone.badge, backgroundColor: filled ? tone.badge : Palette.surface },
+          ]}
+        >
+          <Text style={[styles.badgeText, { color: filled ? Palette.white : Palette.muted }]}>{glyph}</Text>
+        </View>
+        <Text style={[styles.label, selected && styles.labelSelected]}>{label}</Text>
+      </AnimatedPressable>
+    </Animated.View>
   );
 }
 
@@ -79,7 +87,6 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: Layout.cardPadding,
   },
-  pressed: { backgroundColor: Palette.softInfo },
   badge: {
     width: 28,
     height: 28,

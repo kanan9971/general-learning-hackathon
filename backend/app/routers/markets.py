@@ -5,8 +5,8 @@ from fastapi import APIRouter, Query
 
 from ..deps import BearerToken, CurrentUser
 from ..schemas.markets import (
-    ExplainSectionRequest, ExplainSectionResponse, LabAnswerRequest, LabFeedback, LabRequest, LabSet, MarketsFeed,
-    OverviewRequest, OverviewResponse, SectionId,
+    ChartHistory, ChartTimeframe, ExplainSectionRequest, ExplainSectionResponse, LabAnswerRequest, LabFeedback,
+    LabRequest, LabSet, MarketsFeed, OverviewRequest, OverviewResponse, SectionId,
 )
 from ..services import markets as markets_service
 from ..services import markets_lab
@@ -16,6 +16,16 @@ router = APIRouter(prefix="/v1", tags=["markets"])
 
 def _csv(raw: str | None) -> list[str]:
     return [x.strip() for x in (raw or "").split(",") if x.strip()]
+
+
+@router.get("/markets/history", response_model=ChartHistory)
+async def markets_history(
+    user_id: CurrentUser,
+    symbol: Annotated[str, Query(min_length=1, max_length=16, description="Yahoo ticker, e.g. AAPL")],
+    timeframe: ChartTimeframe = "1M",
+) -> ChartHistory:
+    """OHLCV candles from Yahoo (golden day when DATA_MODE=demo). Numbers are never from the LLM."""
+    return await markets_service.get_chart_history(symbol, timeframe)
 
 
 @router.get("/markets/feed", response_model=MarketsFeed)

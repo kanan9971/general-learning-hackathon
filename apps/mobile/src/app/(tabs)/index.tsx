@@ -1,21 +1,23 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 
 import type { DailyTask } from '@/api/client';
 import { Card } from '@/components/Card';
-import { Chip } from '@/components/Chip';
 import { DataModeBadge } from '@/components/DataModeBadge';
 import { Disclaimer } from '@/components/Disclaimer';
+import { HeroCard } from '@/components/HeroCard';
 import { HubTile, TileGrid } from '@/components/HubTile';
 import { LabelledSection } from '@/components/LabelledSection';
+import { AnimatedPressable, Reveal } from '@/components/Motion';
 import { MoveRow } from '@/components/MoveRow';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { ProfileButton } from '@/components/ProfileButton';
+import { ProgressBar } from '@/components/ProgressBar';
 import { Screen } from '@/components/Screen';
 import { SectionHeader } from '@/components/SectionHeader';
 import { ThemedText } from '@/components/themed-text';
-import { Palette, Radius } from '@/constants/theme';
+import { Elevation, Fonts, OnDark, Palette, Radius } from '@/constants/theme';
 import { asOfLabel } from '@/lib/format';
 import { useDaily } from '@/lib/daily';
 
@@ -44,34 +46,41 @@ export default function TodayScreen() {
       {t ? (
         <>
           {/* The session */}
-          <Card tone={t.goal_met ? 'success' : 'info'}>
-            <View style={styles.between}>
-              <ThemedText type="kicker" style={{ color: t.goal_met ? Palette.success : Palette.primary }}>
-                {t.goal_met ? 'Day complete' : t.is_market_day ? "Today's session" : 'Weekend recap'}
-              </ThemedText>
-              <Chip label={`🔥 ${t.streak}-day streak`} tone={t.streak ? 'accent' : 'neutral'} size="sm" />
-            </View>
-            <Text style={styles.theme}>{t.theme}</Text>
-            <ThemedText type="small" themeColor="textSecondary">
-              Week {t.phase.index + 1} · {t.phase.title} · day {t.day_number} of {t.total_goal_days}
-            </ThemedText>
-            <View style={styles.track}>
-              <View style={[styles.fill, { width: `${Math.max(donePct, 3)}%`, backgroundColor: t.goal_met ? Palette.success : Palette.primary }]} />
-            </View>
-            <ThemedText type="caption" themeColor="textSecondary">
-              {t.minutes_done} of {t.minutes_planned} min ·{' '}
-              {t.is_market_day ? 'goal: a passing analyst note and a practice set' : 'goal: the recap and the review'}
-            </ThemedText>
-            {t.verdict !== 'on_track' ? (
-              <View style={styles.warn}>
-                <Text style={styles.warnText}>
-                  {t.behind_by} goal days behind. Your cycle stretches to fit; nothing resets. Two sessions this week
-                  gets you back.
-                </Text>
+          <Reveal index={0}>
+            <HeroCard tone={t.goal_met ? 'success' : 'primary'}>
+              <View style={styles.between}>
+                <ThemedText type="kicker" style={{ color: OnDark.muted }}>
+                  {t.goal_met ? 'Day complete' : t.is_market_day ? "Today's session" : 'Weekend recap'}
+                </ThemedText>
+                <View style={styles.streak}>
+                  <Ionicons name="flame" size={12} color={t.streak ? OnDark.accent : OnDark.faint} />
+                  <ThemedText type="kicker" style={{ color: t.streak ? OnDark.accent : OnDark.muted }}>
+                    {t.streak}-day streak
+                  </ThemedText>
+                </View>
               </View>
-            ) : null}
-            {!t.goal_met && next ? <PrimaryButton label={`Start: ${next.title}`} onPress={() => open(next)} /> : null}
-          </Card>
+              <Text style={styles.theme}>{t.theme}</Text>
+              <ThemedText type="kicker" style={{ color: OnDark.muted }}>
+                Week {t.phase.index + 1} · {t.phase.title} · day {t.day_number} of {t.total_goal_days}
+              </ThemedText>
+              <ProgressBar percent={donePct} color={OnDark.accent} trackColor={OnDark.track} />
+              <ThemedText type="caption" style={{ color: OnDark.muted }}>
+                {t.minutes_done} of {t.minutes_planned} min ·{' '}
+                {t.is_market_day ? 'goal: a passing analyst note and a practice set' : 'goal: the recap and the review'}
+              </ThemedText>
+              {t.verdict !== 'on_track' ? (
+                <View style={styles.warn}>
+                  <Text style={styles.warnText}>
+                    {t.behind_by} goal days behind. Your cycle stretches to fit; nothing resets. Two sessions this week
+                    gets you back.
+                  </Text>
+                </View>
+              ) : null}
+              {!t.goal_met && next ? (
+                <PrimaryButton variant="inverted" icon="arrow-forward" label={`Start: ${next.title}`} onPress={() => open(next)} style={styles.heroCta} />
+              ) : null}
+            </HeroCard>
+          </Reveal>
 
           {t.cycle_complete ? (
             <Card tone="accent">
@@ -86,25 +95,29 @@ export default function TodayScreen() {
               const done = task.status === 'done';
               const isNext = !t.goal_met && next?.id === task.id;
               return (
-                <Pressable
-                  key={task.id}
-                  accessibilityRole="button"
-                  accessibilityLabel={`${task.title}, ${task.minutes} minutes, ${done ? 'done' : 'to do'}`}
-                  onPress={() => open(task)}
-                  style={({ pressed }) => [styles.block, done && styles.blockDone, isNext && styles.blockNext, pressed && { opacity: 0.75 }]}
-                >
-                  <View style={[styles.badge, done && { backgroundColor: Palette.success, borderColor: Palette.success }]}>
-                    {done ? <Ionicons name="checkmark" size={16} color={Palette.white} /> : <Text style={styles.badgeText}>{i + 1}</Text>}
-                  </View>
-                  <View style={{ flex: 1, gap: 2 }}>
-                    <Text style={styles.blockTitle}>{task.title}</Text>
-                    <Text style={styles.blockBlurb}>{task.blurb}</Text>
-                  </View>
-                  <View style={{ alignItems: 'flex-end', gap: 2 }}>
-                    <Text style={styles.min}>{task.minutes} min</Text>
-                    <Ionicons name="chevron-forward" size={16} color={Palette.muted} />
-                  </View>
-                </Pressable>
+                <Reveal key={task.id} index={i}>
+                  <AnimatedPressable
+                    accessibilityRole="button"
+                    accessibilityLabel={`${task.title}, ${task.minutes} minutes, ${done ? 'done' : 'to do'}`}
+                    onPress={() => open(task)}
+                    haptic="selection"
+                    lift={2}
+                    pressScale={0.985}
+                    style={({ pressed, hovered }) => [styles.block, done && styles.blockDone, isNext && styles.blockNext, (pressed || hovered) && styles.blockPressed]}
+                  >
+                    <View style={[styles.badge, done && { backgroundColor: Palette.success, borderColor: Palette.success }]}>
+                      {done ? <Ionicons name="checkmark" size={16} color={Palette.white} /> : <Text style={styles.badgeText}>{i + 1}</Text>}
+                    </View>
+                    <View style={{ flex: 1, gap: 2 }}>
+                      <Text style={styles.blockTitle}>{task.title}</Text>
+                      <Text style={styles.blockBlurb}>{task.blurb}</Text>
+                    </View>
+                    <View style={{ alignItems: 'flex-end', gap: 2 }}>
+                      <Text style={styles.min}>{task.minutes} min</Text>
+                      <Ionicons name="chevron-forward" size={16} color={Palette.muted} />
+                    </View>
+                  </AnimatedPressable>
+                </Reveal>
               );
             })}
           </View>
@@ -129,23 +142,33 @@ export default function TodayScreen() {
 
 const styles = StyleSheet.create({
   between: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 },
-  theme: { color: Palette.text, fontSize: 20, fontWeight: '800', lineHeight: 26 },
-  track: { height: 8, borderRadius: Radius.sm, backgroundColor: Palette.border, overflow: 'hidden' },
-  fill: { height: 8, borderRadius: Radius.sm },
-  warn: { backgroundColor: Palette.softAccent, borderRadius: Radius.sm, padding: 10 },
-  warnText: { color: Palette.warning, fontSize: 13, fontWeight: '600', lineHeight: 18 },
+  streak: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  theme: {
+    color: OnDark.fg,
+    fontFamily: Fonts.displaySemi,
+    fontSize: 24,
+    fontWeight: '600',
+    lineHeight: 30,
+    letterSpacing: -0.5,
+  },
+  warn: { backgroundColor: OnDark.accentTint, borderLeftWidth: 3, borderLeftColor: OnDark.accent, borderRadius: Radius.sm, padding: 12 },
+  warnText: { color: OnDark.fg, fontSize: 13, fontWeight: '600', lineHeight: 18 },
+  heroCta: { marginTop: 6 },
   block: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    padding: 14,
+    padding: 16,
+    minHeight: 64,
     borderRadius: Radius.md,
     borderWidth: 1,
     borderColor: Palette.border,
     backgroundColor: Palette.surface,
+    ...Elevation.card,
   },
   blockDone: { backgroundColor: Palette.softSuccess, borderColor: Palette.success },
   blockNext: { borderColor: Palette.primary, borderWidth: 2 },
+  blockPressed: { borderColor: Palette.primary, ...Elevation.raised },
   badge: {
     width: 30,
     height: 30,
@@ -155,8 +178,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  badgeText: { color: Palette.primary, fontWeight: '800' },
-  blockTitle: { color: Palette.text, fontSize: 15, fontWeight: '800' },
+  badgeText: { color: Palette.primary, fontWeight: '700' },
+  blockTitle: { color: Palette.text, fontSize: 15, fontWeight: '700', letterSpacing: -0.2 },
   blockBlurb: { color: Palette.muted, fontSize: 12, lineHeight: 17 },
-  min: { color: Palette.muted, fontSize: 12, fontWeight: '700' },
+  min: { color: Palette.muted, fontSize: 12, fontWeight: '700', fontVariant: ['tabular-nums'] },
 });

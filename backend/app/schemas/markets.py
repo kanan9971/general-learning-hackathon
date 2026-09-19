@@ -7,6 +7,8 @@ from pydantic import BaseModel, Field
 from .common import Confidence, DataMode, Level
 from .portfolio import Attribution
 
+ChartTimeframe = Literal["15m", "1h", "4h", "5d", "1M", "1Y", "YTD", "ALL"]
+
 SectionId = Literal[
     "macro", "rates", "fx", "commodities", "equities", "sectors", "companies", "portfolio",
     "desk", "valuation", "risk",
@@ -184,6 +186,29 @@ class InterestOption(BaseModel):
     group: SectionGroup
     title: str
     tagline: str
+
+
+class ChartCandle(BaseModel):
+    """One OHLCV bar. `t` is the bar open in UTC. Numbers come from Yahoo (or the golden capture)."""
+    t: str
+    open: float
+    high: float
+    low: float
+    close: float
+    volume: float
+
+
+class ChartHistory(BaseModel):
+    symbol: str
+    timeframe: ChartTimeframe
+    interval: str  # actual bar size after aggregation (e.g. 4h from 60m)
+    range: str
+    label: str
+    as_of: str | None
+    data_mode: DataMode
+    source: Literal["yahoo", "golden"]
+    candles: list[ChartCandle]
+    note: str | None = None  # e.g. demo day showing daily because 15m was not captured
 
 
 class MarketsFeed(BaseModel):

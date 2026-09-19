@@ -20,7 +20,7 @@ export default function ProfileScreen() {
   }, []);
 
   return (
-    <Screen title="Profile" safeEdges={['bottom']} footer={<Disclaimer />}>
+    <Screen safeEdges={['bottom']} footer={<Disclaimer />}>
       <Stack.Screen options={{ title: 'Profile' }} />
       <Card tone="info">
         <ThemedText type="kicker" style={{ color: Palette.secondary }}>

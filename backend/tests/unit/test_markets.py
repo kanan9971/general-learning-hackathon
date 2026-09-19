@@ -12,7 +12,8 @@ from app.market import ranking, snapshot
 from app.market.facts import to_move
 from app.market.providers.base import Quote
 from app.market.providers.treasury import parse_curve_csv, quotes_from_rows
-from app.market.providers.yahoo import parse_chart
+from app.market.providers import yahoo
+from app.market.providers.yahoo import parse_chart, parse_ohlc
 from app.market.universe import INSTRUMENTS, Instrument
 from app.news.classify import classify
 from app.news.feeds import Feed
@@ -60,6 +61,59 @@ def test_yahoo_chart_parse_skips_null_closes():
     q = parse_chart("X", payload)
     assert q and (q.last, q.prev) == (11.0, 10.0)
     assert parse_chart("X", {"chart": {"result": None}}) is None
+
+
+def test_yahoo_ohlc_parse_skips_null_closes():
+    payload = {"chart": {"result": [{"timestamp": [1, 2, 3], "indicators": {"quote": [{
+        "open": [10.0, None, 11.0], "high": [10.5, None, 11.5], "low": [9.5, None, 10.5],
+        "close": [10.0, None, 11.0], "volume": [100, None, 200],
+    }]}}]}}
+    bars = parse_ohlc(payload)
+    assert [(b.t, b.close, b.volume) for b in bars] == [(1, 10.0, 100.0), (3, 11.0, 200.0)]
+    assert parse_ohlc({"chart": {"result": None}}) == []
+
+
+def test_aggregate_four_hour_buckets():
+    from app.market.history import aggregate
+    from app.market.providers.base import Candle
+    a = Candle(100, 10, 11, 9, 10.5, 1)
+    b = Candle(3700, 10.5, 12, 10, 11, 2)
+    c = Candle(15000, 11, 11.2, 10.8, 11.1, 3)
+    out = aggregate([a, b, c], 14400)
+    assert len(out) == 2
+    assert (out[0].open, out[0].high, out[0].low, out[0].close, out[0].volume) == (10, 12, 9, 11, 3)
+    assert out[1].open == 11
+
+
+def test_history_demo_uses_golden_not_network(demo_client, monkeypatch):
+    from app.market import history
+    from app.market.providers.base import Candle
+    monkeypatch.setattr(history, "get_settings", lambda: Settings(data_mode="demo"))
+
+    async def no_network(*a, **k):
+        raise AssertionError("demo mode must not call providers")
+    monkeypatch.setattr(yahoo, "fetch_ohlc", no_network)
+
+    bars = [Candle(1_700_000_000 + i * 86400, 10 + i, 11 + i, 9 + i, 10.5 + i, 100) for i in range(40)]
+    monkeypatch.setattr(history, "load_golden_charts", lambda: {
+        "series": {"AAPL": {"1d": {"bars": [[b.t, b.open, b.high, b.low, b.close, b.volume] for b in bars]}}},
+    })
+    history.reset_cache()
+    r = demo_client.get("/v1/markets/history", params={"symbol": "AAPL", "timeframe": "1Y"})
+    assert r.status_code == 200
+    d = r.json()
+    assert d["data_mode"] == "demo" and d["source"] == "golden" and d["timeframe"] == "1Y"
+    assert d["candles"][0]["open"] == 10
+    assert d["candles"][-1]["close"] == 49.5
+    assert all("close" in c and "high" in c for c in d["candles"])
+
+
+def test_history_rejects_bad_symbol(demo_client, monkeypatch):
+    from app.market import history
+    monkeypatch.setattr(history, "get_settings", lambda: Settings(data_mode="demo"))
+    r = demo_client.get("/v1/markets/history", params={"symbol": "$$$", "timeframe": "1M"})
+    assert r.status_code == 400
+    assert r.json()["code"] == "invalid_request"
 
 
 RSS = """<?xml version="1.0"?><rss><channel>

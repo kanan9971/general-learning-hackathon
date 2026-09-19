@@ -2,14 +2,22 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { useFonts } from 'expo-font';
+import { Fraunces_600SemiBold, Fraunces_700Bold } from '@expo-google-fonts/fraunces';
+import { JetBrainsMono_500Medium } from '@expo-google-fonts/jetbrains-mono';
 
 import { ensureAnonymousSession } from '../lib/auth';
 import { isOnboarded } from '@/lib/learner';
-import { Palette } from '@/constants/theme';
+import { Fonts, Palette } from '@/constants/theme';
 
 export default function RootLayout() {
   const [ready, setReady] = useState(false);
   const [onboarded, setOnboarded] = useState(false);
+  const [fontsLoaded, fontError] = useFonts({
+    Fraunces_600SemiBold,
+    Fraunces_700Bold,
+    JetBrainsMono_500Medium,
+  });
   const segments = useSegments();
   const router = useRouter();
 
@@ -42,7 +50,7 @@ export default function RootLayout() {
     }
   }, [ready, onboarded, segments, router]);
 
-  if (!ready) {
+  if (!ready || (!fontsLoaded && !fontError)) {
     return (
       <View
         style={{
@@ -67,7 +75,7 @@ export default function RootLayout() {
           headerStyle: { backgroundColor: Palette.pageBackground },
           headerShadowVisible: false,
           headerTintColor: Palette.primary,
-          headerTitleStyle: { color: Palette.text, fontWeight: '700', fontSize: 17 },
+          headerTitleStyle: { color: Palette.text, fontFamily: Fonts.displaySemi, fontWeight: '600', fontSize: 17 },
           headerBackButtonDisplayMode: 'minimal',
         }}
       >

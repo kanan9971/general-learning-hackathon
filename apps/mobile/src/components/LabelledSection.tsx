@@ -2,7 +2,7 @@
 import { StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
-import { Layout, Palette, Radius } from '@/constants/theme';
+import { Elevation, Layout, Palette, Radius } from '@/constants/theme';
 
 export type SectionKind = 'fact' | 'interpretation' | 'teaching' | 'you';
 
@@ -14,7 +14,7 @@ const META: Record<SectionKind, { label: string; color: string; bg: string }> = 
 };
 
 /**
- * Same footprint as `Card` (padding 16, radius 12) plus a 4px colour rail and a kicker,
+ * Same footprint as `Card` (padding 20, radius 14) plus a 4px colour rail and a kicker,
  * so labelled blocks line up with plain cards on the same screen.
  */
 export function LabelledSection({
@@ -46,7 +46,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Palette.border,
     padding: Layout.cardPadding,
-    gap: 6,
+    gap: 8,
+    ...Elevation.card,
   },
   body: { gap: 6 },
 });

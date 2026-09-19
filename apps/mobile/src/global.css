@@ -1,9 +1,82 @@
 :root {
-  --font-display:
-    Spline Sans, Inter, ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji,
-    Segoe UI Symbol, Noto Color Emoji;
-  --font-mono:
-    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
+  --font-display: 'Fraunces_700Bold', Georgia, 'Times New Roman', serif;
+  --font-sans: ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol,
+    Noto Color Emoji;
+  --font-mono: 'JetBrainsMono_500Medium', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    'Liberation Mono', 'Courier New', monospace;
   --font-rounded: 'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif;
-  --font-serif: Georgia, 'Times New Roman', serif;
+  --font-serif: 'Fraunces_600SemiBold', Georgia, 'Times New Roman', serif;
+  --color-primary: #1e4e8c;
+}
+
+html,
+body,
+#root {
+  background:
+    radial-gradient(ellipse at 30% 0%, rgba(250, 235, 215, 0.32) 0%, transparent 52%),
+    #fbfaf8;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Buttons feel like buttons on the web build: pointer, no grey tap flash, no text selection. */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+[role='button'],
+[role='tab'],
+[role='radio'],
+[role='checkbox'],
+[role='link'],
+a,
+button {
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Keyboard users get one consistent ring; mouse clicks do not. */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+::selection {
+  background: rgba(30, 78, 140, 0.16);
+}
+
+/* Thin warm scrollbars instead of the default grey rails. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(28, 25, 23, 0.18) transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: rgba(28, 25, 23, 0.18);
+  border-radius: 999px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+input,
+textarea {
+  transition:
+    border-color 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+input:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 3px rgba(30, 78, 140, 0.14);
 }

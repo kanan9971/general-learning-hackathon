@@ -1,6 +1,7 @@
-import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 
-import { Layout, Palette, Radius } from '@/constants/theme';
+import { AnimatedPressable } from '@/components/Motion';
+import { Elevation, Layout, Palette, Radius } from '@/constants/theme';
 
 export type CardTone = 'surface' | 'info' | 'accent' | 'success' | 'error';
 
@@ -13,8 +14,8 @@ const TONE_BG: Record<CardTone, string> = {
 };
 
 /**
- * The one card surface used everywhere (padding 16, radius 12, 1px border).
- * Pass `onPress` to get a tappable card with a highlighted pressed state.
+ * The one card surface used everywhere (padding 20, radius 14, hairline + warm elevation).
+ * Pass `onPress` to get a tappable card with press compression.
  */
 export function Card({
   children,
@@ -36,17 +37,16 @@ export function Card({
   }
 
   return (
-    <Pressable
+    <AnimatedPressable
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
       onPress={onPress}
-      style={({ pressed }) => [
-        base,
-        pressed && { backgroundColor: Palette.softInfo, borderColor: Palette.primary },
-      ]}
+      haptic="selection"
+      lift={2}
+      style={({ pressed, hovered }) => [base, (pressed || hovered) && styles.pressed]}
     >
       {children}
-    </Pressable>
+    </AnimatedPressable>
   );
 }
 
@@ -57,5 +57,7 @@ const styles = StyleSheet.create({
     borderRadius: Radius.md,
     padding: Layout.cardPadding,
     gap: Layout.cardGap,
+    ...Elevation.card,
   },
+  pressed: { borderColor: Palette.primary, ...Elevation.raised },
 });

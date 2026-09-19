@@ -26,10 +26,10 @@ export function MoveRow({ move, showFiveDay, divider }: { move: Move; showFiveDa
 }
 
 const styles = StyleSheet.create({
-  row: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 10 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 12, minHeight: 44 },
   divider: { borderTopWidth: 1, borderTopColor: Palette.border },
   left: { flex: 1, gap: 2 },
-  label: { color: Palette.text, fontSize: 15, fontWeight: '600' },
+  label: { color: Palette.text, fontSize: 15, fontWeight: '600', letterSpacing: -0.1 },
   meta: { color: Palette.muted, fontSize: 12, fontVariant: ['tabular-nums'] },
   change: { fontSize: 15, fontWeight: '700', minWidth: 72, textAlign: 'right', fontVariant: ['tabular-nums'] },
 });

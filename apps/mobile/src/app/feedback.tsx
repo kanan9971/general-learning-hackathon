@@ -7,7 +7,7 @@ import { Screen } from '@/components/Screen';
 import { SectionHeader } from '@/components/SectionHeader';
 import { ThemedText } from '@/components/themed-text';
 import { conceptLabel } from '@/lib/learner';
-import { Palette } from '@/constants/theme';
+import { Fonts, Palette } from '@/constants/theme';
 
 type Result = {
   conceptId: string;
@@ -105,7 +105,7 @@ export default function FeedbackScreen() {
 
 const styles = StyleSheet.create({
   scoreCard: { alignItems: 'center', paddingVertical: 24, gap: 2 },
-  score: { fontSize: 56, lineHeight: 60, fontWeight: '800', fontVariant: ['tabular-nums'] },
+  score: { fontFamily: Fonts.display, fontSize: 56, lineHeight: 58, fontWeight: '700', letterSpacing: -1.4, fontVariant: ['tabular-nums'] },
   scoreSub: { color: Palette.muted, fontSize: 14, fontWeight: '600' },
   list: { paddingVertical: 4, gap: 0 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12 },

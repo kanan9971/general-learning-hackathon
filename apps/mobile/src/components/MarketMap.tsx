@@ -4,7 +4,7 @@ import type { MarketSectionId, MarketsFeed, Move } from '@/api/client';
 import { Card } from '@/components/Card';
 import { Arrow, TONE, type NodeTone } from '@/components/Diagrams';
 import { ThemedText } from '@/components/themed-text';
-import { Palette, Radius } from '@/constants/theme';
+import { Fonts, Palette, Radius } from '@/constants/theme';
 import { level as levelText, signed } from '@/lib/format';
 
 type MapNode = { symbol: string; label: string; section: MarketSectionId };
@@ -119,11 +119,19 @@ export function MarketMap({ feed, onOpen }: { feed: MarketsFeed; onOpen: (s: Mar
 }
 
 const styles = StyleSheet.create({
-  layerTitle: { color: Palette.muted, fontSize: 11, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 6 },
+  layerTitle: {
+    fontFamily: Fonts.mono,
+    color: Palette.muted,
+    fontSize: 11,
+    fontWeight: '500',
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+    marginBottom: 6,
+  },
   row: { flexDirection: 'row', gap: 8 },
   node: { flex: 1, borderRadius: Radius.md, padding: 10, gap: 2, minHeight: 78, justifyContent: 'center' },
   label: { color: Palette.text, fontSize: 12, fontWeight: '700', lineHeight: 16 },
-  change: { fontSize: 17, fontWeight: '800', fontVariant: ['tabular-nums'] },
+  change: { fontSize: 17, fontWeight: '700', fontVariant: ['tabular-nums'] },
   level: { color: Palette.muted, fontSize: 11, fontVariant: ['tabular-nums'] },
   legend: { marginTop: 8 },
 });

@@ -1,8 +1,9 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import type { ComponentProps } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
-import { Palette, Radius } from '@/constants/theme';
+import { AnimatedPressable } from '@/components/Motion';
+import { Elevation, Fonts, Palette, Radius } from '@/constants/theme';
 
 type IconName = ComponentProps<typeof Ionicons>['name'];
 type Tone = 'info' | 'success' | 'accent' | 'teal' | 'error';
@@ -35,11 +36,13 @@ export function HubTile({
 }) {
   const t = TONE[tone];
   return (
-    <Pressable
+    <AnimatedPressable
       accessibilityRole="button"
       accessibilityLabel={`${title}. ${subtitle}`}
       onPress={onPress}
-      style={({ pressed }) => [styles.tile, wide ? styles.wide : styles.half, pressed && styles.pressed]}
+      haptic="selection"
+      lift={2}
+      style={({ pressed, hovered }) => [styles.tile, wide ? styles.wide : styles.half, (pressed || hovered) && styles.pressed]}
     >
       <View style={styles.top}>
         <View style={[styles.icon, { backgroundColor: t.bg }]}>
@@ -50,12 +53,12 @@ export function HubTile({
             <Text style={[styles.badgeText, { color: t.fg }]}>{badge}</Text>
           </View>
         ) : (
-          <Ionicons name="chevron-forward" size={18} color={Palette.muted} />
+          <Ionicons name="chevron-forward" size={18} color={Palette.subtle} />
         )}
       </View>
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.sub}>{subtitle}</Text>
-    </Pressable>
+    </AnimatedPressable>
   );
 }
 
@@ -71,17 +74,24 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Palette.border,
     borderRadius: Radius.lg,
-    padding: 14,
+    padding: 16,
     gap: 4,
     minHeight: 118,
+    ...Elevation.card,
   },
   half: { flexBasis: '47%', flexGrow: 1 },
   wide: { width: '100%' },
-  pressed: { borderColor: Palette.primary, backgroundColor: Palette.softInfo },
+  pressed: { borderColor: Palette.primary, ...Elevation.raised },
   top: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 },
   icon: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
   badge: { borderRadius: Radius.pill, paddingHorizontal: 8, paddingVertical: 3 },
-  badgeText: { fontSize: 11, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 0.4 },
-  title: { color: Palette.text, fontSize: 16, fontWeight: '800', lineHeight: 21 },
+  badgeText: {
+    fontFamily: Fonts.mono,
+    fontSize: 11,
+    fontWeight: '500',
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
+  },
+  title: { color: Palette.text, fontSize: 16, fontWeight: '700', lineHeight: 21, letterSpacing: -0.2 },
   sub: { color: Palette.muted, fontSize: 13, lineHeight: 18 },
 });

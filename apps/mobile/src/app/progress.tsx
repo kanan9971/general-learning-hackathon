@@ -11,7 +11,7 @@ import { Screen } from '@/components/Screen';
 import { SectionHeader } from '@/components/SectionHeader';
 import { ThemedText } from '@/components/themed-text';
 import { conceptLabel, getPlan, type LearnerPlan } from '@/lib/learner';
-import { Palette, Radius } from '@/constants/theme';
+import { Fonts, Palette, Radius } from '@/constants/theme';
 
 export default function ProgressScreen() {
   const router = useRouter();
@@ -218,9 +218,11 @@ const styles = StyleSheet.create({
   planHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 },
   level: {
     color: Palette.primary,
+    fontFamily: Fonts.display,
     fontSize: 28,
-    lineHeight: 34,
-    fontWeight: '800',
+    lineHeight: 32,
+    fontWeight: '700',
+    letterSpacing: -0.6,
     textTransform: 'capitalize',
   },
   table: { paddingVertical: 4, gap: 0 },

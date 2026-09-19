@@ -105,6 +105,6 @@ export default function ConnectScreen() {
 }
 
 const styles = StyleSheet.create({
-  title: { color: Palette.text, fontSize: 16, fontWeight: '800' },
+  title: { color: Palette.text, fontSize: 16, fontWeight: '700', letterSpacing: -0.2 },
   link: { color: Palette.primary, fontSize: 14, fontWeight: '700' },
 });

@@ -36,5 +36,5 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: Spacing.two,
   },
-  spaced: { marginTop: Spacing.two },
+  spaced: { marginTop: Spacing.three },
 });

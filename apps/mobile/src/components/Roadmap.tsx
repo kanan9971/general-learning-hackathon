@@ -1,10 +1,11 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import type { Roadmap as RoadmapData, RoadmapNode, RoadmapNodeState } from '@/api/client';
-import { Palette, Radius } from '@/constants/theme';
+import { AnimatedPressable } from '@/components/Motion';
+import { Elevation, Fonts, Palette, Radius } from '@/constants/theme';
 
 const COLS = 3; // widest tier has three nodes; every cell is 1/3 of the width so connector math is exact
-const LINE = '#B7C3D2';
+const LINE = 'rgba(28, 25, 23, 0.14)';
 
 const STYLE: Record<RoadmapNodeState, { bg: string; border: string; bar: string; label: string }> = {
   not_started: { bg: Palette.surface, border: Palette.border, bar: Palette.border, label: 'Not started' },
@@ -63,16 +64,18 @@ function Node({
           <Text style={styles.hereText}>YOU ARE HERE</Text>
         </View>
       ) : null}
-      <Pressable
+      <AnimatedPressable
         accessibilityRole="button"
         accessibilityLabel={`${node.title}. ${st.label}, ${pct} percent.`}
         onPress={() => onOpen(node)}
-        style={({ pressed }) => [
+        haptic="selection"
+        lift={2}
+        style={({ pressed, hovered }) => [
           styles.node,
           node.collapsed && styles.nodeCollapsed,
           { backgroundColor: st.bg, borderColor: node.recommended ? Palette.primary : st.border },
           node.recommended && styles.nodeHere,
-          pressed && { opacity: 0.75 },
+          (pressed || hovered) && styles.nodeActive,
         ]}
       >
         <Text style={styles.title} numberOfLines={2}>
@@ -89,11 +92,11 @@ function Node({
         ) : (
           <Text style={styles.meta}>Known · tap to review</Text>
         )}
-      </Pressable>
+      </AnimatedPressable>
       {node.test_out ? (
-        <Pressable onPress={() => onTestOut(node)} accessibilityRole="button" hitSlop={6}>
+        <AnimatedPressable onPress={() => onTestOut(node)} accessibilityRole="button" hitSlop={6} haptic="selection" pressScale={0.94}>
           <Text style={styles.testOut}>Test out ›</Text>
-        </Pressable>
+        </AnimatedPressable>
       ) : null}
     </View>
   );
@@ -154,12 +157,13 @@ const styles = StyleSheet.create({
   },
   nodeCollapsed: { minHeight: 64, opacity: 0.85 },
   nodeHere: { borderWidth: 3 },
-  title: { color: Palette.text, fontSize: 13, fontWeight: '800', lineHeight: 17 },
-  track: { height: 6, borderRadius: 3, backgroundColor: Palette.border, overflow: 'hidden' },
+  nodeActive: { borderColor: Palette.primary, ...Elevation.raised },
+  title: { color: Palette.text, fontSize: 13, fontWeight: '700', lineHeight: 17, letterSpacing: -0.2 },
+  track: { height: 6, borderRadius: 3, backgroundColor: Palette.surfaceSunken, overflow: 'hidden' },
   fill: { height: 6, borderRadius: 3 },
   meta: { color: Palette.muted, fontSize: 10.5, fontWeight: '600' },
   here: { alignSelf: 'center', backgroundColor: Palette.primary, borderRadius: Radius.pill, paddingHorizontal: 8, paddingVertical: 2 },
-  hereText: { color: Palette.white, fontSize: 9, fontWeight: '800', letterSpacing: 0.6 },
+  hereText: { fontFamily: Fonts.mono, color: Palette.white, fontSize: 9, fontWeight: '500', letterSpacing: 0.8 },
   testOut: { color: Palette.primary, fontSize: 11, fontWeight: '700', textAlign: 'center' },
   connectors: { height: 30, width: '100%' },
   seg: { position: 'absolute' },

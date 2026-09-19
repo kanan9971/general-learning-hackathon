@@ -739,3 +739,31 @@ export const submitPaperOrder = (body: PaperTicket) => request<{ fill: PaperFill
 export const cancelPaperOrder = (fillId: string) =>
   request<PaperBook>(`/v1/portfolio/orders/${fillId}/cancel`, {});
 export const getPaperAnalysis = () => request<PaperAnalysis>('/v1/portfolio/analysis', {});
+
+// ---- Yahoo OHLCV (paper chart) ----
+export type ChartTimeframe = '15m' | '1h' | '4h' | '5d' | '1M' | '1Y' | 'YTD' | 'ALL';
+
+export type ChartCandle = {
+  t: string;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  volume: number;
+};
+
+export type ChartHistory = {
+  symbol: string;
+  timeframe: ChartTimeframe;
+  interval: string;
+  range: string;
+  label: string;
+  as_of: string | null;
+  data_mode: DataMode;
+  source: 'yahoo' | 'golden';
+  candles: ChartCandle[];
+  note: string | null;
+};
+
+export const getChartHistory = (symbol: string, timeframe: ChartTimeframe) =>
+  request<ChartHistory>(`/v1/markets/history${q({ symbol, timeframe })}`);

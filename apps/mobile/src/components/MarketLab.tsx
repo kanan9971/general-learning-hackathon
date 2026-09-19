@@ -1,5 +1,7 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, TextInput, View } from 'react-native';
+import Animated from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
 
 import {
@@ -23,14 +25,16 @@ import { Chip, ChipRow } from '@/components/Chip';
 import { DataModeBadge } from '@/components/DataModeBadge';
 import { Disclaimer } from '@/components/Disclaimer';
 import { FlowDiagram, ImpactDiagram, LinkDiagram, Node, StepsDiagram, type NodeTone } from '@/components/Diagrams';
+import { HeroCard } from '@/components/HeroCard';
 import { LabelledSection } from '@/components/LabelledSection';
+import { AnimatedPressable, haptic, useSelectionPop } from '@/components/Motion';
 import { MoveRow } from '@/components/MoveRow';
 import { OptionCard } from '@/components/OptionCard';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { Screen } from '@/components/Screen';
 import { SectionHeader } from '@/components/SectionHeader';
 import { ThemedText } from '@/components/themed-text';
-import { Palette, Radius } from '@/constants/theme';
+import { Elevation, OnDark, Palette, Radius } from '@/constants/theme';
 import { localToday } from '@/lib/daily';
 import { asOfLabel, signed } from '@/lib/format';
 import { getInterests } from '@/lib/interests';
@@ -266,8 +270,9 @@ export function MarketLab({
           {feedback ? (
             <PrimaryButton
               label={submitting ? 'Loading…' : i + 1 < total ? 'Next question' : placement ? 'See my level' : 'See my results'}
+              icon="arrow-forward"
               onPress={() => void next()}
-              disabled={submitting}
+              loading={submitting}
             />
           ) : (
             <PrimaryButton
@@ -275,7 +280,8 @@ export function MarketLab({
                 submitting ? 'Checking…' : q.kind === 'predict' || q.kind === 'scenario' ? 'Lock in my prediction' : 'Check my answer'
               }
               onPress={() => void submit()}
-              disabled={answer == null || submitting}
+              disabled={answer == null}
+              loading={submitting}
             />
           )}
           <Disclaimer />
@@ -356,18 +362,20 @@ export function MarketLab({
                   const on = picks[p.id] === o.id;
                   const c = o.id === 'up' ? Palette.success : o.id === 'down' ? Palette.error : Palette.muted;
                   return (
-                    <Pressable
+                    <AnimatedPressable
                       key={o.id}
                       accessibilityRole="radio"
                       accessibilityState={{ selected: on, disabled: !!feedback }}
                       onPress={() => !feedback && setPicks((m) => ({ ...m, [p.id]: o.id }))}
-                      style={[styles.segBtn, on && { backgroundColor: c, borderColor: c }]}
+                      haptic="selection"
+                      pressScale={0.94}
+                      style={({ hovered }) => [styles.segBtn, hovered && !on && !feedback && { borderColor: c }, on && { backgroundColor: c, borderColor: c }]}
                     >
                       <Text style={[styles.segText, on && { color: Palette.white }]}>
                         {o.id === 'up' ? '↑ ' : o.id === 'down' ? '↓ ' : '→ '}
                         {o.text}
                       </Text>
-                    </Pressable>
+                    </AnimatedPressable>
                   );
                 })}
               </View>
@@ -455,19 +463,29 @@ function PredictButton({
   onPress: () => void;
 }) {
   const color = up ? Palette.success : Palette.error;
+  const soft = up ? Palette.softSuccess : Palette.softError;
+  const pop = useSelectionPop(selected);
   return (
-    <Pressable
-      accessibilityRole="radio"
-      accessibilityState={{ selected, disabled }}
-      onPress={disabled ? undefined : onPress}
-      style={[
-        styles.predictBtn,
-        { borderColor: selected ? color : Palette.border, backgroundColor: selected ? (up ? Palette.softSuccess : Palette.softError) : Palette.surface },
-      ]}
-    >
-      <Text style={[styles.arrow, { color }]}>{up ? '↑' : '↓'}</Text>
-      <Text style={[styles.predictLabel, { color: selected ? color : Palette.text }]}>{label}</Text>
-    </Pressable>
+    <Animated.View style={[{ flex: 1 }, pop]}>
+      <AnimatedPressable
+        accessibilityRole="radio"
+        accessibilityState={{ selected, disabled }}
+        onPress={disabled ? undefined : onPress}
+        haptic="light"
+        lift={2}
+        style={({ hovered }) => [
+          styles.predictBtn,
+          { borderColor: selected ? color : Palette.border, backgroundColor: selected ? soft : Palette.surface },
+          hovered && !disabled && !selected && { borderColor: color, ...Elevation.raised },
+          selected && Elevation.raised,
+        ]}
+      >
+        <View style={[styles.predictIcon, { backgroundColor: selected ? color : soft }]}>
+          <Ionicons name={up ? 'trending-up' : 'trending-down'} size={26} color={selected ? Palette.white : color} />
+        </View>
+        <Text style={[styles.predictLabel, { color: selected ? color : Palette.text }]}>{label}</Text>
+      </AnimatedPressable>
+    </Animated.View>
   );
 }
 
@@ -487,20 +505,22 @@ function ChainPicker({
       {q.items.map((it) => {
         const pos = order.indexOf(it.id);
         return (
-          <Pressable
+          <AnimatedPressable
             key={it.id}
             accessibilityRole="button"
             onPress={() => {
               if (locked) return;
               setOrder(pos >= 0 ? order.filter((x) => x !== it.id) : [...order, it.id]);
             }}
-            style={[styles.chainItem, pos >= 0 && styles.chainItemOn]}
+            haptic="selection"
+            pressScale={0.985}
+            style={({ hovered }) => [styles.chainItem, hovered && !locked && pos < 0 && { borderColor: Palette.subtle }, pos >= 0 && styles.chainItemOn]}
           >
             <View style={[styles.chainBadge, pos >= 0 && { backgroundColor: Palette.primary }]}>
               <Text style={[styles.chainBadgeText, pos >= 0 && { color: Palette.white }]}>{pos >= 0 ? pos + 1 : ''}</Text>
             </View>
             <Text style={styles.chainText}>{it.text}</Text>
-          </Pressable>
+          </AnimatedPressable>
         );
       })}
       {!locked && order.length ? <PrimaryButton label="Start over" variant="ghost" onPress={() => setOrder([])} /> : null}
@@ -687,12 +707,13 @@ function Summary({
   onShown?: () => void;
   dailyDone?: boolean;
 }) {
-  useEffect(() => {
-    onShown?.();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
   const points = results.reduce((a, r) => a + (r.fb.observed === 'correct' ? 1 : r.fb.observed === 'partial' ? 0.5 : 0), 0);
   const pct = results.length ? Math.round((points / results.length) * 100) : 0;
+  useEffect(() => {
+    onShown?.();
+    haptic(pct >= 50 ? 'success' : 'selection');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const verdict =
     pct >= 80 ? 'You understand how this hangs together.' : pct >= 50 ? 'Solid base, a few gaps to close.' : 'Good start: the mechanism is the thing to revisit.';
   const weak = Array.from(
@@ -713,20 +734,27 @@ function Summary({
       safeEdges={['bottom']}
       footer={
         <>
-          <PrimaryButton label={dailyDone ? "Back to today" : "Another set"} onPress={dailyDone ? () => router.replace('/(tabs)') : onAgain} />
+          <PrimaryButton label={dailyDone ? "Back to today" : "Another set"} icon={dailyDone ? 'arrow-forward' : 'refresh'} onPress={dailyDone ? () => router.replace('/(tabs)') : onAgain} />
           <PrimaryButton label={dailyDone ? "Another set" : "Back"} variant="secondary" onPress={dailyDone ? onAgain : onDone} />
           <Disclaimer />
         </>
       }
     >
-      <Card tone={pct >= 80 ? 'success' : pct >= 50 ? 'info' : 'accent'}>
-        <ThemedText type="display">{pct}%</ThemedText>
-        <ThemedText type="smallBold">{verdict}</ThemedText>
-        <ThemedText type="small" themeColor="textSecondary">
+      <HeroCard tone={pct >= 80 ? 'success' : pct >= 50 ? 'primary' : 'ink'}>
+        <ThemedText type="kicker" style={{ color: OnDark.accent }}>
+          Score
+        </ThemedText>
+        <ThemedText type="display" style={{ color: OnDark.fg, fontVariant: ['tabular-nums'] }}>
+          {pct}%
+        </ThemedText>
+        <ThemedText type="smallBold" style={{ color: OnDark.fg }}>
+          {verdict}
+        </ThemedText>
+        <ThemedText type="small" style={{ color: OnDark.muted }}>
           {results.filter((r) => r.fb.observed === 'correct').length} of {results.length} fully correct. Your concept
           mastery on the Learn tab was updated from these answers.
         </ThemedText>
-      </Card>
+      </HeroCard>
 
       <SectionHeader title="By skill" />
       <Card>
@@ -745,13 +773,15 @@ function Summary({
           <SectionHeader title="Worth revisiting" meta="tap to learn" />
           <ChipRow>
             {weak.map((c) => (
-              <Pressable
+              <AnimatedPressable
                 key={c}
                 onPress={() => router.push({ pathname: '/lesson', params: { concept: c } })}
                 accessibilityRole="button"
+                haptic="selection"
+                pressScale={0.94}
               >
                 <Chip label={conceptLabel(c)} tone="accent" outlined />
-              </Pressable>
+              </AnimatedPressable>
             ))}
           </ChipRow>
         </>
@@ -771,13 +801,14 @@ const styles = StyleSheet.create({
   predictBtn: {
     flex: 1,
     alignItems: 'center',
-    gap: 2,
-    paddingVertical: 18,
-    borderRadius: Radius.md,
+    gap: 10,
+    paddingVertical: 20,
+    borderRadius: Radius.lg,
     borderWidth: 2,
+    ...Elevation.card,
   },
-  arrow: { fontSize: 32, fontWeight: '800', lineHeight: 36 },
-  predictLabel: { fontSize: 16, fontWeight: '700' },
+  predictIcon: { width: 52, height: 52, borderRadius: 26, alignItems: 'center', justifyContent: 'center' },
+  predictLabel: { fontSize: 17, fontWeight: '700', letterSpacing: -0.2 },
   input: {
     minHeight: 140,
     borderWidth: 1,
@@ -850,23 +881,23 @@ function PlacementSummary({ step, onDone, edges }: { step: PlacementStep; onDone
       safeEdges={edges}
       footer={
         <>
-          <PrimaryButton label="Build my roadmap" onPress={onDone} />
+          <PrimaryButton label="Build my roadmap" icon="arrow-forward" onPress={onDone} />
           <Disclaimer />
         </>
       }
     >
-      <Card tone="info">
-        <ThemedText type="kicker" style={{ color: Palette.secondary }}>
+      <HeroCard>
+        <ThemedText type="kicker" style={{ color: OnDark.accent }}>
           Placed at
         </ThemedText>
-        <ThemedText type="display" style={{ textTransform: 'capitalize' }}>
+        <ThemedText type="display" style={{ textTransform: 'capitalize', color: OnDark.fg }}>
           {level}
         </ThemedText>
-        <ThemedText type="small" themeColor="textSecondary">
+        <ThemedText type="small" style={{ color: OnDark.muted }}>
           {step.percent}% across {step.total} topics. Your roadmap now skips what you know and starts where the gaps
           are.
         </ThemedText>
-      </Card>
+      </HeroCard>
       <SectionHeader title="By topic" />
       <Card>
         {step.topics.map((t, n) => (

@@ -5,8 +5,8 @@ import { useTheme } from '@/hooks/use-theme';
 
 /**
  * Type scale (single source of truth):
- *  display 40/44 · title 28/34 · subtitle 20/28 · sectionTitle 16/22 · default 16/24
- *  small 14/20 · caption 12/16 · kicker 11/14 uppercase
+ *  display 40/42 · title 30/34 · subtitle 20/26 · sectionTitle 16/22 · default 16/24
+ *  small 14/20 · caption 12/16 · kicker 11/14 uppercase mono
  */
 export type ThemedTextProps = TextProps & {
   type?:
@@ -58,24 +58,31 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   display: {
+    fontFamily: Fonts.display,
     fontSize: 40,
-    lineHeight: 44,
-    fontWeight: '800',
+    lineHeight: 42,
+    fontWeight: '700',
+    letterSpacing: -1.2,
   },
   title: {
-    fontSize: 28,
+    fontFamily: Fonts.display,
+    fontSize: 30,
     lineHeight: 34,
     fontWeight: '700',
+    letterSpacing: -0.8,
   },
   subtitle: {
+    fontFamily: Fonts.displaySemi,
     fontSize: 20,
-    lineHeight: 28,
-    fontWeight: '700',
+    lineHeight: 26,
+    fontWeight: '600',
+    letterSpacing: -0.4,
   },
   sectionTitle: {
     fontSize: 16,
     lineHeight: 22,
     fontWeight: '700',
+    letterSpacing: -0.2,
   },
   small: {
     fontSize: 14,
@@ -91,12 +98,14 @@ const styles = StyleSheet.create({
     fontSize: 12,
     lineHeight: 16,
     fontWeight: '500',
+    color: Palette.subtle,
   },
   kicker: {
+    fontFamily: Fonts.mono,
     fontSize: 11,
     lineHeight: 14,
-    fontWeight: '700',
-    letterSpacing: 0.8,
+    fontWeight: '500',
+    letterSpacing: 1,
     textTransform: 'uppercase',
   },
   link: {
@@ -112,5 +121,6 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.mono,
     fontWeight: Platform.select({ android: '700' }) ?? '500',
     fontSize: 12,
+    fontVariant: ['tabular-nums'],
   },
 });

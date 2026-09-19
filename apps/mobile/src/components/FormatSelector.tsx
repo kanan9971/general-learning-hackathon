@@ -1,5 +1,6 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
+import { AnimatedPressable } from '@/components/Motion';
 import { Layout, Palette, Radius } from '@/constants/theme';
 import type { QuizFormat } from '@/api/client';
 
@@ -29,12 +30,14 @@ export function FormatSelector({
         const on = selected.includes(id);
         const copy = COPY[id] ?? { title: id, blurb: '' };
         return (
-          <Pressable
+          <AnimatedPressable
             key={id}
             accessibilityRole="checkbox"
             accessibilityState={{ checked: on }}
             onPress={() => onToggle(id)}
-            style={[styles.card, on && styles.cardOn]}
+            haptic="selection"
+            pressScale={0.985}
+            style={({ hovered }) => [styles.card, on && styles.cardOn, hovered && !on && { borderColor: Palette.subtle }]}
           >
             <View style={[styles.check, on && styles.checkOn]}>
               <Text style={[styles.checkText, on && styles.checkTextOn]}>{on ? '✓' : ''}</Text>
@@ -43,7 +46,7 @@ export function FormatSelector({
               <Text style={styles.title}>{copy.title}</Text>
               <Text style={styles.blurb}>{copy.blurb}</Text>
             </View>
-          </Pressable>
+          </AnimatedPressable>
         );
       })}
     </View>
@@ -66,7 +69,7 @@ const styles = StyleSheet.create({
   check: {
     width: 28,
     height: 28,
-    borderRadius: 8,
+    borderRadius: Radius.sm,
     borderWidth: 2,
     borderColor: Palette.border,
     alignItems: 'center',

@@ -4,11 +4,12 @@ import { useRouter } from 'expo-router';
 
 import { Card } from '@/components/Card';
 import { Chip, ChipRow } from '@/components/Chip';
+import { HeroCard } from '@/components/HeroCard';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { Screen } from '@/components/Screen';
 import { ThemedText } from '@/components/themed-text';
 import { conceptLabel, getPlan, type LearnerPlan } from '@/lib/learner';
-import { Palette } from '@/constants/theme';
+import { Fonts, OnDark, Palette } from '@/constants/theme';
 
 export default function OnboardingPlan() {
   const router = useRouter();
@@ -40,19 +41,20 @@ export default function OnboardingPlan() {
       footer={
         <PrimaryButton
           label="See my roadmap"
+          icon="arrow-forward"
           onPress={continueNext}
         />
       }
     >
-      <Card tone="info">
-        <ThemedText type="kicker" style={{ color: Palette.secondary }}>
+      <HeroCard>
+        <ThemedText type="kicker" style={{ color: OnDark.accent }}>
           Inferred level
         </ThemedText>
         <Text style={styles.level}>{plan.level}</Text>
-        <ThemedText type="small" themeColor="textSecondary">
+        <ThemedText type="small" style={{ color: OnDark.muted }}>
           {plan.percentCorrect}% across the placement quiz
         </ThemedText>
-      </Card>
+      </HeroCard>
 
       <Card>
         <ThemedText type="kicker" style={{ color: Palette.secondary }}>
@@ -73,10 +75,12 @@ export default function OnboardingPlan() {
 
 const styles = StyleSheet.create({
   level: {
-    color: Palette.primary,
-    fontSize: 32,
-    lineHeight: 38,
-    fontWeight: '800',
+    color: OnDark.fg,
+    fontFamily: Fonts.display,
+    fontSize: 36,
+    lineHeight: 40,
+    fontWeight: '700',
+    letterSpacing: -0.8,
     textTransform: 'capitalize',
   },
 });

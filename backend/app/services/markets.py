@@ -15,6 +15,7 @@ from ..llm.prompts import market_overview as overview_prompt
 from ..llm.prompts import market_section as prompt
 from ..llm.structured import generate
 from ..market.guide import load_guide
+from ..market.history import get_history as load_chart_history
 from ..market.snapshot import get_snapshot, load_golden
 from ..market.universe import DEFAULT_COMPANIES, INSTRUMENTS, company_sector
 from ..news import feeds as news_feeds
@@ -23,9 +24,9 @@ from ..portfolio.attribution import attribute
 from ..rag.context import build_news_context
 from ..schemas.ai import MarketOverviewLLM, MarketSectionLLM
 from ..schemas.markets import (
-    DeskView, Evidence, ExplainDriver, ExplainSectionResponse, GuideStep, Headline, InterestOption, MarketOverview,
-    MarketSection, MarketsFeed, Move, OverviewDeskView, OverviewLink, OverviewPoint, OverviewResponse,
-    ProvidersStatus, SectionExplanation,
+    ChartHistory, ChartTimeframe, DeskView, Evidence, ExplainDriver, ExplainSectionResponse, GuideStep, Headline,
+    InterestOption, MarketOverview, MarketSection, MarketsFeed, Move, OverviewDeskView, OverviewLink, OverviewPoint,
+    OverviewResponse, ProvidersStatus, SectionExplanation,
 )
 
 HEADLINES_PER_SECTION = 6
@@ -51,6 +52,11 @@ def allowed_concepts() -> list[str]:
     ids += [c for r in guide().relationships for c in r.concept_ids]
     ids += [c for sc in guide().scenarios for c in sc.concept_ids]
     return list(dict.fromkeys(ids))
+
+
+async def get_chart_history(symbol: str, timeframe: ChartTimeframe) -> ChartHistory:
+    """Yahoo OHLCV for the paper chart. Live → cache → golden; demo is golden only."""
+    return await load_chart_history(symbol, timeframe)
 
 
 def clean_tickers(raw: list[str]) -> list[str]:
