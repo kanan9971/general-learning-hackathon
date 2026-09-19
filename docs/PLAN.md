@@ -1,13 +1,39 @@
 # DeskReady — Hackathon Build Plan (AI Daily Market Tutor)
 
 > Working name: **DeskReady** (alternates: MarketMentor, TradeTutor). Rename is a find/replace.
-> Team: 4 people · Time left: **16 hours** · Repo: empty (only `README.md`, one commit on `main`).
+> Team: 4 people · Time left: **16 hours**. Live status: see **Build status** below and `docs/ARCHITECTURE.md` §7.
 
 ## Context
 
 Students read market news daily but can't say *what mattered, why it moved, how it hits their portfolio, or defend a view in an S&T interview*. We are building a **React Native mobile app** that runs a closed daily learning loop — **OBSERVE → EXPLAIN → APPLY → ANSWER → FEEDBACK → REVISIT** — with deterministic market facts, AI-generated (and labelled) explanations, a rubric-graded analyst challenge, and a RAG tutor that teaches exactly the concept the learner got wrong, with citations, then updates a learner model.
 
 On approval, implementation starts by committing this plan to `docs/PLAN.md` and writing `CLAUDE.md` (draft in §21).
+
+## Build status (updated 2026-09-19, `main` @ `9f64aca`)
+
+**Scope change since the original plan:** the P0 "daily analyst challenge" became an **adaptive infinite Quiz tab** (multi-format questions, immediate feedback, server-side mastery). Today/case-study screens now sit behind it. Mobile uses silent anonymous Supabase auth instead of an email/password login screen.
+
+### ✅ Done
+- Repo scaffold, `CLAUDE.md`, `docs/ARCHITECTURE.md`, env examples
+- FastAPI backend: config, typed errors, Supabase JWT auth (ES256/JWKS), local dev bypass, `/health`
+- Supabase: migrations 0001–0006 applied (21 tables, RLS on all), 29 concepts + 14 edges seeded
+- RAG: ingest pipeline (PDF + Markdown), 5 momentum papers + 7 foundation lessons embedded (Qwen, 1536-d), hybrid retrieval (`match_chunks`), citation validation, injection-safe context
+- RAG tutor `POST /v1/tutor/lesson` + `/v1/kb/search` + `/v1/sources/{id}`, wired into the mobile Lesson screen
+- Adaptive quiz `/v1/quiz/*` + `/v1/learn/progress`: selection, generation with fallbacks, HMAC-sealed MCQs, grading, mastery + Leitner updates, persistence
+- Mobile: onboarding diagnostic → Quiz tab → Learn progress → live Lesson; UI primitives and palette
+
+### ⚠️ Done but needs action
+- **Enable anonymous sign-ins** in Supabase (Authentication → Sign In / Providers). Currently disabled, so the app only works via the local dev bypass
+- Set a real `QUIZ_HMAC_SECRET` (code default is a dev value)
+- Finance owner to review the 7 lessons (`reviewed: false`) and add more (target ≥15)
+
+### ❌ Not started (next, in priority order)
+1. **Market data** (`backend/app/market/`): Yahoo chart provider, FRED provider, golden demo day, fallback chain, `DATA_MODE`, move ranking, `tickers` seed
+2. **News** (`backend/app/news/`): WSJ + Yahoo RSS parsing into `documents(layer='market')`
+3. **Daily brief**: cron route → snapshot → `explain_event` prompt → `daily_briefs`; replace Today/Event fixtures with the real brief
+4. **Portfolio**: demo portfolio seed, deterministic attribution, labelled AI narrative; replace Portfolio fixture
+5. Judge demo account, golden-day brief pre-generated, Vercel deployment, demo rehearsal + backup video
+6. P1: long-form analyst challenge (`evaluate`), Desk drill, paper-trade lab, RAG-grounded quiz questions, lesson persistence
 
 ### Locked architectural decisions (asked & answered)
 
@@ -442,18 +468,20 @@ Each case: `id, query, learner_level, layer_expected, expected_doc_ids, expected
 
 ## 20. Final build checklist
 
+Legend: `[x]` done · `[~]` partly done · `[ ]` not started.
+
 **P0 (demo-critical)**
-- [ ] Repo scaffold, `CLAUDE.md`, `docs/PLAN.md`, `.env.example`
-- [ ] Supabase migrations (core, rag, rls, match_chunks) + seed concepts/tickers
-- [ ] FastAPI on Vercel with JWT auth dep + `/health`
+- [x] Repo scaffold, `CLAUDE.md`, `docs/PLAN.md`, `.env.example`
+- [x] Supabase migrations (core, rag, rls, match_chunks, adaptive quiz) + seed concepts · [ ] seed tickers
+- [~] FastAPI with JWT auth dep + `/health` (done locally; **not deployed to Vercel yet**)
 - [ ] Providers (Yahoo, FRED, golden) + WSJ/Yahoo RSS news + fallback chain + `DATA_MODE`
 - [ ] Ranking + attribution (tested)
 - [ ] Cron route → snapshot → `explain_event` → brief
-- [ ] KB: ~25 concepts, ≥ 15 lessons ingested (target 25)
-- [ ] Hybrid retrieval + boosts + citation validation
-- [ ] Prompts: explain_event, question, evaluate, tutor (+ schemas)
-- [ ] Mastery update + Leitner scheduling
-- [ ] Mobile: auth, onboarding, Today, Event, Portfolio, Challenge, Feedback, Lesson, Learn, Source drawer
+- [~] KB: 29 concepts ✅, 7 lessons + 5 papers ingested (target ≥15 lessons; lessons unreviewed)
+- [x] Hybrid retrieval + boosts + citation validation
+- [~] Prompts: tutor ✅, quiz_question ✅, quiz_eval ✅ · explain_event ❌ · long-form evaluate ❌
+- [x] Mastery update + Leitner scheduling (via adaptive quiz)
+- [~] Mobile: onboarding ✅, Quiz (replaces Challenge/Feedback) ✅, Lesson ✅, Learn ✅ · Today/Event/Portfolio on fixtures · auth needs anonymous sign-in enabled · source drawer ❌
 - [ ] Judge account + golden day brief pre-generated
 - [ ] Manual demo checklist ×2, backup video
 
@@ -461,7 +489,7 @@ Each case: `id, query, learner_level, layer_expected, expected_doc_ids, expected
 - [ ] Desk "walk me through the markets" drill
 - [ ] Paper-trade form + process evaluation
 - [ ] Number guard, per-user LLM cap, `DELETE /v1/me`
-- [ ] `kb/search` debug + automated eval run
+- [x] `kb/search` debug + automated eval run (`pytest -m rag`)
 - [ ] Watchlist mode
 
 **P2 (post-hackathon)**

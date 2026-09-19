@@ -35,9 +35,9 @@ The product/scope plan lives in `PLAN.md`; this file is the structural contract.
 | `backend/app/portfolio` | Deterministic attribution, sector exposure. Pure functions. | portfolio math |
 | `backend/app/learning` | Rubric scoring (overall score), mastery updates, Leitner scheduling, adaptive quiz target selection, MCQ HMAC seals. Pure functions. | learner math |
 | `backend/app/services` | Request orchestration that spans db + learning + llm (quiz sessions, refill, grading). Called only by routers. | use-cases |
-| `backend/app/llm` | Grok client, prompts, structured-output parsing, audit log. No DB reads of its own. | AI calls |
+| `backend/app/llm` | Grok client (`client.py`), structured-output parsing (`structured.py`), embeddings (`embed.py`), prompts (`prompts/`: system, tutor, quiz_question, quiz_eval), deterministic template fallbacks (`fallbacks/`). No DB reads of its own. | AI calls |
 | `backend/app/rag` | Ingest (CLI), chunk, embed, hybrid retrieve, boost, build untrusted context, validate citations. | retrieval |
-| `backend/app/db` | Supabase client factories (`client.py`) and writes/queries (`knowledge.py`). The only code that talks to Supabase for data. | data access |
+| `backend/app/db` | Supabase client factories (`client.py`: `service_client`, `user_client(jwt)`), knowledge base reads/writes (`knowledge.py`), quiz persistence (`quiz.py`, RLS via user JWT) and its local in-memory twin (`memory_quiz.py`, dev bypass only). The only code that talks to Supabase for data. | data access |
 | `supabase/migrations` | Schema and RLS. Additive only. | schema |
 | `content/` | Lessons, concepts, golden-day data. Data, not code. | knowledge |
 
@@ -66,16 +66,16 @@ Allowed direction is **left → right** ("may import / call"). Anything not list
 2. **LLM output is untrusted until validated.** Pydantic parse → 1 repair retry → deterministic fallback. Concept IDs must exist in `concepts`; source IDs must be a subset of what was provided.
 3. **Retrieved text is untrusted data.** Wrapped in `<source id=…>` blocks, never in the system prompt; the LLM has no tools and no secrets.
 4. **Knowledge layers stay separate:** `foundation` chunks vs `market` chunks (column `layer`); learner memory is relational (`concept_mastery`), never vectorised.
-5. **Two DB identities:** requests touching *user-owned* tables use a Supabase client carrying the *user's JWT* (RLS enforces ownership). The service-role key is used by `/v1/cron/*`, the ingest CLI, and **read-only reference-data reads** in `db/knowledge.py` (documents, chunks, concepts via `match_chunks`) plus the `llm_calls` audit insert. Routes still require an authenticated user before doing any of this.
-8. **Local dev auth bypass:** `AUTH_DEV_BYPASS=true` makes token-less requests act as user `00000000-…` because the mobile app has no login yet. `deps.py` ignores it whenever the `VERCEL` env var is set, so it can never be on in a deployment.
-6. **Secrets:** env only, read via `config.py`. Never logged, never in the mobile app (only the Supabase anon key and API URL are public).
+5. **Two DB identities:** requests touching *user-owned* tables use a Supabase client carrying the *user's JWT* (`db.client.user_client`, RLS enforces ownership). The service-role key is used by `/v1/cron/*`, the ingest CLI, and **read-only reference-data reads** in `db/knowledge.py` (documents, chunks, concepts via `match_chunks`) plus the `llm_calls` audit insert. Routes still require an authenticated user before doing any of this.
+6. **Secrets:** env only, read via `config.py`. Never logged, never in the mobile app (only the Supabase anon key and API URL are public). `QUIZ_HMAC_SECRET` seals MCQ answers; the code default is a dev value and **must** be overridden in any deployment.
 7. **Answers are saved before any LLM call**, so a failed grader never loses user input.
+8. **Auth modes:** (a) production: mobile signs in with Supabase (currently *anonymous* sign-in, `apps/mobile/src/lib/auth.ts`) and sends the JWT; (b) local dev: `AUTH_DEV_BYPASS=true` lets token-less requests act as user `00000000-…` and the quiz uses the in-memory store. `deps.py` ignores the bypass whenever the `VERCEL` env var is set, so it can never be on in a deployment.
 
 ## 5. Request flows
 
 - **Daily brief (cron, post-close):** cron → `market` snapshot (fallback chain) + `news` RSS → `rag` ingest market chunks → `llm.explain_event` per top-ranked move → validated → `daily_briefs`. Request path only *reads* the stored brief.
 - **Onboarding diagnostic (mobile, current demo):** static MCQ fixture → client scores → persist plan (level + focus concepts) in AsyncStorage. Retake from Learn overwrites plan only; mastery history kept. (Server `POST /v1/onboarding` still planned for auth profiles later.)
-- **Adaptive infinite quiz (Quiz tab):** silent anonymous Supabase Auth (no login UI) → `GET/PUT /v1/quiz/preferences` (formats + catalog/custom topics) → `POST /v1/quiz/sessions` creates a session and prepares up to **3** unanswered questions (current + ready). Selection is deterministic (`learning/adaptive`): due reviews, repeated mistakes, low mastery, preferred/custom topics. Generation uses `llm/structured` + `prompts/quiz_question` with template fallbacks; MCQ correctness is stored as an HMAC seal (never plaintext to the client). `POST .../answers` **saves the answer first**, grades (deterministic MCQ / structured eval for written), updates `concept_mastery` + `mastery_events` (linked via `quiz_attempt_id`), returns immediate feedback + next question. Client calls `POST .../refill` in the background to keep queue depth at 2–3. `POST .../end` closes voluntarily. `GET /v1/learn/progress` drives the Learn tab. RAG grounding for questions is deferred; questions are labelled hypothetical educational exercises. Local/dev without a JWT uses an in-memory store (`QUIZ_USE_MEMORY` / auth bypass).
+- **Adaptive infinite quiz (Quiz tab):** silent anonymous Supabase Auth (no login UI; **requires "Anonymous sign-ins" enabled in Supabase → Authentication → Sign In / Providers**, currently disabled, so the app silently falls back to the local bypass) → `GET/PUT /v1/quiz/preferences` (formats + catalog/custom topics) → `POST /v1/quiz/sessions` creates a session and prepares up to **3** unanswered questions (current + ready). Selection is deterministic (`learning/adaptive`): due reviews, repeated mistakes, low mastery, preferred/custom topics. Generation uses `llm/structured` + `prompts/quiz_question` with template fallbacks; MCQ correctness is stored as an HMAC seal (never plaintext to the client). `POST .../answers` **saves the answer first**, grades (deterministic MCQ / structured eval for written), updates `concept_mastery` + `mastery_events` (linked via `quiz_attempt_id`), returns immediate feedback + next question. Client calls `POST .../refill` in the background to keep queue depth at 2–3. `POST .../end` closes voluntarily. `GET /v1/learn/progress` drives the Learn tab. RAG grounding for questions is deferred; questions are labelled hypothetical educational exercises. Local/dev without a JWT uses an in-memory store (`QUIZ_USE_MEMORY` / auth bypass).
 - **Daily case-study quiz (retired from P0 path):** previous fixture MCQ loop kept as offline reference only; long-form essay `evaluate` remains a later P1 challenge.
 - **Teaching (live):** `POST /v1/tutor/lesson {concept_id, level, misconception?, question?}` in `routers/tutor.py`: `db.knowledge.get_concept` → `rag.retrieve` (foundation layer, concept-filtered, then unfiltered with a concept boost if thin) → `rag.context.build_context` (escaped `<source id=Sn>` blocks) → `llm.structured.generate(TutorLessonLLM, prompts/tutor)` → `rag.citations.validate_citations` → response with citations (chunk id, section, excerpt, URL). Below the similarity bar the lesson is flagged `insufficient_evidence` and cites nothing. If the LLM fails, an extractive fallback quotes the top sources verbatim. The mobile `lesson.tsx` calls this and falls back to the canned lesson if the API is unreachable. Mastery is not updated here; that belongs to the quiz/evaluation flow.
 - **KB search / sources:** `POST /v1/kb/search` (debug + eval) and `GET /v1/sources/{chunk_id}` (citation drawer).
@@ -100,18 +100,25 @@ Lessons: `python -m app.rag.ingest ../content/lessons --store` (Markdown with fr
 
 ## 7. Current status (update as phases land)
 
+Last verified: 2026-09-19 against `main` @ `9f64aca` + migration 0006 applied. Backend 36 offline tests + 5 live RAG tests pass; mobile `tsc` clean; web bundle builds; live quiz flow checked with a real Supabase user (start → MCQ answer graded correct → mastery 0.35→0.50 → `quiz_attempts` row visible only to that user → session end).
+
 | Area | State |
 |---|---|
-| FastAPI app, config, typed errors (incl. 422 → `invalid_request`), JWT dependency (ES256 via Supabase JWKS; HS256 fallback; local dev bypass), `/health` | done, live-verified |
-| Pydantic API schemas + placeholder fixtures (`/v1/dev/fixtures/*` when `DEV_FIXTURES=true`) | done |
-| Supabase migrations 0001–0006 (core, rag, rls, research type, `match_chunks`, adaptive quiz) | **0001–0005 applied**; **0006 additive** (learner_preferences, quiz_sessions/questions/attempts, mastery_events.quiz_attempt_id) — apply before production quiz persistence |
-| Seed | `concepts` (29) + `concept_edges` (14) via `supabase/seed/concepts.sql` |
-| Knowledge base | 5 research papers (377 chunks) + 7 foundation lessons (49 chunks, `content/lessons/`, **`reviewed: false`, need finance-owner review**). Embeddings: Qwen `qwen3.7-text-embedding`, 1536-d. |
-| RAG retrieval (`match_chunks` hybrid vector+FTS+RRF, Python boosts, per-doc cap, sufficiency threshold 0.50) | done. Live eval (`pytest -m rag`): hit@3 10/10, beginners never get papers, off-topic → insufficient. |
-| RAG tutor (`/v1/tutor/lesson`), KB search, source lookup, citation validation, LLM audit to `llm_calls` | done, live-verified (~6s per lesson with Grok `grok-4.20-0309-non-reasoning`) |
-| Adaptive quiz (`/v1/quiz/*`, `/v1/learn/progress`), mastery math, template fallbacks, HMAC MCQ seals | done (memory store for local bypass; Supabase RLS path with anonymous JWT) |
-| Mobile: onboarding → **Quiz** (formats/topics → infinite session) → Learn progress / Portfolio / live lesson | done |
-| Mobile auth | silent **anonymous** Supabase session (no login UI); email/password deferred |
-| market / news / portfolio / long-form challenge evaluation | not started |
-| RAG-grounded quiz generation | deferred (hook: pass retrieved foundation context into `quiz_question` prompt) |
-| Lesson persistence (`lessons` table needs an `evaluation_id`) | deferred until the evaluation flow exists |
+| FastAPI app, config, typed errors (incl. 422 → `invalid_request`), JWT dependency (ES256 via Supabase JWKS; HS256 fallback; local dev bypass), `/health` | ✅ done, live-verified |
+| Supabase migrations 0001–0006 (core, rag, rls, research type, `match_chunks`, adaptive quiz) | ✅ **all applied** to `apsojsuiginpuqljutyo`. RLS on all 21 tables. Advisories: `llm_calls` has no policy (intentional, service only); `vector` in `public` (left as is). |
+| Seed | ✅ `concepts` (29) + `concept_edges` (14). ❌ `tickers`, demo portfolio, judge account not seeded |
+| Knowledge base | ✅ 5 research papers (377 chunks) + 7 lessons (49 chunks), Qwen `qwen3.7-text-embedding` 1536-d. ⚠️ lessons `reviewed: false`; plan target was ≥15 lessons |
+| RAG retrieval + tutor (`/v1/tutor/lesson`, `/v1/kb/search`, `/v1/sources/{id}`), citation validation, LLM audit | ✅ done, live-verified (hit@3 10/10, ~6s/lesson) |
+| Adaptive quiz (`/v1/quiz/*`, `/v1/learn/progress`), mastery math, template fallbacks, HMAC MCQ seals | ✅ done, live-verified with Supabase persistence (~13s to start a session, ~6s per graded answer) |
+| Mobile: onboarding → Quiz (formats/topics → infinite session) → Learn / Portfolio / live lesson | ✅ done |
+| Mobile auth | ⚠️ anonymous sign-in code exists but **Supabase anonymous sign-ins are disabled**, so the app runs on the local bypass. Enable it (or add email/password) before any deployed demo |
+| `QUIZ_HMAC_SECRET` | ⚠️ using code default; set a real secret in `backend/.env` / Vercel |
+| Market data (`market/`: Yahoo, FRED, golden day, fallback chain, ranking) | ❌ not started (empty package) |
+| News (`news/`: WSJ + Yahoo RSS) | ❌ not started (package does not exist yet) |
+| Daily brief cron + `explain_event` prompt, `daily_briefs` | ❌ not started (Today/Portfolio still read fixtures) |
+| Portfolio attribution (`portfolio/`) + portfolio narrative | ❌ not started |
+| Long-form analyst challenge evaluation (`evaluate`) | ❌ not started (quiz covers short answers) |
+| RAG-grounded quiz generation | ⏸ deferred (hook: pass retrieved foundation context into `quiz_question` prompt) |
+| Lesson persistence (`lessons` table needs an `evaluation_id`) | ⏸ deferred |
+| Vercel deployment | ❌ not deployed |
+| IBKR read-only | ⏸ P2 (extension point in §6) |
