@@ -15,7 +15,7 @@ Feature freeze at H13. P0 = the "magic moment" loop in docs/PLAN.md §18.
 - backend — Python FastAPI deployed on Vercel serverless (entry: backend/api/index.py)
 - supabase — Postgres + pgvector + Auth (email/password) + RLS; SQL migrations in supabase/migrations
 - LLM: xAI Grok via `openai` SDK (base_url https://api.x.ai/v1); model IDs from env (`XAI_MODEL_FAST`, `XAI_MODEL_REASONING`)
-- Embeddings: Alibaba Qwen `text-embedding-v4` via DashScope OpenAI-compatible API, 1536-d (OpenAI is blocked in Hong Kong; provider is swappable via `EMBEDDING_*` env vars, but dims must match `vector(1536)`)
+- Embeddings: Alibaba Qwen `qwen3.7-text-embedding` via DashScope OpenAI-compatible API, 1536-d (OpenAI is blocked in Hong Kong; provider is swappable via `EMBEDDING_*` env vars, but dims must match `vector(1536)`)
 - Market data: Yahoo Finance chart endpoint via httpx (prices; no `yfinance` on Vercel) + FRED (2Y yield, curve, macro)
 - News: WSJ public RSS + Yahoo Finance ticker RSS — headline, summary, URL, timestamp only; never scrape WSJ article bodies
 - Fallback chain: live → cached snapshot → golden demo day
@@ -25,6 +25,10 @@ Feature freeze at H13. P0 = the "magic moment" loop in docs/PLAN.md §18.
 - Backend dev: `cd backend && .venv/bin/uvicorn app.main:app --reload --port 8000`
 - Backend tests: `cd backend && .venv/bin/pytest` (markers `-m rag`, `-m prompts` hit live APIs; default run is offline)
 - Ingest KB (dry run): `cd backend && .venv/bin/python -m app.rag.ingest ../content/sources/research_papers.yaml` (add `--store` to embed + write to Supabase; PDFs go in `content/raw/`, gitignored)
+- Ingest lessons: `cd backend && .venv/bin/python -m app.rag.ingest ../content/lessons --store`
+- Live RAG eval (embeddings + Supabase): `cd backend && .venv/bin/pytest -m rag`
+- Try the tutor locally (needs `AUTH_DEV_BYPASS=true` in backend/.env): `curl -X POST localhost:8000/v1/tutor/lesson -H 'content-type: application/json' -d '{"concept_id":"real-yields","level":"beginner"}'`
+- Live Supabase check (creates/deletes temp users): `cd backend && PYTHONPATH=. .venv/bin/python ../scripts/check_supabase.py`
 - Generate daily brief locally: `scripts/run_cron_local.sh --date YYYY-MM-DD`
 - Mobile: `cd apps/mobile && npm install && npx expo start` (press `w` for web on localhost:8081; `--tunnel` for phones). Routes live in `apps/mobile/src/app`
 - Regenerate API types after changing backend schemas: `scripts/gen_types.sh`

@@ -1,6 +1,6 @@
 from typing import Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from .common import Level
 
@@ -88,6 +88,8 @@ class LessonResponse(BaseModel):
     citations: list["SourceRefLite"]
     follow_up: str
     mastery_updates: list[ConceptUpdate]
+    generated_by: Literal["llm", "fallback"] = "llm"
+    retrieval: "RetrievalInfo | None" = None
 
 
 class SourceRefLite(BaseModel):
@@ -95,6 +97,44 @@ class SourceRefLite(BaseModel):
     title: str
     publisher: str
     url: str | None = None
+    chunk_id: str | None = None
+    section_path: str | None = None
+    excerpt: str | None = None
+    content_type: str | None = None
+    published_at: str | None = None
+
+
+class RetrievalInfo(BaseModel):
+    chunks_considered: int
+    top_similarity: float | None
+    sufficient: bool
+
+
+class TutorLessonRequest(BaseModel):
+    concept_id: str = Field(min_length=1, max_length=80)
+    level: Level = "beginner"
+    misconception: str | None = Field(default=None, max_length=500)
+    question: str | None = Field(default=None, max_length=500)
+
+
+class KbSearchRequest(BaseModel):
+    query: str = Field(min_length=3, max_length=500)
+    layer: Literal["foundation", "market"] | None = "foundation"
+    concept_ids: list[str] | None = None
+    level: Level = "advanced"
+    k: int = Field(default=5, ge=1, le=10)
+
+
+class SearchHit(BaseModel):
+    chunk_id: str
+    document_id: str
+    title: str
+    section_path: str | None
+    excerpt: str
+    similarity: float
+    score: float
+    difficulty: int | None
+    content_type: str | None
 
 
 class Mastery(BaseModel):

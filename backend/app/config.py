@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     # Embeddings: Alibaba Model Studio (DashScope), OpenAI-compatible. OpenAI is blocked in Hong Kong.
     embedding_api_key: str = ""
     embedding_base_url: str = "https://dashscope-intl.aliyuncs.com/compatible-mode/v1"
-    embedding_model: str = "text-embedding-v4"
+    embedding_model: str = "qwen3.7-text-embedding"
     embedding_dims: int = 1536  # must match vector(1536) in migration 0002
 
     supabase_url: str = ""
@@ -33,6 +33,10 @@ class Settings(BaseSettings):
     allowed_origins: str = "*"
     app_version: str = "0.0.1"
     dev_fixtures: bool = False  # serve /v1/dev/fixtures/* (local only)
+    # Local-only: requests without a token act as a fixed dev user (mobile app has no login yet).
+    # Ignored when running on Vercel (VERCEL env var is set there).
+    auth_dev_bypass: bool = False
+    vercel: str = ""
 
 
 @lru_cache

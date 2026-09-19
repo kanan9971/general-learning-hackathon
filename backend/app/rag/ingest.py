@@ -1,7 +1,8 @@
-"""Ingest CLI: manifest -> extract -> clean -> chunk -> (embed -> store).
+"""Ingest CLI: source -> (extract -> clean) -> chunk -> (embed -> store).
 
+Sources: a YAML manifest of PDFs (research papers) or a directory of Markdown lessons.
   python -m app.rag.ingest ../content/sources/research_papers.yaml            # dry run (default)
-  python -m app.rag.ingest ../content/sources/research_papers.yaml --store    # embed + write to Supabase
+  python -m app.rag.ingest ../content/lessons --store                         # embed + write to Supabase
 """
 import argparse
 import hashlib
@@ -10,7 +11,9 @@ from pathlib import Path
 
 import yaml
 
-from .chunk import chunk_document
+import frontmatter
+
+from .chunk import chunk_document, chunk_markdown
 from .clean import clean_pages, has_injection
 from .extract import extract_pages
 
@@ -31,10 +34,37 @@ def load_manifest(path: Path) -> list[dict]:
     return docs
 
 
+LESSON_REQUIRED = {"id", "title", "source", "concept_ids", "difficulty", "trust_level"}
+LESSON_DEFAULTS = {
+    "layer": "foundation", "content_type": "lesson", "time_sensitivity": "evergreen",
+    "region": "US", "publisher": "DeskReady", "authors": "DeskReady team",
+    "published_at": None, "source_url": None,
+}
+
+
+def load_lessons(directory: Path) -> list[tuple[dict, str]]:
+    out = []
+    for path in sorted(directory.glob("*.md")):
+        post = frontmatter.load(path)
+        meta = {**LESSON_DEFAULTS, **post.metadata}
+        missing = LESSON_REQUIRED - meta.keys()
+        if missing:
+            raise ValueError(f"{path.name}: missing frontmatter {sorted(missing)}")
+        out.append((meta, post.content))
+    return out
+
+
+def build_lesson(meta: dict, body: str) -> tuple[dict, list[dict]]:
+    return _assemble(meta, body, chunk_markdown(body, meta["title"]))
+
+
 def build_document(meta: dict, raw_dir: Path) -> tuple[dict, list[dict]]:
     pages = extract_pages(raw_dir / meta["local_file"])
     text = clean_pages(pages)
-    chunks = chunk_document(text, meta["title"])
+    return _assemble(meta, text, chunk_document(text, meta["title"]))
+
+
+def _assemble(meta: dict, text: str, chunks) -> tuple[dict, list[dict]]:
     checksum = hashlib.sha256(text.encode()).hexdigest()
     doc = {
         "id": meta["id"], "title": meta["title"], "source": meta["publisher"],
@@ -60,15 +90,18 @@ def build_document(meta: dict, raw_dir: Path) -> tuple[dict, list[dict]]:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("manifest", type=Path)
+    ap.add_argument("source", type=Path, help="YAML manifest of PDFs, or a directory of Markdown lessons")
     ap.add_argument("--raw-dir", type=Path, default=Path("../content/raw"))
     ap.add_argument("--out-dir", type=Path, default=Path("../content/processed"))
     ap.add_argument("--store", action="store_true", help="embed and write to Supabase")
     args = ap.parse_args()
 
     args.out_dir.mkdir(parents=True, exist_ok=True)
-    for meta in load_manifest(args.manifest):
-        doc, rows = build_document(meta, args.raw_dir)
+    if args.source.is_dir():
+        built = [build_lesson(m, body) for m, body in load_lessons(args.source)]
+    else:
+        built = [build_document(m, args.raw_dir) for m in load_manifest(args.source)]
+    for doc, rows in built:
         flagged = sum(r["injection_flag"] for r in rows)
         toks = [r["token_count"] for r in rows]
         print(f"{doc['id']}: {len(rows)} chunks, tokens min/avg/max = "

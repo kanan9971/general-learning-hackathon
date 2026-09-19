@@ -1,4 +1,4 @@
-"""Embeddings client: Alibaba Qwen text-embedding-v4 via DashScope's OpenAI-compatible API.
+"""Embeddings client: Alibaba Qwen qwen3.7-text-embedding via DashScope's OpenAI-compatible API.
 No DB, no retrieval logic. Provider is swappable via EMBEDDING_* env vars."""
 from openai import OpenAI
 

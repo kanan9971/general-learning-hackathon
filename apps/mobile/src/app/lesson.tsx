@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Linking, StyleSheet, Text, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 
-import { getFixture } from '@/api/client';
+import { getFixture, getTutorLesson, type TutorLesson } from '@/api/client';
 import { Card } from '@/components/Card';
 import { Chip } from '@/components/Chip';
 import { LabelledSection } from '@/components/LabelledSection';
@@ -10,19 +10,10 @@ import { PrimaryButton } from '@/components/PrimaryButton';
 import { Screen } from '@/components/Screen';
 import { SectionHeader } from '@/components/SectionHeader';
 import { ThemedText } from '@/components/themed-text';
-import { conceptLabel } from '@/lib/learner';
-import { Palette } from '@/constants/theme';
+import { conceptLabel, getPlan } from '@/lib/learner';
+import { Palette, Radius } from '@/constants/theme';
 
-type LessonPayload = {
-  lesson: {
-    concept_id: string;
-    level: string;
-    sections: { kind: string; heading: string; text: string; source_ids: string[] }[];
-    check_question: string;
-  };
-  citations: { source_id: string; title: string; publisher: string }[];
-  follow_up: string;
-};
+type LessonPayload = TutorLesson;
 
 const FALLBACK: LessonPayload = {
   lesson: {
@@ -48,22 +39,50 @@ const FALLBACK: LessonPayload = {
   follow_up: 'How would a rise in real yields show up in a rates-vs-tech story?',
 };
 
+const KIND_TONE: Record<string, 'success' | 'accent' | 'neutral'> = {
+  supported: 'success',
+  synthesis: 'neutral',
+  assumption: 'accent',
+  uncertainty: 'accent',
+};
+
 export default function LessonScreen() {
   const router = useRouter();
-  const { concept } = useLocalSearchParams<{ concept?: string }>();
+  const { concept, misconception } = useLocalSearchParams<{ concept?: string; misconception?: string }>();
   const [payload, setPayload] = useState<LessonPayload | null>(null);
+  const [offline, setOffline] = useState(false);
 
   useEffect(() => {
-    getFixture<LessonPayload>('lesson')
-      .then(setPayload)
-      .catch(() => setPayload(FALLBACK));
-  }, []);
+    let cancelled = false;
+    (async () => {
+      const plan = await getPlan();
+      try {
+        // Live RAG tutor: retrieves sources and cites them.
+        const live = await getTutorLesson({
+          concept_id: concept ?? 'real-yields',
+          level: plan?.level ?? 'beginner',
+          misconception: misconception || undefined,
+        });
+        if (!cancelled) setPayload(live);
+      } catch {
+        // Backend unreachable: fall back to the canned lesson so the demo never dead-ends.
+        const canned = await getFixture<LessonPayload>('lesson').catch(() => FALLBACK);
+        if (!cancelled) {
+          setOffline(true);
+          setPayload(canned);
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [concept, misconception]);
 
   if (!payload) {
     return (
       <Screen title="Lesson" safeEdges={['bottom']}>
         <ThemedText type="small" themeColor="textSecondary">
-          Loading…
+          Building your lesson from sources…
         </ThemedText>
       </Screen>
     );
@@ -79,6 +98,20 @@ export default function LessonScreen() {
       safeEdges={['bottom']}
       footer={<PrimaryButton label="Done — go to Learn" onPress={() => router.replace('/(tabs)/learn')} />}
     >
+      {offline ? (
+        <View style={styles.notice}>
+          <Text style={styles.noticeText}>Offline: showing a saved sample lesson, not a live one.</Text>
+        </View>
+      ) : null}
+      {payload.lesson.insufficient_evidence ? (
+        <View style={styles.notice}>
+          <Text style={styles.noticeText}>
+            Not enough sourced material on this concept yet. Everything below is AI explanation, not from
+            sources.
+          </Text>
+        </View>
+      ) : null}
+
       <LabelledSection kind="teaching">
         {sections.map((s, i) => (
           <View key={s.heading} style={[styles.section, i > 0 && styles.sectionDivider]}>
@@ -86,11 +119,7 @@ export default function LessonScreen() {
               <ThemedText type="sectionTitle" style={{ flex: 1 }}>
                 {s.heading}
               </ThemedText>
-              <Chip
-                label={s.kind}
-                tone={s.kind === 'supported' ? 'success' : 'neutral'}
-                size="sm"
-              />
+              <Chip label={s.kind} tone={KIND_TONE[s.kind] ?? 'neutral'} size="sm" />
             </View>
             <ThemedText>{s.text}</ThemedText>
             {s.source_ids.length ? (
@@ -100,17 +129,41 @@ export default function LessonScreen() {
         ))}
       </LabelledSection>
 
-      <SectionHeader title="Citations" meta={`${payload.citations.length} sources`} />
+      <SectionHeader
+        title="Citations"
+        meta={`${payload.citations.length} ${payload.citations.length === 1 ? 'source' : 'sources'}`}
+      />
       <Card style={styles.citeCard}>
-        {payload.citations.map((c, i) => (
-          <View key={c.source_id} style={[styles.citeRow, i > 0 && styles.sectionDivider]}>
-            <Text style={styles.citeId}>{c.source_id}</Text>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.citeTitle}>{c.title}</Text>
-              <Text style={styles.citePublisher}>{c.publisher}</Text>
+        {payload.citations.length === 0 ? (
+          <ThemedText type="small" themeColor="textSecondary" style={styles.citeEmpty}>
+            No sources cited.
+          </ThemedText>
+        ) : null}
+        {payload.citations.map((c, i) => {
+          const section = c.section_path ? c.section_path.split(' > ').pop() : null;
+          return (
+            <View key={c.source_id} style={[styles.citeRow, i > 0 && styles.sectionDivider]}>
+              <Text style={styles.citeId}>{c.source_id}</Text>
+              <View style={styles.citeBody}>
+                <Text style={styles.citeTitle}>{c.title}</Text>
+                <Text style={styles.citePublisher}>
+                  {c.publisher}
+                  {section ? ` · ${section}` : ''}
+                </Text>
+                {c.excerpt ? <Text style={styles.citeExcerpt}>“{c.excerpt}”</Text> : null}
+                {c.url ? (
+                  <Text
+                    style={styles.citeLink}
+                    accessibilityRole="link"
+                    onPress={() => Linking.openURL(c.url!)}
+                  >
+                    Open source →
+                  </Text>
+                ) : null}
+              </View>
             </View>
-          </View>
-        ))}
+          );
+        })}
       </Card>
 
       <LabelledSection kind="you" title="Check yourself">
@@ -124,11 +177,19 @@ export default function LessonScreen() {
 }
 
 const styles = StyleSheet.create({
+  notice: {
+    backgroundColor: Palette.softAccent,
+    borderRadius: Radius.sm,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  noticeText: { color: Palette.warning, fontSize: 13, lineHeight: 18, fontWeight: '600' },
   section: { gap: 6, paddingVertical: 4 },
   sectionDivider: { borderTopWidth: 1, borderTopColor: Palette.border, paddingTop: 12, marginTop: 6 },
   sectionHead: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   sources: { color: Palette.muted, fontSize: 12, lineHeight: 16 },
   citeCard: { paddingVertical: 4, gap: 0 },
+  citeEmpty: { paddingVertical: 8 },
   citeRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, paddingVertical: 10 },
   citeId: {
     color: Palette.primary,
@@ -137,6 +198,9 @@ const styles = StyleSheet.create({
     minWidth: 28,
     paddingTop: 2,
   },
+  citeBody: { flex: 1, gap: 2 },
   citeTitle: { color: Palette.text, fontSize: 14, fontWeight: '600', lineHeight: 20 },
   citePublisher: { color: Palette.muted, fontSize: 12, lineHeight: 16 },
+  citeExcerpt: { color: Palette.muted, fontSize: 12, lineHeight: 17, fontStyle: 'italic', marginTop: 2 },
+  citeLink: { color: Palette.primary, fontSize: 13, fontWeight: '700', marginTop: 4 },
 });

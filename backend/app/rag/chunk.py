@@ -86,3 +86,28 @@ def chunk_document(text: str, title: str) -> list[Chunk]:
     for i, c in enumerate(kept):
         c.index = i
     return kept
+
+
+_MD_HEADING = re.compile(r"^##\s+(.+?)\s*$", re.M)
+
+
+def chunk_markdown(body: str, title: str) -> list[Chunk]:
+    """Lessons: one `## Section` = one chunk (split on paragraphs if a section is oversized)."""
+    parts = _MD_HEADING.split(body)
+    sections = [(parts[i].strip(), parts[i + 1].strip()) for i in range(1, len(parts) - 1, 2)]
+    if not sections and body.strip():
+        sections = [(title, body.strip())]
+    chunks: list[Chunk] = []
+    for heading, text in sections:
+        path = f"{title} > {heading}"
+        buf: list[str] = []
+        for para in [p.strip() for p in text.split("\n\n") if p.strip()]:
+            if buf and count_tokens("\n\n".join(buf + [para])) > MAX_TOKENS:
+                content = "\n\n".join(buf)
+                chunks.append(Chunk(len(chunks), path, content, count_tokens(content)))
+                buf = []
+            buf.append(para)
+        if buf:
+            content = "\n\n".join(buf)
+            chunks.append(Chunk(len(chunks), path, content, count_tokens(content)))
+    return chunks

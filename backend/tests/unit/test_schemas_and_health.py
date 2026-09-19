@@ -32,7 +32,7 @@ def test_health():
 
 def test_auth_rejects_missing_token():
     with pytest.raises(ApiError) as e:
-        get_user_id(None, Settings(supabase_jwt_secret="s"))
+        get_user_id(None, Settings(supabase_jwt_secret="s", auth_dev_bypass=False))
     assert e.value.status == 401
 
 
@@ -43,3 +43,29 @@ def test_auth_accepts_valid_and_rejects_bad_token():
     bad = jwt.encode({"sub": "u1", "aud": "authenticated"}, "wrong", algorithm="HS256")
     with pytest.raises(ApiError):
         get_user_id(f"Bearer {bad}", s)
+
+
+def test_auth_accepts_es256_via_jwks(monkeypatch):
+    from cryptography.hazmat.primitives.asymmetric import ec
+
+    from app import deps
+
+    key = ec.generate_private_key(ec.SECP256R1())
+    good = jwt.encode({"sub": "u2", "aud": "authenticated"}, key, algorithm="ES256", headers={"kid": "k1"})
+
+    monkeypatch.setattr(deps, "_signing_key", lambda url, kid: key.public_key())
+    s = Settings(supabase_url="https://x.supabase.co")
+    assert get_user_id(f"Bearer {good}", s) == "u2"
+    other = ec.generate_private_key(ec.SECP256R1())
+    bad = jwt.encode({"sub": "u2", "aud": "authenticated"}, other, algorithm="ES256", headers={"kid": "k1"})
+    with pytest.raises(ApiError) as e:
+        get_user_id(f"Bearer {bad}", s)
+    assert e.value.status == 401
+
+
+def test_dev_bypass_only_off_vercel():
+    from app.deps import DEV_USER_ID
+
+    assert get_user_id(None, Settings(auth_dev_bypass=True, vercel="")) == DEV_USER_ID
+    with pytest.raises(ApiError):
+        get_user_id(None, Settings(auth_dev_bypass=True, vercel="1"))
