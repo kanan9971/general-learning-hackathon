@@ -107,7 +107,7 @@ Allowed direction is **left → right** ("may import / call"). Anything not list
 `content/sources/research_papers.yaml` (manifest: id, title, authors, publisher, canonical `source_url`, `pdf_url`, concept_ids) →
 `rag/extract.py` (PDF→text; refuses scanned PDFs) → `rag/clean.py` (running headers/footers, references, equation/table debris, NUL bytes, injection flag) →
 `rag/chunk.py` (section-aware, ≤350-token target / 500 max, 1-sentence overlap, `Title > Section` path) →
-`llm/embed.py` (Alibaba Qwen qwen3.7-text-embedding, 1536-d, batch ≤10; query embed is `embed_query` with an in-process LRU cache) → `db/knowledge.py` (checksum skip; if migration 0007 is applied, insert the new `chunks.version` inactive then `activate_document_version` in one RPC; otherwise insert **new** documents only and never delete existing chunks).
+`llm/embed.py` (Alibaba Qwen qwen3.7-text-embedding, 1536-d, batch ≤10; query embed is `embed_query` with an in-process LRU cache) → `db/knowledge.py` (checksum skip; if migration 0008 is applied, insert the new `chunks.version` inactive then `activate_document_version` in one RPC; otherwise insert **new** documents only and never delete existing chunks).
 Run: `python ../scripts/fetch_papers.py` then `python -m app.rag.ingest ../content/sources/research_papers.yaml` (dry run, writes `content/processed/*.jsonl`) or add `--store`.
 Lessons: `python -m app.rag.ingest ../content/lessons --store` (Markdown with frontmatter; one `## Section` = one chunk).
 **Retrieval:** hybrid `match_chunks` (vector ∪ FTS + RRF). Python filters `similarity >= 0.50` **before** taking k, prefixes the query embed with a concept hint (`Title`-like shape), and keeps at least one `content_type='lesson'` chunk in top-k when one cleared the bar. `GET /v1/sources/{chunk_id}` serves superseded (`is_active=false`) chunks so stored citations survive a versioned re-ingest; injection-flagged text is still hidden.
@@ -116,7 +116,7 @@ Lessons: `python -m app.rag.ingest ../content/lessons --store` (Markdown with fr
 
 ## 7. Current status (update as phases land)
 
-Last verified: 2026-09-20. Backend offline RAG+unit tests pass; live RAG eval 24/24 cases, hit@3 20/20 (100%), MRR@5 1.000. Migration 0007 is in `supabase/migrations/` but **not yet applied** to `apsojsuiginpuqljutyo` (`chunks.version` absent); ingest therefore inserts new documents only and never deletes the original 5 papers' chunk UUIDs. FTS `plainto_tsquery` fallback is waiting on that migration; punctuation queries still hit via the vector half.
+Last verified: 2026-09-20. Backend offline RAG+unit tests pass; live RAG eval 24/24 cases, hit@3 20/20 (100%), MRR@5 1.000. Migration 0008 (RAG hardening) is in `supabase/migrations/` but **not yet applied** to `apsojsuiginpuqljutyo` (`chunks.version` absent); ingest therefore inserts new documents only and never deletes the original 5 papers' chunk UUIDs. FTS `plainto_tsquery` fallback is waiting on that migration; punctuation queries still hit via the vector half.
 
 | Area | State |
 |---|---|

@@ -9,7 +9,7 @@ def _vec(v: list[float]) -> str:
 
 
 def supports_chunk_versioning(db: Client) -> bool:
-    """True after migration 0007 (chunks.version + activate_document_version)."""
+    """True after migration 0008 (chunks.version + activate_document_version)."""
     global _VERSIONING
     if _VERSIONING is not None:
         return _VERSIONING
@@ -46,7 +46,7 @@ def _chunk_rows(chunks: list[dict], extra: dict | None = None) -> list[dict]:
 
 
 def upsert_document(db: Client, doc: dict, chunks: list[dict]) -> str:
-    """Versioned upsert when 0007 is applied. Otherwise insert new documents only — never
+    """Versioned upsert when 0008 is applied. Otherwise insert new documents only — never
     delete existing chunks (that would invalidate stored cited_chunk_ids).
     Returns skipped|inserted|updated."""
     if not chunks:
