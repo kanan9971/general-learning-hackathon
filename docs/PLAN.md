@@ -27,12 +27,12 @@ On approval, implementation starts by committing this plan to `docs/PLAN.md` and
 
 ## 1. Product interpretation
 
-- **What it is:** a 5–10 minute daily mobile session that turns market news into *practice*: see 3 events → understand the causal chain → see your portfolio impact → write your own analysis → get rubric feedback → get a cited micro-lesson on your weakest concept → your mastery map updates.
+- **What it is:** a 5–10 minute daily mobile session that turns market news into *practice*: see 3 events as case studies → understand the causal chain → see demo-portfolio impact → take a short MCQ quiz → get feedback → get a cited micro-lesson on a weak concept → mastery map updates.
 - **Core user (MVP):** a non-finance / technical student preparing for Sales & Trading internships. Secondary: finance students, beginner investors.
 - **Main problem:** passive news consumption doesn't build causal reasoning, cross-asset intuition, or the ability to *speak* a market view.
-- **Differentiator:** not a summarizer — a **closed loop with a learner model**. Facts are deterministic, explanations are labelled interpretations with alternatives + confidence, grading rewards reasoning not agreement, and teaching is targeted RAG with inspectable citations.
-- **MVP will:** one daily brief (live or fallback), 3 ranked events with causal chains, a demo portfolio with deterministic attribution, one analyst challenge, rubric evaluation, RAG lesson with citations, one follow-up question, mastery/progress screen.
-- **MVP will not:** execute trades, give buy/sell advice, integrate IBKR, cover global markets, do voice, or do full spaced repetition.
+- **Differentiator:** not a summarizer — a **closed loop with a learner model**. An onboarding MCQ sets the tone of a custom plan; daily news events become case studies + quizzes that continuously update mastery. Facts are deterministic; explanations are labelled interpretations.
+- **MVP will:** onboarding diagnostic quiz (once, retakeable from Learn) → custom plan tone · daily brief with case-study events · demo portfolio attribution · daily MCQ quiz + feedback · RAG-style lesson with citations · Learn mastery screen. Hackathon demo **skips auth**.
+- **MVP will not:** execute trades, give buy/sell advice, integrate IBKR, require sign-up for the demo, cover global markets, do voice, or do full spaced repetition.
 
 ## 2. Assumptions & open questions
 
@@ -52,25 +52,25 @@ Open questions (defaults in bold, change any time):
 
 ## 3. MVP scope (16 h, 4 people)
 
-**Must-have (P0):** email sign-up/login + judge account · 3-step onboarding · Today brief (cross-asset strip + 3 event cards) · event detail with causal chain, alternatives, confidence, sources · portfolio impact (deterministic attribution + labelled AI narrative) · one daily analyst challenge · rubric evaluation (10 categories) · RAG lesson with citations on the top misconception · follow-up question · mastery update + progress screen · data-mode fallback chain · source drawer.
+**Must-have (P0):** onboarding MCQ diagnostic (sets custom-plan tone; once per install, retake from Learn) · Today brief (cross-asset strip + event case studies) · event detail with causal chain, alternatives, confidence · portfolio impact (deterministic attribution + labelled AI narrative) · daily MCQ quiz on the case study · feedback + mastery update · cited micro-lesson · Learn / living plan · data-mode badge · light design palette. **Auth skipped for hackathon demo.**
 
-**Simplify:** onboarding = 3 screens · challenge = text only, 100–300 words · spaced review = Leitner boxes (1/3/7/14 days) · reranking = RRF + boosts (no ML reranker) · portfolio = demo portfolio only · S&T mode = one drill ("walk me through the markets", text) if time.
+**Simplify:** onboarding = welcome + 6–8 MCQs + plan reveal · daily assessment = MCQ (not 100–300 word essay) · spaced review = Leitner later · portfolio = demo portfolio only · Desk / S&T drill = deferred.
 
-**Mock / stub:** watchlist (static list) · paper-trade journal (form + AI evaluation only if time; revisit = "coming soon") · learning heatmap (derived from mastery rows).
+**Mock / stub:** watchlist · paper-trade journal · long-form analyst challenge (backend schemas remain for later).
 
-**Defer (P2):** IBKR read-only · CSV upload · voice answers · live news ingestion into RAG beyond daily cron · notifications/email · multi-region · advanced S&T role-play · full SM-2.
+**Defer (P2):** IBKR read-only · CSV upload · voice answers · live news ingestion into RAG beyond daily cron · notifications/email · multi-region · advanced S&T role-play · full SM-2 · full Supabase auth UI.
 
 **Non-goals:** order execution, return promises, "buy this now", storing brokerage credentials, scraping paywalled content, LLM-computed numbers.
 
 ## 4. User journeys
 
-1. **First-time onboarding:** Sign up (email/password) → Step 1 background + level (Beginner/Intermediate/Advanced) → Step 2 goal (S&T prep / investing / both) + target desk (macro, rates, equities, FX, general) → Step 3 "Use demo portfolio" (default) or watchlist → lands on Today. `POST /v1/onboarding` creates profile, seeds demo portfolio, seeds `concept_mastery` rows at prior = f(level).
-2. **Daily session:** Today → skim cross-asset strip → tap top event → read chain + alternatives → Portfolio tab shows impact → "Today's Challenge" CTA → answer → feedback → lesson → follow-up → Progress shows updated mastery + streak.
-3. **Portfolio impact:** Portfolio tab → day P&L % (deterministic) → contributors bar chart (top +/−) → sector concentration → each position row links to the event that plausibly moved it (AI, labelled) → concepts to understand chips.
-4. **Analyst challenge:** question card (type, difficulty, word range, 2 hints collapsed) → text editor with live word count → submit → rubric screen (overall, per-category bars, strengths, gaps, misconceptions, stronger version).
-5. **RAG teaching:** from rubric, "Teach me: Real yields & long-duration equities" → lesson sections tagged *From sources* / *AI synthesis* / *Assumption* / *Uncertain* → tap citation → source drawer (title, publisher, date, excerpt, link) → check question → mastery chip animates.
-6. **S&T practice (P1):** Desk tab → "Walk me through the markets (60s)" → write ~150 words → interviewer persona scores on desk rubric + asks one pushback follow-up.
-7. **Judge demo:** log in with judge account (pre-warmed, golden day or live) → full loop in ~3 min (see §18).
+1. **First-time onboarding:** Welcome → 6–8 foundation MCQs (static seed about KB concepts, not live RAG) → plan reveal (inferred level + 2–3 focus concepts) → Today. Completion stored in AsyncStorage (`deskready.onboarded`); does not show again unless **Retake diagnostic** on Learn.
+2. **Daily session:** Today → skim strip → open case study → causal chain → Start quiz → MCQ → feedback → lesson → Learn shows updated mastery.
+3. **Portfolio impact:** Portfolio tab → day P&L % (deterministic) → contributors → sectors → AI narrative labelled Interpretation.
+4. **Daily quiz:** 3–5 MCQs grounded in today’s event → client-side score + mastery bumps → Teach me CTA.
+5. **RAG teaching:** lesson sections with kind tags + inline citations → check question → back to Learn.
+6. **Retake:** Learn → Retake diagnostic → quiz → new plan → back to Learn (daily mastery kept).
+7. **Judge demo:** open Expo web / phone → complete diagnostic once → full case-study loop (~3 min). No login.
 
 ## 5. Technical architecture
 
@@ -302,19 +302,18 @@ All tables in `public`, UUID PKs unless noted, `created_at timestamptz default n
 
 | Screen | Goal & components | Data | Empty / loading / error | Demo notes |
 |---|---|---|---|---|
-| Sign in / up | email+password; "Educational, not financial advice" footer | Supabase | inline errors | judge creds on printed card |
-| Onboarding (3 steps) | level chips, goal/desk chips, portfolio choice | `POST /onboarding` | progress dots; retry | pre-completed for judge |
-| **Today** | `DataModeBadge` + as-of, `CrossAssetStrip` (horizontal scroll: S&P 500, Nasdaq, 2Y, 10Y, 2s10s, DXY, WTI, Gold, VIX), 3 `EventCard`s (move, catalyst, confidence), Challenge CTA, streak pill | `GET /brief` | skeleton cards; "Live data unavailable — showing cached day" banner | golden day forced via `DATA_MODE=demo` if live is dull |
-| Event detail | Facts block (numbers from data, source + timestamp) → `CausalChain` (vertical stepper) → Alternatives → Affected +/− chips → Concepts chips → Sources | `GET /events/{id}` | missing sources → "No supporting source; low confidence" | the explanation magic moment |
-| Portfolio | day % (deterministic, labelled "Calculated"), `ContributionChart` (top ±), sector donut/bar, positions list linked to events, AI narrative in `LabelledSection kind=interpretation` | `GET /portfolio/impact` | no positions → watchlist CTA; narrative unavailable → hide section | airline vs oil & semis story |
-| Challenge | question card, type/difficulty tags, collapsible hints, multiline input w/ word counter (100–300), submit | `GET /challenge/today` | disabled submit outside range; saved-draft (AsyncStorage) | pre-typed demo answer ready to paste |
-| Feedback | overall ring, `RubricBars` (10), strengths/gaps, misconception cards w/ quote, stronger version (collapsed), "Teach me" CTA | `POST responses` | 10–20s loading w/ staged text ("Checking facts… Scoring reasoning…"); retry on failure (answer kept) | |
-| Lesson | sections w/ kind tags, `CitationChip`s → `SourceDrawer` bottom sheet, check question, follow-up answer box, mastery delta toast | `POST lesson` | insufficient-evidence variant | the RAG magic moment |
-| Learn / Progress | concept `MasteryCard` grid (heat-coloured), due-for-review list, recent scores sparkline, streak | `GET /progress` | new user → "Complete today's challenge" | shows the update live |
-| Desk (P1) | "Walk me through the markets" timer + text, interviewer pushback | `POST /desk/walkthrough` | — | optional 30s segment |
-| Source drawer | title, publisher, published/ingested date, trust badge, section path, excerpt, "Open source" | `GET /sources/{id}` | link missing → "Internal lesson" | |
+| Onboarding welcome | What DeskReady is + Start diagnostic | — | — | Auth skipped |
+| Onboarding quiz | One MCQ at a time, progress dots, 6–8 Qs | `fixtures/onboarding-quiz.json` | — | Sets plan tone |
+| Plan reveal | Inferred level + focus chips → Continue | AsyncStorage plan | — | Retake returns to Learn |
+| **Today** | `DataModeBadge`, strip, `EventCard` case studies, quiz CTA | `GET /fixtures/brief` (+ local fallback) | API offline banner | DEMO DAY ok |
+| Case study | Fact / interpretation / causal chain / alternatives / Start quiz | brief fixture by id | — | explanation moment |
+| Daily quiz | 3–5 MCQs | `fixtures/daily-quiz.json` | — | updates mastery |
+| Feedback | Score, hits/misses, Teach me | quiz results params | — | |
+| Lesson | Sections + citations + check question | `GET /fixtures/lesson` | local fallback | |
+| Portfolio | Day %, contributors, sectors, narrative | `GET /fixtures/portfolio_impact` | fallback | demo book |
+| Learn | Living plan + mastery bars + **Retake diagnostic** | AsyncStorage | empty mastery hint | retake only here |
 
-Design system: neutral slate background, one accent (teal), semantic up/down colours that remain distinguishable for colour-blind users (blue/orange + ▲▼ icons, never colour alone); `LabelledSection` visual language: **Fact** (grey, database icon) · **Interpretation** (amber, sparkle icon) · **Teaching** (teal, book icon) · **Your view** (purple). No confetti, no "win" language.
+Design system (locked palette): page `#FAFAF7` · surface `#FFFFFF` · primary `#1E4E8C` · secondary `#087E8B` · accent `#F4B942` · success `#1F7A4D` · error `#B42318` · text `#1F2937` · muted `#596579` · borders `#D9E2EC` · soft info/success/accent backgrounds. `LabelledSection`: **Fact** (muted) · **Interpretation** (amber) · **Teaching** (teal) · **Your view** (primary). No confetti, no "win" language.
 
 ## 12. Implementation phases — 16-hour plan
 

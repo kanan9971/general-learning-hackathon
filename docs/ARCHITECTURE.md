@@ -71,8 +71,9 @@ Allowed direction is **left → right** ("may import / call"). Anything not list
 ## 5. Request flows
 
 - **Daily brief (cron, post-close):** cron → `market` snapshot (fallback chain) + `news` RSS → `rag` ingest market chunks → `llm.explain_event` per top-ranked move → validated → `daily_briefs`. Request path only *reads* the stored brief.
-- **Analyst challenge:** `GET challenge` (generate once/user/day via `llm.question`) → `POST response` (save) → `llm.evaluate` (facts + answer) → `learning.rubric` computes overall → `evaluations`.
-- **Teaching:** misconception → `rag.retrieve` (foundation layer, filtered by concept + level) → `llm.tutor` with untrusted context → `rag.citations` validates → `lessons` → `learning.mastery` updates `concept_mastery` + `next_review_at`.
+- **Onboarding diagnostic (mobile, current demo):** static MCQ fixture → client scores → persist plan (level + focus concepts) in AsyncStorage. Retake from Learn overwrites plan only; mastery history kept. (Server `POST /v1/onboarding` still planned for auth profiles later.)
+- **Daily case-study quiz (mobile, current demo):** MCQs from local fixture grounded in the brief event → mastery bumps in AsyncStorage → feedback → lesson fixture. Long-form `evaluate` route remains for a later P1 essay challenge.
+- **Teaching:** misconception / weak concept → `rag.retrieve` (foundation layer) → `llm.tutor` → citations → mastery update. Demo uses lesson fixture until RAG ships.
 - **Portfolio:** positions × snapshot → `portfolio.attribution` (deterministic) ; optional `llm.portfolio_narrative` labelled as interpretation.
 
 ## 6. Extension points (future work slots in here)
@@ -98,9 +99,9 @@ Run: `python -m app.rag.ingest ../content/sources/research_papers.yaml` (dry run
 | FastAPI app, config, typed errors, JWT dependency, `/health` | done (phase 0) |
 | Pydantic API schemas + placeholder fixtures (`app/fixtures`, served at `/v1/dev/fixtures/*` when `DEV_FIXTURES=true`) | done (phase 0) |
 | Supabase migrations 0001–0003 (core, rag, rls) | written, **not yet applied/tested against a real DB** |
-| Expo app: 4 tabs, API client, Today reads fixtures | done (phase 0) |
-| RAG ingest pipeline (extract, clean, chunk, embed, store) + 5 momentum papers (~300 chunks, dry-run verified; **not yet embedded/stored**: needs OPENAI_API_KEY + Supabase) | done except store step |
+| Expo app: onboarding MCQ → plan → Today / case study / daily quiz / feedback / lesson / Portfolio / Learn (palette + AsyncStorage gate; auth skipped) | done (mobile loop UI) |
+| RAG ingest pipeline (extract, clean, chunk, embed, store) + 5 momentum papers (~300 chunks, dry-run verified; **not yet embedded/stored**: needs embedding key + Supabase) | done except store step |
 | Migration 0004 (`research` content type) | written, not applied |
 | market / news / portfolio / learning / llm prompts | empty packages (later phases) |
 | retrieval (`rag/retrieve.py`, `match_chunks`), citations, context builder | not started (next) |
-| `match_chunks` SQL function (migration 0004) | not started |
+| `match_chunks` SQL function | not started |

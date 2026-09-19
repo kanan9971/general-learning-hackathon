@@ -1,24 +1,57 @@
-import { ScrollView, StyleSheet } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { MaxContentWidth } from '@/constants/theme';
+import { MaxContentWidth, Palette } from '@/constants/theme';
 
-export function Screen({ title, children }: { title: string; children: React.ReactNode }) {
+export function Screen({
+  title,
+  subtitle,
+  children,
+  scroll = true,
+}: {
+  title?: string;
+  subtitle?: string;
+  children: React.ReactNode;
+  scroll?: boolean;
+}) {
+  const body = (
+    <View style={styles.content}>
+      {title ? <ThemedText type="title" style={styles.title}>{title}</ThemedText> : null}
+      {subtitle ? (
+        <ThemedText type="small" themeColor="textSecondary">
+          {subtitle}
+        </ThemedText>
+      ) : null}
+      {children}
+    </View>
+  );
+
   return (
-    <ThemedView style={styles.root}>
+    <View style={styles.root}>
       <SafeAreaView style={styles.root} edges={['top']}>
-        <ScrollView contentContainerStyle={styles.content}>
-          <ThemedText type="title">{title}</ThemedText>
-          {children}
-        </ScrollView>
+        {scroll ? (
+          <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+            {body}
+          </ScrollView>
+        ) : (
+          body
+        )}
       </SafeAreaView>
-    </ThemedView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1 },
-  content: { padding: 16, gap: 12, width: '100%', maxWidth: MaxContentWidth, alignSelf: 'center' },
+  root: { flex: 1, backgroundColor: Palette.pageBackground },
+  scroll: { flexGrow: 1 },
+  content: {
+    padding: 16,
+    gap: 12,
+    width: '100%',
+    maxWidth: MaxContentWidth,
+    alignSelf: 'center',
+    paddingBottom: 32,
+  },
+  title: { fontSize: 28, lineHeight: 34, fontWeight: '700', color: Palette.text },
 });

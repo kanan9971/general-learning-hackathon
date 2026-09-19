@@ -1,0 +1,50 @@
+{
+  "event_id": "evt-1",
+  "title": "Today's case-study quiz",
+  "questions": [
+    {
+      "id": "dq1",
+      "concept_id": "cpi-surprise",
+      "prompt": "In today's case study, the main catalyst for higher yields is described as",
+      "options": [
+        { "id": "a", "text": "An inflation surprise that lifts rate expectations", "correct": true },
+        { "id": "b", "text": "A surprise cut in the Fed funds rate", "correct": false },
+        { "id": "c", "text": "A company-specific earnings miss only", "correct": false },
+        { "id": "d", "text": "A holiday market closure", "correct": false }
+      ]
+    },
+    {
+      "id": "dq2",
+      "concept_id": "bond-price-yield",
+      "prompt": "If government bond yields rise, bond prices generally",
+      "options": [
+        { "id": "a", "text": "Fall", "correct": true },
+        { "id": "b", "text": "Rise one-for-one", "correct": false },
+        { "id": "c", "text": "Are unaffected", "correct": false },
+        { "id": "d", "text": "Only change on weekends", "correct": false }
+      ]
+    },
+    {
+      "id": "dq3",
+      "concept_id": "discount-rates-equities",
+      "prompt": "Why might long-duration growth equities face pressure when yields jump?",
+      "options": [
+        { "id": "a", "text": "Higher discount rates reduce the present value of distant cash flows", "correct": true },
+        { "id": "b", "text": "Growth stocks are banned when yields rise", "correct": false },
+        { "id": "c", "text": "Banks stop lending to tech forever", "correct": false },
+        { "id": "d", "text": "CPI prints are ignored by equity markets", "correct": false }
+      ]
+    },
+    {
+      "id": "dq4",
+      "concept_id": "real-yields",
+      "prompt": "Which group is listed as positively affected in the placeholder event?",
+      "options": [
+        { "id": "a", "text": "Banks", "correct": true },
+        { "id": "b", "text": "Long-duration growth equities", "correct": false },
+        { "id": "c", "text": "All cryptocurrencies", "correct": false },
+        { "id": "d", "text": "Only gold miners", "correct": false }
+      ]
+    }
+  ]
+}

@@ -1,28 +1,35 @@
-// Keeps Fact / Interpretation / Teaching / Your view visually distinct (see CLAUDE.md rule 5).
+// Keeps Fact / Interpretation / Teaching / Your view visually distinct.
 import { StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
+import { Palette } from '@/constants/theme';
 
 export type SectionKind = 'fact' | 'interpretation' | 'teaching' | 'you';
-const META: Record<SectionKind, { label: string; color: string }> = {
-  fact: { label: 'FACT (calculated from data)', color: '#64748B' },
-  interpretation: { label: 'AI INTERPRETATION', color: '#D97706' },
-  teaching: { label: 'TEACHING', color: '#0F766E' },
-  you: { label: 'YOUR VIEW', color: '#7C3AED' },
+
+const META: Record<SectionKind, { label: string; color: string; bg: string }> = {
+  fact: { label: 'FACT (from data)', color: Palette.muted, bg: Palette.surface },
+  interpretation: { label: 'AI INTERPRETATION', color: Palette.accent, bg: Palette.softAccent },
+  teaching: { label: 'TEACHING', color: Palette.secondary, bg: Palette.softSuccess },
+  you: { label: 'YOUR VIEW', color: Palette.primary, bg: Palette.softInfo },
 };
 
 export function LabelledSection({ kind, children }: { kind: SectionKind; children: React.ReactNode }) {
-  const { label, color } = META[kind];
+  const { label, color, bg } = META[kind];
   return (
-    <ThemedView type="backgroundElement" style={[styles.card, { borderLeftColor: color }]}>
+    <View style={[styles.card, { borderLeftColor: color, backgroundColor: bg }]}>
       <ThemedText type="smallBold" style={{ color }}>{label}</ThemedText>
       <View style={styles.body}>{children}</View>
-    </ThemedView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  card: { borderLeftWidth: 4, borderRadius: 8, padding: 12 },
+  card: {
+    borderLeftWidth: 4,
+    borderRadius: 10,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: Palette.border,
+  },
   body: { marginTop: 6, gap: 4 },
 });

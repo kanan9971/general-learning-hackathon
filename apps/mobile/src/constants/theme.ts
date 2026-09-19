@@ -1,26 +1,60 @@
 /**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
+ * DeskReady light design tokens (hackathon palette).
  */
 
 import '@/global.css';
 
 import { Platform } from 'react-native';
 
+export const Palette = {
+  pageBackground: '#FAFAF7',
+  surface: '#FFFFFF',
+  primary: '#1E4E8C',
+  primaryHover: '#163A68',
+  secondary: '#087E8B',
+  accent: '#F4B942',
+  success: '#1F7A4D',
+  warning: '#C45A00',
+  error: '#B42318',
+  text: '#1F2937',
+  muted: '#596579',
+  border: '#D9E2EC',
+  softInfo: '#EAF3FF',
+  softSuccess: '#EAF7EF',
+  softAccent: '#FFF5D8',
+  white: '#FFFFFF',
+} as const;
+
+/** Light-first theme used by ThemedText / ThemedView. */
 export const Colors = {
   light: {
-    text: '#000000',
-    background: '#ffffff',
-    backgroundElement: '#F0F0F3',
-    backgroundSelected: '#E0E1E6',
-    textSecondary: '#60646C',
+    text: Palette.text,
+    textSecondary: Palette.muted,
+    background: Palette.pageBackground,
+    backgroundElement: Palette.surface,
+    backgroundSelected: Palette.softInfo,
+    primary: Palette.primary,
+    secondary: Palette.secondary,
+    accent: Palette.accent,
+    success: Palette.success,
+    warning: Palette.warning,
+    error: Palette.error,
+    border: Palette.border,
   },
   dark: {
-    text: '#ffffff',
-    background: '#000000',
-    backgroundElement: '#212225',
-    backgroundSelected: '#2E3135',
-    textSecondary: '#B0B4BA',
+    // Demo is light-first; keep a readable dark fallback that mirrors roles.
+    text: '#F3F4F6',
+    textSecondary: '#9CA3AF',
+    background: '#0F172A',
+    backgroundElement: '#1E293B',
+    backgroundSelected: '#1E3A5F',
+    primary: '#5B8FD4',
+    secondary: '#2AA6B2',
+    accent: '#F4B942',
+    success: '#34D399',
+    warning: '#FB923C',
+    error: '#F87171',
+    border: '#334155',
   },
 } as const;
 
@@ -28,13 +62,9 @@ export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
 
 export const Fonts = Platform.select({
   ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
     sans: 'system-ui',
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
     serif: 'ui-serif',
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
     rounded: 'ui-rounded',
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
     mono: 'ui-monospace',
   },
   default: {
@@ -62,4 +92,4 @@ export const Spacing = {
 } as const;
 
 export const BottomTabInset = Platform.select({ ios: 50, android: 80 }) ?? 0;
-export const MaxContentWidth = 800;
+export const MaxContentWidth = 480;

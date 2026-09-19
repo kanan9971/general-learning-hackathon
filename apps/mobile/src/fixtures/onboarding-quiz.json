@@ -1,0 +1,94 @@
+{
+  "title": "Diagnostic quiz",
+  "description": "Answer a few questions so we can set the tone of your custom plan. There is no pass or fail.",
+  "questions": [
+    {
+      "id": "q1",
+      "concept_id": "bond-price-yield",
+      "prompt": "When bond yields rise, what typically happens to existing bond prices?",
+      "options": [
+        { "id": "a", "text": "Prices fall", "correct": true },
+        { "id": "b", "text": "Prices rise", "correct": false },
+        { "id": "c", "text": "Prices stay the same", "correct": false },
+        { "id": "d", "text": "Only coupon payments change", "correct": false }
+      ]
+    },
+    {
+      "id": "q2",
+      "concept_id": "duration",
+      "prompt": "All else equal, which bond is more sensitive to a rate move?",
+      "options": [
+        { "id": "a", "text": "A short-maturity T-bill", "correct": false },
+        { "id": "b", "text": "A long-duration bond (e.g. 30-year)", "correct": true },
+        { "id": "c", "text": "A floating-rate note", "correct": false },
+        { "id": "d", "text": "Cash", "correct": false }
+      ]
+    },
+    {
+      "id": "q3",
+      "concept_id": "real-yields",
+      "prompt": "Roughly, real yield ≈",
+      "options": [
+        { "id": "a", "text": "Nominal yield + expected inflation", "correct": false },
+        { "id": "b", "text": "Nominal yield − expected inflation", "correct": true },
+        { "id": "c", "text": "Fed funds rate only", "correct": false },
+        { "id": "d", "text": "Dividend yield − bond yield", "correct": false }
+      ]
+    },
+    {
+      "id": "q4",
+      "concept_id": "cpi-surprise",
+      "prompt": "A hotter-than-expected CPI print often leads markets to price",
+      "options": [
+        { "id": "a", "text": "Easier Fed policy and lower yields", "correct": false },
+        { "id": "b", "text": "Stickier rates / higher rate expectations", "correct": true },
+        { "id": "c", "text": "Immediate recession with no rate reaction", "correct": false },
+        { "id": "d", "text": "Only FX moves; equities ignore CPI", "correct": false }
+      ]
+    },
+    {
+      "id": "q5",
+      "concept_id": "discount-rates-equities",
+      "prompt": "Higher discount rates tend to pressure long-duration growth equities because",
+      "options": [
+        { "id": "a", "text": "Future cash flows are worth less in present value", "correct": true },
+        { "id": "b", "text": "Companies stop reporting earnings", "correct": false },
+        { "id": "c", "text": "Dividends must be paid in cash immediately", "correct": false },
+        { "id": "d", "text": "Short-term traders are banned from the stock", "correct": false }
+      ]
+    },
+    {
+      "id": "q6",
+      "concept_id": "risk-on-off",
+      "prompt": "In a risk-off move you often see",
+      "options": [
+        { "id": "a", "text": "Equities up, USD and Treasuries down", "correct": false },
+        { "id": "b", "text": "Equities down; flight into USD / Treasuries", "correct": true },
+        { "id": "c", "text": "Oil and crypto always rise together", "correct": false },
+        { "id": "d", "text": "VIX falls to zero", "correct": false }
+      ]
+    },
+    {
+      "id": "q7",
+      "concept_id": "vix",
+      "prompt": "The VIX is best thought of as",
+      "options": [
+        { "id": "a", "text": "A forecast of next week's S&P earnings", "correct": false },
+        { "id": "b", "text": "A measure of expected near-term equity volatility", "correct": true },
+        { "id": "c", "text": "The Fed's official inflation target", "correct": false },
+        { "id": "d", "text": "A bond credit rating", "correct": false }
+      ]
+    },
+    {
+      "id": "q8",
+      "concept_id": "yield-curve",
+      "prompt": "A steeper 2s10s curve usually means",
+      "options": [
+        { "id": "a", "text": "The gap between 10Y and 2Y yields is widening", "correct": true },
+        { "id": "b", "text": "All yields are identical", "correct": false },
+        { "id": "c", "text": "Equities cannot move for 10 days", "correct": false },
+        { "id": "d", "text": "The dollar has been abolished", "correct": false }
+      ]
+    }
+  ]
+}
