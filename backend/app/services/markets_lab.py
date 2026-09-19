@@ -20,8 +20,17 @@ from . import markets as markets_service
 from . import quiz as quiz_service
 
 
-async def _pool(section, watch: list[str]):
+PLACEMENT_AS_OF = "placement"  # placement questions are static, so their ids never depend on today's data
+
+
+def placement_pool():
+    return lab.build_pool({}, markets_service.guide(), PLACEMENT_AS_OF, None)
+
+
+async def _pool(section, watch: list[str], placement: bool = False):
     g = markets_service.guide()
+    if placement:
+        return None, placement_pool()
     symbols = list(dict.fromkeys(
         [i.symbol for i in INSTRUMENTS] + [x for r in g.relationships for x in (r.cause, r.effect)]))
     snap = await get_snapshot(symbols)
@@ -55,7 +64,7 @@ def _fallback_grade(item: lab.LabItem, text: str) -> tuple[str, int, str]:
 
 
 async def answer(user_id: str, token: str | None, req: LabAnswerRequest) -> LabFeedback:
-    _, pool = await _pool(req.section, req.watch)
+    _, pool = await _pool(req.section, req.watch, req.placement)
     item = next((i for i in pool if i.public.id == req.question_id), None)
     if item is None:
         raise ApiError("question_expired", "Today's data changed. Start a new set.", 409, True)
@@ -95,9 +104,10 @@ async def answer(user_id: str, token: str | None, req: LabAnswerRequest) -> LabF
     mastery: list[LabMastery] = []
     if graded_by != "fallback":  # a keyword guess is not evidence of understanding
         try:
+            deltas = (quiz_service.seed_placement(user_id, token, q.concept_ids, verdict.observed, q.difficulty)
+                      if req.placement else quiz_service.record_observation(user_id, token, q.concept_ids, verdict.observed))
             mastery = [LabMastery(concept_id=d.concept_id, mastery_before=d.mastery_before,
-                                  mastery_after=d.mastery_after)
-                       for d in quiz_service.record_observation(user_id, token, q.concept_ids, verdict.observed)]
+                                  mastery_after=d.mastery_after) for d in deltas]
         except Exception:  # noqa: BLE001 - never lose the feedback because progress storage failed
             mastery = []
     reveal = item.reveal.model_copy(update={"parts": verdict.parts}) if verdict.parts else item.reveal

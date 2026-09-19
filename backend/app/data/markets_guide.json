@@ -2257,5 +2257,268 @@
    ],
    "level": 2
   }
+ ],
+ "roadmap": [
+  {
+   "id": "connect",
+   "section_id": null,
+   "tier": 0,
+   "requires": [],
+   "action": "connect",
+   "title": "How it all connects",
+   "tagline": "The whole market in one picture",
+   "concept_ids": [
+    "rate-expectations",
+    "risk-on-off",
+    "usd-rate-differentials"
+   ],
+   "min_level": "beginner"
+  },
+  {
+   "id": "macro",
+   "section_id": "macro",
+   "tier": 1,
+   "requires": [
+    "connect"
+   ],
+   "action": "section",
+   "title": null,
+   "tagline": null,
+   "concept_ids": [],
+   "min_level": "beginner"
+  },
+  {
+   "id": "desk",
+   "section_id": "desk",
+   "tier": 1,
+   "requires": [
+    "connect"
+   ],
+   "action": "section",
+   "title": null,
+   "tagline": null,
+   "concept_ids": [],
+   "min_level": "beginner"
+  },
+  {
+   "id": "rates",
+   "section_id": "rates",
+   "tier": 2,
+   "requires": [
+    "macro"
+   ],
+   "action": "section",
+   "title": null,
+   "tagline": null,
+   "concept_ids": [],
+   "min_level": "beginner"
+  },
+  {
+   "id": "valuation",
+   "section_id": "valuation",
+   "tier": 2,
+   "requires": [
+    "desk"
+   ],
+   "action": "section",
+   "title": null,
+   "tagline": null,
+   "concept_ids": [],
+   "min_level": "beginner"
+  },
+  {
+   "id": "fx",
+   "section_id": "fx",
+   "tier": 3,
+   "requires": [
+    "rates"
+   ],
+   "action": "section",
+   "title": null,
+   "tagline": null,
+   "concept_ids": [],
+   "min_level": "beginner"
+  },
+  {
+   "id": "commodities",
+   "section_id": "commodities",
+   "tier": 3,
+   "requires": [
+    "rates"
+   ],
+   "action": "section",
+   "title": null,
+   "tagline": null,
+   "concept_ids": [],
+   "min_level": "beginner"
+  },
+  {
+   "id": "equities",
+   "section_id": "equities",
+   "tier": 3,
+   "requires": [
+    "rates"
+   ],
+   "action": "section",
+   "title": null,
+   "tagline": null,
+   "concept_ids": [],
+   "min_level": "beginner"
+  },
+  {
+   "id": "sectors",
+   "section_id": "sectors",
+   "tier": 4,
+   "requires": [
+    "equities"
+   ],
+   "action": "section",
+   "title": null,
+   "tagline": null,
+   "concept_ids": [],
+   "min_level": "beginner"
+  },
+  {
+   "id": "companies",
+   "section_id": "companies",
+   "tier": 5,
+   "requires": [
+    "sectors",
+    "valuation"
+   ],
+   "action": "section",
+   "title": null,
+   "tagline": null,
+   "concept_ids": [],
+   "min_level": "beginner"
+  },
+  {
+   "id": "risk",
+   "section_id": "risk",
+   "tier": 5,
+   "requires": [
+    "sectors"
+   ],
+   "action": "section",
+   "title": null,
+   "tagline": null,
+   "concept_ids": [],
+   "min_level": "beginner"
+  },
+  {
+   "id": "portfolio",
+   "section_id": "portfolio",
+   "tier": 6,
+   "requires": [
+    "companies",
+    "risk"
+   ],
+   "action": "section",
+   "title": null,
+   "tagline": null,
+   "concept_ids": [],
+   "min_level": "beginner"
+  },
+  {
+   "id": "interview",
+   "section_id": null,
+   "tier": 7,
+   "requires": [
+    "portfolio"
+   ],
+   "action": "lab_explain",
+   "title": "Interview walk-through",
+   "tagline": "Explain markets out loud, desk-style",
+   "concept_ids": [
+    "st-morning-meeting",
+    "priced-in",
+    "rate-expectations"
+   ],
+   "min_level": "advanced"
+  },
+  {
+   "id": "crossasset",
+   "section_id": null,
+   "tier": 7,
+   "requires": [
+    "portfolio"
+   ],
+   "action": "lab_scenario",
+   "title": "Cross-asset what-ifs",
+   "tagline": "Shock one market, trace every ripple",
+   "concept_ids": [
+    "correlation",
+    "risk-on-off",
+    "market-regime"
+   ],
+   "min_level": "advanced"
+  }
+ ],
+ "cycle_phases": [
+  {
+   "title": "The big picture",
+   "theme": "How the economy, the Fed and markets connect",
+   "topics": [
+    "connect",
+    "macro"
+   ]
+  },
+  {
+   "title": "Rates & the curve",
+   "theme": "Yields, the curve and how a desk trades them",
+   "topics": [
+    "rates",
+    "desk"
+   ]
+  },
+  {
+   "title": "Dollar & commodities",
+   "theme": "Currencies, oil and gold, and what drives them",
+   "topics": [
+    "fx",
+    "commodities"
+   ]
+  },
+  {
+   "title": "Stocks & risk mood",
+   "theme": "Indices, volatility and how risk is sized",
+   "topics": [
+    "equities",
+    "risk"
+   ]
+  },
+  {
+   "title": "Sectors",
+   "theme": "Why the same news hits industries differently",
+   "topics": [
+    "sectors",
+    "valuation"
+   ]
+  },
+  {
+   "title": "Companies",
+   "theme": "Earnings, guidance and what is priced in",
+   "topics": [
+    "companies",
+    "sectors"
+   ]
+  },
+  {
+   "title": "Your book",
+   "theme": "Portfolio exposures, sizing and hedging",
+   "topics": [
+    "portfolio",
+    "risk"
+   ]
+  },
+  {
+   "title": "Capstone",
+   "theme": "Put it all together like a desk analyst",
+   "topics": [
+    "interview",
+    "crossasset",
+    "portfolio"
+   ]
+  }
  ]
 }

@@ -24,7 +24,7 @@ export default function OnboardingWelcome() {
       safeEdges={['top', 'bottom']}
       footer={
         <>
-          <PrimaryButton label="Start diagnostic" onPress={() => router.push('/onboarding/quiz')} />
+          <PrimaryButton label="Find my level" onPress={() => router.push('/onboarding/quiz')} />
           <Disclaimer />
         </>
       }
@@ -58,10 +58,11 @@ export default function OnboardingWelcome() {
         <ThemedText type="kicker" style={{ color: Palette.primary }}>
           First step
         </ThemedText>
-        <ThemedText type="sectionTitle">A quick diagnostic</ThemedText>
+        <ThemedText type="sectionTitle">A 5-minute placement quiz</ThemedText>
         <Text style={styles.cardBody}>
-          Eight multiple-choice questions set the tone of your custom plan — level and focus
-          concepts. You only do this once (you can retake later from Learn).
+          Nine adaptive questions, one per topic, find what you already know. They build your personal
+          roadmap, so you skip the basics you have covered and start where the gaps are. You can retake it
+          any time from your profile.
         </Text>
       </Card>
     </Screen>

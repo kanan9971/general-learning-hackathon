@@ -22,6 +22,7 @@ export function Screen({
   scroll = true,
   safeEdges = ['top'],
   resetKey,
+  right,
 }: {
   title?: string;
   subtitle?: string;
@@ -31,6 +32,8 @@ export function Screen({
   safeEdges?: Edge[];
   /** When this changes the page scrolls back to the top (e.g. switching tabs). */
   resetKey?: string;
+  /** Sits at the right of the title row (e.g. the profile button). */
+  right?: React.ReactNode;
 }) {
   const ref = useRef<ScrollView>(null);
   useEffect(() => {
@@ -40,13 +43,16 @@ export function Screen({
   const body = (
     <View style={styles.content}>
       {title || subtitle ? (
-        <View style={styles.header}>
-          {title ? <ThemedText type="title">{title}</ThemedText> : null}
-          {subtitle ? (
-            <ThemedText type="small" themeColor="textSecondary">
-              {subtitle}
-            </ThemedText>
-          ) : null}
+        <View style={styles.headerRow}>
+          <View style={styles.header}>
+            {title ? <ThemedText type="title">{title}</ThemedText> : null}
+            {subtitle ? (
+              <ThemedText type="small" themeColor="textSecondary">
+                {subtitle}
+              </ThemedText>
+            ) : null}
+          </View>
+          {right}
         </View>
       ) : null}
       {children}
@@ -87,7 +93,8 @@ const styles = StyleSheet.create({
     maxWidth: MaxContentWidth,
     alignSelf: 'center',
   },
-  header: { gap: Spacing.one, marginBottom: Spacing.one },
+  headerRow: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: Spacing.two },
+  header: { flex: 1, gap: Spacing.one, marginBottom: Spacing.one },
   footer: {
     borderTopWidth: 1,
     borderTopColor: Palette.border,

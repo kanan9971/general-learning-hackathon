@@ -16,6 +16,8 @@ class MemoryQuizStore:
         self.attempts: dict[str, dict] = {}
         self.mastery: dict[tuple[str, str], dict] = {}
         self.mastery_events: list[dict] = []
+        self.cycles: dict[str, list[dict]] = {}  # user_id -> cycles, newest last
+        self.daily_sessions: dict[tuple[str, str], dict] = {}  # (user_id, iso date) -> session
         self.concepts: list[dict] = [
             {"id": "bond-price-yield", "name": "Bond prices and yields", "asset_class": "rates", "level": "beginner", "summary": "Bond prices and yields move inversely."},
             {"id": "cpi-surprise", "name": "Inflation (CPI) surprises", "asset_class": "macro", "level": "beginner", "summary": "Markets react to CPI relative to expectations."},
@@ -35,6 +37,8 @@ class MemoryQuizStore:
             self.attempts.clear()
             self.mastery.clear()
             self.mastery_events.clear()
+            self.cycles.clear()
+            self.daily_sessions.clear()
 
 
 STORE = MemoryQuizStore()

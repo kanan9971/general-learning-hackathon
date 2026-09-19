@@ -1,208 +1,162 @@
-import { useCallback, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
-import { useFocusEffect, useRouter } from 'expo-router';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useRouter } from 'expo-router';
 
-import {
-  getQuizPreferences,
-  updateQuizPreferences,
-  type QuizFormat,
-  type QuizPreferencesResponse,
-} from '@/api/client';
+import type { DailyTask } from '@/api/client';
 import { Card } from '@/components/Card';
-import { Chip, ChipRow } from '@/components/Chip';
+import { Chip } from '@/components/Chip';
+import { DataModeBadge } from '@/components/DataModeBadge';
 import { Disclaimer } from '@/components/Disclaimer';
-import { FormatSelector } from '@/components/FormatSelector';
+import { HubTile, TileGrid } from '@/components/HubTile';
+import { LabelledSection } from '@/components/LabelledSection';
+import { MoveRow } from '@/components/MoveRow';
 import { PrimaryButton } from '@/components/PrimaryButton';
+import { ProfileButton } from '@/components/ProfileButton';
 import { Screen } from '@/components/Screen';
 import { SectionHeader } from '@/components/SectionHeader';
 import { ThemedText } from '@/components/themed-text';
-import { getPlan } from '@/lib/learner';
 import { Palette, Radius } from '@/constants/theme';
+import { asOfLabel } from '@/lib/format';
+import { useDaily } from '@/lib/daily';
 
-export default function QuizLauncherScreen() {
+/** Today: your 30-45 minute desk session. New every day, built from today's market and your roadmap. */
+export default function TodayScreen() {
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [prefs, setPrefs] = useState<QuizPreferencesResponse | null>(null);
-  const [formats, setFormats] = useState<QuizFormat[]>([]);
-  const [level, setLevel] = useState<'beginner' | 'intermediate' | 'advanced'>('beginner');
-
-  useFocusEffect(
-    useCallback(() => {
-      let cancelled = false;
-      (async () => {
-        setLoading(true);
-        setError(null);
-        try {
-          const plan = await getPlan();
-          const data = await getQuizPreferences();
-          if (cancelled) return;
-          setPrefs(data);
-          const saved = data.preferences.preferred_formats;
-          setFormats(saved.length ? saved : []);
-          setLevel(data.preferences.level || plan?.level || 'beginner');
-        } catch (e) {
-          if (!cancelled) {
-            setError(e instanceof Error ? e.message : 'Could not load quiz preferences');
-            // Local defaults so the UI still works if API is down briefly
-            setPrefs({
-              preferences: {
-                preferred_formats: [],
-                preferred_concept_ids: [],
-                custom_topics: [],
-                level: 'beginner',
-              },
-              available_formats: [
-                { id: 'mcq', label: 'Multiple choice' },
-                { id: 'case_study', label: 'Case study' },
-                { id: 'short_answer', label: 'Short answer' },
-                { id: 'analysis', label: 'Analysis' },
-              ],
-              available_topics: [],
-            });
-          }
-        } finally {
-          if (!cancelled) setLoading(false);
-        }
-      })();
-      return () => {
-        cancelled = true;
-      };
-    }, []),
-  );
-
-  const toggleFormat = (f: QuizFormat) => {
-    setFormats((prev) => (prev.includes(f) ? prev.filter((x) => x !== f) : [...prev, f]));
-  };
-
-  const onStart = async () => {
-    if (!formats.length) return;
-    setError(null);
-    try {
-      await updateQuizPreferences({
-        preferred_formats: formats,
-        preferred_concept_ids: prefs?.preferences.preferred_concept_ids ?? [],
-        custom_topics: prefs?.preferences.custom_topics ?? [],
-        level,
-      });
-    } catch {
-      // Preferences save is best-effort; session start still goes through.
-    }
-    router.push({
-      pathname: '/quiz',
-      params: {
-        formats: formats.join(','),
-        concepts: (prefs?.preferences.preferred_concept_ids ?? []).join(','),
-        customs: (prefs?.preferences.custom_topics ?? []).join('|'),
-        level,
-      },
-    });
-  };
-
-  if (loading) {
-    return (
-      <Screen title="Quiz">
-        <ActivityIndicator color={Palette.primary} />
-      </Screen>
-    );
-  }
-
-  const topics = prefs?.preferences.preferred_concept_ids ?? [];
-  const customs = prefs?.preferences.custom_topics ?? [];
-  const topicNames = topics.map((id) => {
-    const hit = prefs?.available_topics.find((t) => t.id === id);
-    return hit?.name ?? id;
-  });
+  const { today: t, error, loading, reload } = useDaily();
+  const open = (task: DailyTask) => router.push({ pathname: '/daily/[task]', params: { task: task.id } });
+  const next = t?.tasks.find((x) => x.status === 'todo');
+  const donePct = t ? Math.round((t.minutes_done / Math.max(t.minutes_planned, 1)) * 100) : 0;
+  const date = new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
 
   return (
-    <Screen
-      title="Quiz"
-      subtitle={`Adaptive practice · ${level}`}
-      footer={
-        <>
-          <PrimaryButton
-            label="Start quiz"
-            onPress={() => void onStart()}
-            disabled={!formats.length}
-          />
-          <Disclaimer />
-        </>
-      }
-    >
-      {error ? (
-        <View style={styles.warn}>
-          <Text style={styles.warnText}>{error}</Text>
-        </View>
+    <Screen title="Today" subtitle={date} right={<ProfileButton />} footer={<Disclaimer />}>
+      {loading && !t ? <ActivityIndicator color={Palette.primary} /> : null}
+      {error && !t ? (
+        <Card tone="error">
+          <ThemedText type="smallBold">Couldn&apos;t build today&apos;s session</ThemedText>
+          <ThemedText type="small" themeColor="textSecondary">
+            {error}. Is the backend running?
+          </ThemedText>
+          <PrimaryButton label="Try again" variant="secondary" onPress={() => void reload()} />
+        </Card>
       ) : null}
 
-      <Card tone="info">
-        <ThemedText type="kicker" style={{ color: Palette.secondary }}>
-          How it works
-        </ThemedText>
-        <ThemedText type="small" themeColor="textSecondary">
-          Questions adapt to your proficiency, weak topics, and recurring mistakes. Keep going as long
-          as you like — we only prepare the next 2–3 questions at a time.
-        </ThemedText>
-      </Card>
+      {t ? (
+        <>
+          {/* The session */}
+          <Card tone={t.goal_met ? 'success' : 'info'}>
+            <View style={styles.between}>
+              <ThemedText type="kicker" style={{ color: t.goal_met ? Palette.success : Palette.primary }}>
+                {t.goal_met ? 'Day complete' : t.is_market_day ? "Today's session" : 'Weekend recap'}
+              </ThemedText>
+              <Chip label={`🔥 ${t.streak}-day streak`} tone={t.streak ? 'accent' : 'neutral'} size="sm" />
+            </View>
+            <Text style={styles.theme}>{t.theme}</Text>
+            <ThemedText type="small" themeColor="textSecondary">
+              Week {t.phase.index + 1} · {t.phase.title} · day {t.day_number} of {t.total_goal_days}
+            </ThemedText>
+            <View style={styles.track}>
+              <View style={[styles.fill, { width: `${Math.max(donePct, 3)}%`, backgroundColor: t.goal_met ? Palette.success : Palette.primary }]} />
+            </View>
+            <ThemedText type="caption" themeColor="textSecondary">
+              {t.minutes_done} of {t.minutes_planned} min ·{' '}
+              {t.is_market_day ? 'goal: a passing analyst note and a practice set' : 'goal: the recap and the review'}
+            </ThemedText>
+            {t.verdict !== 'on_track' ? (
+              <View style={styles.warn}>
+                <Text style={styles.warnText}>
+                  {t.behind_by} goal days behind. Your cycle stretches to fit; nothing resets. Two sessions this week
+                  gets you back.
+                </Text>
+              </View>
+            ) : null}
+            {!t.goal_met && next ? <PrimaryButton label={`Start: ${next.title}`} onPress={() => open(next)} /> : null}
+          </Card>
 
-      <Card tone="accent">
-        <ThemedText type="kicker" style={{ color: Palette.warning }}>
-          Markets × quiz
-        </ThemedText>
-        <ThemedText type="smallBold">What if the Fed had done the opposite?</ThemedText>
-        <ThemedText type="small" themeColor="textSecondary">
-          Change one thing (a Fed cut, an oil shock, a stronger dollar) and predict what happens to rates, stocks,
-          gold and more. Built from today&apos;s real market moves, and it feeds the same progress as your quiz. The
-          adaptive questions below are also written as what-if scenarios.
-        </ThemedText>
-        <PrimaryButton
-          label="Try what-if scenarios"
-          variant="secondary"
-          onPress={() => router.push({ pathname: '/lab', params: { kinds: 'scenario' } })}
-        />
-        <PrimaryButton label="Open today's market map" variant="ghost" onPress={() => router.push('/markets')} />
-      </Card>
+          {t.cycle_complete ? (
+            <Card tone="accent">
+              <ThemedText type="smallBold">You finished the whole cycle. Start the next one from Learn.</ThemedText>
+            </Card>
+          ) : null}
 
-      <SectionHeader title="Question types" meta="pick at least one" />
-      <FormatSelector
-        formats={prefs?.available_formats ?? []}
-        selected={formats}
-        onToggle={toggleFormat}
-      />
+          {/* The blocks */}
+          <SectionHeader title="The blocks" meta={`${t.tasks.filter((x) => x.status === 'done').length}/${t.tasks.length} done`} first />
+          <View style={{ gap: 10 }}>
+            {t.tasks.map((task, i) => {
+              const done = task.status === 'done';
+              const isNext = !t.goal_met && next?.id === task.id;
+              return (
+                <Pressable
+                  key={task.id}
+                  accessibilityRole="button"
+                  accessibilityLabel={`${task.title}, ${task.minutes} minutes, ${done ? 'done' : 'to do'}`}
+                  onPress={() => open(task)}
+                  style={({ pressed }) => [styles.block, done && styles.blockDone, isNext && styles.blockNext, pressed && { opacity: 0.75 }]}
+                >
+                  <View style={[styles.badge, done && { backgroundColor: Palette.success, borderColor: Palette.success }]}>
+                    {done ? <Ionicons name="checkmark" size={16} color={Palette.white} /> : <Text style={styles.badgeText}>{i + 1}</Text>}
+                  </View>
+                  <View style={{ flex: 1, gap: 2 }}>
+                    <Text style={styles.blockTitle}>{task.title}</Text>
+                    <Text style={styles.blockBlurb}>{task.blurb}</Text>
+                  </View>
+                  <View style={{ alignItems: 'flex-end', gap: 2 }}>
+                    <Text style={styles.min}>{task.minutes} min</Text>
+                    <Ionicons name="chevron-forward" size={16} color={Palette.muted} />
+                  </View>
+                </Pressable>
+              );
+            })}
+          </View>
 
-      <SectionHeader title="Topics" meta={topicNames.length || customs.length ? 'customised' : 'auto'} />
-      <Card>
-        {topicNames.length === 0 && customs.length === 0 ? (
-          <ThemedText type="small" themeColor="textSecondary">
-            No topics pinned yet — we will target weak and due concepts automatically.
-          </ThemedText>
-        ) : (
-          <ChipRow>
-            {topicNames.map((n) => (
-              <Chip key={n} label={n} tone="info" outlined />
+          {/* Today's market, briefly */}
+          <SectionHeader title="Today's market" />
+          <DataModeBadge mode={t.data_mode} asOf={asOfLabel(t.as_of)} />
+          <LabelledSection kind="fact" title="Biggest moves">
+            {t.top_moves.map((m, i) => (
+              <MoveRow key={m.fact_id} move={m} divider={i > 0} />
             ))}
-            {customs.map((c) => (
-              <Chip key={c} label={c} tone="accent" outlined />
-            ))}
-          </ChipRow>
-        )}
-        <PrimaryButton
-          label="Choose topics"
-          variant="secondary"
-          onPress={() => router.push('/topics' as '/quiz')}
-          style={{ marginTop: 8 }}
-        />
-      </Card>
+          </LabelledSection>
+          <TileGrid>
+            <HubTile tone="teal" icon="sparkles-outline" title="AI overview" subtitle="What happened and why" onPress={() => router.push('/overview')} />
+            <HubTile tone="info" icon="map-outline" title="Market map" subtitle="Moves on one diagram" onPress={() => router.push({ pathname: '/connect', params: { tab: 'map' } })} />
+          </TileGrid>
+        </>
+      ) : null}
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  warn: {
-    backgroundColor: Palette.softAccent,
-    borderRadius: Radius.sm,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+  between: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8 },
+  theme: { color: Palette.text, fontSize: 20, fontWeight: '800', lineHeight: 26 },
+  track: { height: 8, borderRadius: Radius.sm, backgroundColor: Palette.border, overflow: 'hidden' },
+  fill: { height: 8, borderRadius: Radius.sm },
+  warn: { backgroundColor: Palette.softAccent, borderRadius: Radius.sm, padding: 10 },
+  warnText: { color: Palette.warning, fontSize: 13, fontWeight: '600', lineHeight: 18 },
+  block: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    padding: 14,
+    borderRadius: Radius.md,
+    borderWidth: 1,
+    borderColor: Palette.border,
+    backgroundColor: Palette.surface,
   },
-  warnText: { color: Palette.warning, fontSize: 13, fontWeight: '600' },
+  blockDone: { backgroundColor: Palette.softSuccess, borderColor: Palette.success },
+  blockNext: { borderColor: Palette.primary, borderWidth: 2 },
+  badge: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    borderWidth: 2,
+    borderColor: Palette.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  badgeText: { color: Palette.primary, fontWeight: '800' },
+  blockTitle: { color: Palette.text, fontSize: 15, fontWeight: '800' },
+  blockBlurb: { color: Palette.muted, fontSize: 12, lineHeight: 17 },
+  min: { color: Palette.muted, fontSize: 12, fontWeight: '700' },
 });

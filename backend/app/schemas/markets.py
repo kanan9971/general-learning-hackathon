@@ -131,11 +131,31 @@ class Primer(BaseModel):
     steps: list[GuideStep]
 
 
+class RoadmapNodeDef(BaseModel):
+    id: str
+    section_id: SectionId | None = None  # topic page this node opens; None for special nodes
+    tier: int  # row in the tree (0 = top)
+    requires: list[str] = Field(default_factory=list)
+    action: Literal["section", "connect", "lab_explain", "lab_scenario"] = "section"
+    title: str | None = None  # override; defaults to the section's title
+    tagline: str | None = None
+    concept_ids: list[str] = Field(default_factory=list)  # override; defaults to the section's concepts
+    min_level: Level = "beginner"  # advanced-only nodes are hidden for other levels
+
+
+class CyclePhaseDef(BaseModel):
+    title: str
+    theme: str
+    topics: list[str]  # roadmap node ids, rotated across the phase's days
+
+
 class MarketsGuide(BaseModel):
     primer: Primer
     sections: list[SectionGuide]
     relationships: list[Relationship] = Field(default_factory=list)
     scenarios: list[Scenario] = Field(default_factory=list)
+    roadmap: list[RoadmapNodeDef] = Field(default_factory=list)
+    cycle_phases: list[CyclePhaseDef] = Field(default_factory=list)
 
 
 class MarketSection(BaseModel):
@@ -321,6 +341,7 @@ class LabSet(BaseModel):
 
 class LabAnswerRequest(BaseModel):
     question_id: str
+    placement: bool = False  # placement-quiz question (seeds mastery, static pool)
     answer: str | list[str] | dict[str, str]  # option id, ordered item ids, {part id: option id}, or free text
     level: Level = "beginner"
     section: SectionId | None = None

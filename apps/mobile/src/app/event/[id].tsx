@@ -100,7 +100,7 @@ export default function EventDetailScreen() {
       safeEdges={['bottom']}
       footer={
         <>
-          <PrimaryButton label="Go to Quiz" onPress={() => router.push('/(tabs)')} />
+          <PrimaryButton label="Go to Quiz" onPress={() => router.push('/(tabs)/practice')} />
           <Disclaimer />
         </>
       }

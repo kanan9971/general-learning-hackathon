@@ -36,19 +36,15 @@ export default function TabsLayout() {
     >
       <Tabs.Screen
         name="index"
-        options={{ title: 'Quiz', tabBarIcon: tabIcon('help-circle-outline', 'help-circle') }}
-      />
-      <Tabs.Screen
-        name="markets"
-        options={{ title: 'Markets', tabBarIcon: tabIcon('trending-up-outline', 'trending-up') }}
-      />
-      <Tabs.Screen
-        name="portfolio"
-        options={{ title: 'Portfolio', tabBarIcon: tabIcon('pie-chart-outline', 'pie-chart') }}
+        options={{ title: 'Today', tabBarIcon: tabIcon('today-outline', 'today') }}
       />
       <Tabs.Screen
         name="learn"
-        options={{ title: 'Learn', tabBarIcon: tabIcon('school-outline', 'school') }}
+        options={{ title: 'Learn', tabBarIcon: tabIcon('git-network-outline', 'git-network') }}
+      />
+      <Tabs.Screen
+        name="practice"
+        options={{ title: 'Practice', tabBarIcon: tabIcon('flask-outline', 'flask') }}
       />
     </Tabs>
   );

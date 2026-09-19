@@ -34,6 +34,7 @@ class LabItem:
     model_answer: str = ""
     score_hint: float = 0.0  # ranking weight: how notable today's data is for this question
     topic: str = ""  # what it is about (cause symbol / section id): keeps a set from repeating itself
+    flip: bool = False  # built from today's data (not usable in the placement quiz)
 
 
 @dataclass
@@ -260,7 +261,7 @@ def _flip_item(cause_sym: str, rels: list[Relationship], moves: dict[str, Move],
             facts=[cause] + [moves[r.effect] for r in rels], shock=f"{cause.label} {verb_then}", parts=results,
             facts_note=f"Today's real moves, when {cause.label} {verb_now}. Your answers should be the mirror image.",
             model_answer="Every rule works in both directions: " + " ".join(f"{moves[r.effect].label}: {r.why}" for r in rels)),
-        rubric=[r.why for r in rels], model_answer="", score_hint=cause.score + 0.5, topic=cause_sym)
+        rubric=[r.why for r in rels], model_answer="", score_hint=cause.score + 0.5, topic=cause_sym, flip=True)
 
 
 def _scenario_items(guide: MarketsGuide, moves: dict[str, Move], as_of: str | None,

@@ -211,7 +211,7 @@ export default function InfiniteQuizScreen() {
         footer={
           <>
             <PrimaryButton label="Retry" onPress={retryStart} />
-            <PrimaryButton label="Back to launcher" variant="ghost" onPress={() => router.replace('/(tabs)')} />
+            <PrimaryButton label="Back to launcher" variant="ghost" onPress={() => router.replace('/(tabs)/practice')} />
           </>
         }
       >

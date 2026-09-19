@@ -33,6 +33,8 @@ Feature freeze at H13. P0 = the "magic moment" loop in docs/PLAN.md §18.
 - Live Supabase check (creates/deletes temp users): `cd backend && PYTHONPATH=. .venv/bin/python ../scripts/check_supabase.py`
 - Generate daily brief locally: `scripts/run_cron_local.sh --date YYYY-MM-DD`
 - Markets feed / AI overview (dev bypass): `curl 'localhost:8000/v1/markets/feed?interests=macro,rates&watch=TSLA'` · `curl -X POST localhost:8000/v1/markets/overview -H 'content-type: application/json' -d '{"level":"beginner"}'` (set `DATA_MODE=live` for real-time data)
+- Today's session / cycle (dev bypass; add `today=YYYY-MM-DD` to simulate other days): `curl 'localhost:8000/v1/daily/today?level=beginner'` · `curl 'localhost:8000/v1/daily/cycle?level=beginner'`
+- Personalised roadmap (dev bypass): `curl 'localhost:8000/v1/roadmap?level=intermediate'` · placement: `curl -X POST localhost:8000/v1/roadmap/placement/next -H 'content-type: application/json' -d '{"history":[]}'`
 - What-if scenarios only: `curl -X POST localhost:8000/v1/markets/lab -H 'content-type: application/json' -d '{"level":"beginner","count":5,"kinds":["scenario"]}'`
 - Market Lab questions (dev bypass): `curl -X POST localhost:8000/v1/markets/lab -H 'content-type: application/json' -d '{"level":"beginner","count":6}'` (answers via `/v1/markets/lab/answer`)
 - Re-capture the golden demo day from live providers (real numbers only): `cd backend && .venv/bin/python -m app.market.capture --replace`

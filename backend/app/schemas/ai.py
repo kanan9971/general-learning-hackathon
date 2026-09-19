@@ -113,3 +113,18 @@ class MarketOverviewLLM(BaseModel):
     confidence: Literal["low", "medium", "high"]
     confidence_reason: str = Field(max_length=300)
     concept_ids: list[str] = Field(default_factory=list, max_length=5)
+
+
+class NoteScoreLLM(BaseModel):
+    prompt_id: Literal["moved", "evidence", "chain", "affected", "wrong_if"]
+    score: int = Field(ge=0, le=4)
+    comment: str = Field(max_length=260)
+
+
+class AnalystNoteLLM(BaseModel):
+    """Grade of a structured analyst note. The overall score is computed server-side from prompt_scores."""
+    prompt_scores: list[NoteScoreLLM] = Field(min_length=5, max_length=5)
+    strengths: list[str] = Field(default_factory=list, max_length=3)
+    gaps: list[str] = Field(default_factory=list, max_length=3)
+    model_note: str = Field(max_length=900)
+    review_concept_ids: list[str] = Field(default_factory=list, max_length=3)

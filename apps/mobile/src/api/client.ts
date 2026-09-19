@@ -470,8 +470,152 @@ export const getMarketLab = (body: {
 
 export const answerMarketLab = (body: {
   question_id: string;
+  placement?: boolean;
   answer: string | string[] | Record<string, string>;
   level: Level;
   section?: MarketSectionId;
   watch: string[];
 }) => request<LabFeedback>('/v1/markets/lab/answer', body);
+
+
+// ---- Roadmap + placement ----
+export type RoadmapNodeState = 'not_started' | 'in_progress' | 'priority' | 'mastered';
+
+export type RoadmapNode = {
+  id: string;
+  title: string;
+  tagline: string;
+  tier: number;
+  order: number;
+  requires: string[];
+  action: 'section' | 'connect' | 'lab_explain' | 'lab_scenario';
+  section_id?: MarketSectionId | null;
+  concept_ids: string[];
+  progress: number;
+  coverage: number;
+  state: RoadmapNodeState;
+  recommended: boolean;
+  collapsed: boolean;
+  test_out: boolean;
+  hint?: string | null;
+};
+
+export type Roadmap = {
+  level: Level;
+  track: string;
+  rationale: string;
+  needs_placement: boolean;
+  next_id?: string | null;
+  mastered_count: number;
+  total_count: number;
+  nodes: RoadmapNode[];
+};
+
+export type PlacementStep = {
+  done: boolean;
+  index: number;
+  total: number;
+  question?: LabQuestion | null;
+  level?: Level | null;
+  percent?: number | null;
+  topics: { section_id: MarketSectionId; title: string; observed: Observed; difficulty: number }[];
+  focus_concept_ids: string[];
+};
+
+export const getRoadmap = (level?: Level) =>
+  request<Roadmap>(`/v1/roadmap${level ? `?level=${level}` : ''}`);
+
+export const getPlacementNext = (history: { question_id: string; observed: Observed }[]) =>
+  request<PlacementStep>('/v1/roadmap/placement/next', { history });
+
+// ---- Daily session + learning cycle ----
+export type TaskKind = 'brief' | 'focus' | 'analysis' | 'practice' | 'review' | 'recap';
+export type Verdict = 'on_track' | 'slipping' | 'behind';
+
+export type DailyTask = {
+  id: TaskKind;
+  kind: TaskKind;
+  title: string;
+  blurb: string;
+  minutes: number;
+  status: 'todo' | 'done';
+  result?: Record<string, unknown> | null;
+  done_at?: string | null;
+};
+
+export type NotePrompt = { id: string; title: string; hint: string };
+
+export type DailyToday = {
+  date: string;
+  weekday: string;
+  is_market_day: boolean;
+  theme: string;
+  day_number: number;
+  total_goal_days: number;
+  phase: { index: number; title: string; theme: string; topics: { id: string; title: string; section_id?: MarketSectionId | null }[] };
+  focus_node_id: string;
+  focus_title: string;
+  focus_section_id?: MarketSectionId | null;
+  tasks: DailyTask[];
+  minutes_planned: number;
+  minutes_done: number;
+  goal_met: boolean;
+  streak: number;
+  best_streak: number;
+  verdict: Verdict;
+  behind_by: number;
+  cycle_complete: boolean;
+  as_of: string | null;
+  data_mode: DataMode;
+  top_moves: Move[];
+  analysis?: { target: Move; related: Move[]; headlines: Headline[]; prompts: NotePrompt[] } | null;
+  week?: { days_met: number; market_days: number; notes_written: number; avg_note_score: number | null; minutes: number } | null;
+  due_concepts: string[];
+};
+
+export type AnalysisFeedback = {
+  score: number;
+  observed: Observed;
+  passed: boolean;
+  prompt_scores: { prompt_id: string; score: number; comment: string }[];
+  strengths: string[];
+  gaps: string[];
+  model_note: string;
+  graded_by: 'llm' | 'fallback';
+  today: DailyToday;
+};
+
+export type CycleStatus = {
+  started_on: string;
+  level: Level;
+  completed_days: number;
+  total_days: number;
+  day_number: number;
+  phase_index: number;
+  phase_title: string;
+  focus_node_id: string;
+  streak: number;
+  best_streak: number;
+  verdict: Verdict;
+  behind_by: number;
+  week_minutes: number;
+  complete: boolean;
+  phases: { index: number; title: string; theme: string; topics: string[]; days_done: number; days_total: number; state: 'done' | 'current' | 'upcoming' }[];
+  calendar: { date: string; weekday: string; status: 'met' | 'partial' | 'missed' | 'today' | 'future' | 'rest'; minutes: number }[];
+};
+
+const q = (o: Record<string, string | undefined>) => {
+  const p = Object.entries(o).filter(([, v]) => v).map(([k, v]) => `${k}=${encodeURIComponent(v as string)}`);
+  return p.length ? `?${p.join('&')}` : '';
+};
+
+export const getDailyToday = (level: Level | undefined, today: string) => request<DailyToday>(`/v1/daily/today${q({ level, today })}`);
+export const getDailyCycle = (level: Level | undefined, today: string) => request<CycleStatus>(`/v1/daily/cycle${q({ level, today })}`);
+export const restartDailyCycle = (level: Level | undefined, today: string) =>
+  request<CycleStatus>(`/v1/daily/cycle/restart${q({ level, today })}`, {});
+export const completeDailyTask = (
+  taskId: TaskKind,
+  body: { level?: Level; today: string; call?: string; watch?: string; answered?: number; correct?: number },
+) => request<DailyToday>(`/v1/daily/tasks/${taskId}/complete`, body);
+export const submitDailyAnalysis = (body: { level?: Level; today: string; answers: Record<string, string> }) =>
+  request<AnalysisFeedback>('/v1/daily/analysis', body);

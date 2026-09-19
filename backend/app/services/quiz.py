@@ -653,6 +653,48 @@ def record_observation(user_id: str, token: str | None, concept_ids: list[str], 
     return _apply_mastery(user_id, token, get_settings(), {"concept_ids": concept_ids}, observed, None)  # type: ignore[arg-type]
 
 
+def mastery_map(user_id: str, token: str | None) -> dict[str, tuple[float, int]]:
+    """concept_id -> (mastery, attempts): the single progress model behind Learn, roadmap and Lab."""
+    return {c.concept_id: (c.mastery, c.attempts) for c in _mastery_states(user_id, token, get_settings())}
+
+
+def current_level(user_id: str, token: str | None) -> str:
+    s = get_settings()
+    prefs = _get_prefs(user_id, token, s) or {}
+    values = [c.mastery for c in _mastery_states(user_id, token, s)]
+    return prefs.get("level") or overall_level_from_mastery(values, "beginner")
+
+
+_PLACEMENT_TARGET = {"correct": 0.62, "partial": 0.5, "incorrect": 0.2}
+
+
+def seed_placement(user_id: str, token: str | None, concept_ids: list[str], observed: str, difficulty: int):
+    """Placement answers set mastery directly (a right answer at difficulty d -> 0.62 + 0.1*d), because
+    the incremental update would need many answers before a topic you already know reads as known."""
+    s = get_settings()
+    updates: list[MasteryDelta] = []
+    for cid in concept_ids:
+        raw = _get_mastery_row(user_id, token, s, cid) or {}
+        prev = float(raw.get("mastery") or 0.35)
+        attempts = int(raw.get("attempts") or 0)
+        target = _PLACEMENT_TARGET[observed] + (0.1 * difficulty if observed == "correct" else 0.0)
+        new = target if attempts == 0 else 0.5 * prev + 0.5 * target
+        sched = apply_observation(prev, observed, box=int(raw.get("box") or 1),  # type: ignore[arg-type]
+                                  confidence=float(raw.get("confidence") or 0))
+        _upsert_mastery(user_id, token, s, cid, {
+            "mastery": round(new, 4), "confidence": sched["confidence"], "box": sched["box"], "attempts": attempts + 1,
+            "correct": int(raw.get("correct") or 0) + (1 if observed == "correct" else 0),
+            "last_reviewed_at": sched["last_reviewed_at"], "next_review_at": sched["next_review_at"],
+        })
+        _insert_mastery_event(user_id, token, s, {
+            "id": new_id(), "user_id": user_id, "concept_id": cid, "delta": round(new - prev, 4),
+            "reason": f"placement:{observed}", "quiz_attempt_id": None,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        })
+        updates.append(MasteryDelta(concept_id=cid, observed=observed, mastery_before=prev, mastery_after=round(new, 4)))  # type: ignore[arg-type]
+    return updates
+
+
 # ---------- public helpers ----------
 
 def _to_public(q: dict) -> QuizQuestionPublic:

@@ -78,7 +78,11 @@ export default function RootLayout() {
         <Stack.Screen name="market/[section]" options={{ headerShown: true, title: 'Market' }} />
         <Stack.Screen name="interests" options={{ headerShown: true, title: 'Interests' }} />
         <Stack.Screen name="lab" options={{ headerShown: true, title: 'Market Lab' }} />
-        <Stack.Screen name="group/[id]" options={{ headerShown: true, title: 'Markets' }} />
+        <Stack.Screen name="daily/[task]" options={{ headerShown: true, title: 'Session' }} />
+        <Stack.Screen name="profile" options={{ headerShown: true, title: 'Profile' }} />
+        <Stack.Screen name="progress" options={{ headerShown: true, title: 'Progress' }} />
+        <Stack.Screen name="placement" options={{ headerShown: true, title: 'Placement' }} />
+        <Stack.Screen name="quiz-setup" options={{ headerShown: true, title: 'Endless quiz' }} />
         <Stack.Screen name="connect" options={{ headerShown: true, title: 'How it connects' }} />
         <Stack.Screen name="overview" options={{ headerShown: true, title: 'AI overview' }} />
         <Stack.Screen name="quiz" options={{ headerShown: true, title: 'Quiz' }} />
