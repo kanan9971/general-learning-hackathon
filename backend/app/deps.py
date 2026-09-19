@@ -52,12 +52,17 @@ def _decode(token: str, settings: Settings) -> dict:
     raise jwt.InvalidAlgorithmError(f"unsupported alg {alg}")
 
 
+DEV_USER_ID = "00000000-0000-0000-0000-000000000000"
+
+
 def get_user_id(
     authorization: Annotated[str | None, Header()] = None,
     settings: Settings = Depends(get_settings),
 ) -> str:
     """Verify the Supabase JWT and return the user id (`sub`)."""
     if not authorization or not authorization.lower().startswith("bearer "):
+        if settings.auth_dev_bypass and not settings.vercel:
+            return DEV_USER_ID
         raise ApiError("unauthorized", "Missing bearer token", 401)
     token = authorization.split(" ", 1)[1]
     try:

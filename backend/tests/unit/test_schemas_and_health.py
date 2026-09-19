@@ -32,7 +32,7 @@ def test_health():
 
 def test_auth_rejects_missing_token():
     with pytest.raises(ApiError) as e:
-        get_user_id(None, Settings(supabase_jwt_secret="s"))
+        get_user_id(None, Settings(supabase_jwt_secret="s", auth_dev_bypass=False))
     assert e.value.status == 401
 
 
@@ -61,3 +61,11 @@ def test_auth_accepts_es256_via_jwks(monkeypatch):
     with pytest.raises(ApiError) as e:
         get_user_id(f"Bearer {bad}", s)
     assert e.value.status == 401
+
+
+def test_dev_bypass_only_off_vercel():
+    from app.deps import DEV_USER_ID
+
+    assert get_user_id(None, Settings(auth_dev_bypass=True, vercel="")) == DEV_USER_ID
+    with pytest.raises(ApiError):
+        get_user_id(None, Settings(auth_dev_bypass=True, vercel="1"))

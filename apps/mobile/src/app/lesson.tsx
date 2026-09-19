@@ -1,25 +1,16 @@
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Linking, StyleSheet, Text, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 
-import { getFixture } from '@/api/client';
+import { getFixture, getTutorLesson, type TutorLesson } from '@/api/client';
 import { LabelledSection } from '@/components/LabelledSection';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { Screen } from '@/components/Screen';
 import { ThemedText } from '@/components/themed-text';
-import { conceptLabel } from '@/lib/learner';
+import { conceptLabel, getPlan } from '@/lib/learner';
 import { Palette } from '@/constants/theme';
 
-type LessonPayload = {
-  lesson: {
-    concept_id: string;
-    level: string;
-    sections: { kind: string; heading: string; text: string; source_ids: string[] }[];
-    check_question: string;
-  };
-  citations: { source_id: string; title: string; publisher: string }[];
-  follow_up: string;
-};
+type LessonPayload = TutorLesson;
 
 const FALLBACK: LessonPayload = {
   lesson: {
@@ -47,14 +38,35 @@ const FALLBACK: LessonPayload = {
 
 export default function LessonScreen() {
   const router = useRouter();
-  const { concept } = useLocalSearchParams<{ concept?: string }>();
+  const { concept, misconception } = useLocalSearchParams<{ concept?: string; misconception?: string }>();
   const [payload, setPayload] = useState<LessonPayload | null>(null);
+  const [offline, setOffline] = useState(false);
 
   useEffect(() => {
-    getFixture<LessonPayload>('lesson')
-      .then(setPayload)
-      .catch(() => setPayload(FALLBACK));
-  }, []);
+    let cancelled = false;
+    (async () => {
+      const plan = await getPlan();
+      try {
+        // Live RAG tutor: retrieves sources and cites them.
+        const live = await getTutorLesson({
+          concept_id: concept ?? 'real-yields',
+          level: plan?.level ?? 'beginner',
+          misconception: misconception || undefined,
+        });
+        if (!cancelled) setPayload(live);
+      } catch {
+        // Backend unreachable: fall back to the canned lesson so the demo never dead-ends.
+        const canned = await getFixture<LessonPayload>('lesson').catch(() => FALLBACK);
+        if (!cancelled) {
+          setOffline(true);
+          setPayload(canned);
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [concept, misconception]);
 
   if (!payload) {
     return (
@@ -68,6 +80,14 @@ export default function LessonScreen() {
 
   return (
     <Screen title={conceptLabel(conceptId)} subtitle={`Level: ${payload.lesson.level}`}>
+      {offline ? (
+        <Text style={styles.notice}>Offline: showing a saved sample lesson, not a live one.</Text>
+      ) : null}
+      {payload.lesson.insufficient_evidence ? (
+        <Text style={styles.notice}>
+          Not enough sourced material on this concept yet. Everything below is AI explanation, not from sources.
+        </Text>
+      ) : null}
       <LabelledSection kind="teaching">
         {payload.lesson.sections.map((s) => (
           <View key={s.heading} style={styles.section}>
@@ -86,10 +106,20 @@ export default function LessonScreen() {
 
       <View style={styles.citeCard}>
         <Text style={styles.citeTitle}>Citations</Text>
+        {payload.citations.length === 0 ? <Text style={styles.citeLine}>No sources cited.</Text> : null}
         {payload.citations.map((c) => (
-          <Text key={c.source_id} style={styles.citeLine}>
-            [{c.source_id}] {c.title} — {c.publisher}
-          </Text>
+          <View key={c.source_id} style={styles.cite}>
+            <Text style={styles.citeLine}>
+              [{c.source_id}] {c.title}
+              {c.section_path ? ` › ${c.section_path.split(' > ').pop()}` : ''} — {c.publisher}
+            </Text>
+            {c.excerpt ? <Text style={styles.citeExcerpt}>“{c.excerpt}”</Text> : null}
+            {c.url ? (
+              <Text style={styles.citeLink} onPress={() => Linking.openURL(c.url!)}>
+                Open source
+              </Text>
+            ) : null}
+          </View>
         ))}
       </View>
 
@@ -118,4 +148,8 @@ const styles = StyleSheet.create({
   },
   citeTitle: { color: Palette.secondary, fontWeight: '700', fontSize: 12 },
   citeLine: { color: Palette.muted, fontSize: 13, lineHeight: 18 },
+  cite: { gap: 2, marginBottom: 6 },
+  citeExcerpt: { color: Palette.muted, fontSize: 12, lineHeight: 17, fontStyle: 'italic' },
+  citeLink: { color: Palette.secondary, fontSize: 12, fontWeight: '600' },
+  notice: { color: Palette.secondary, fontSize: 13, lineHeight: 18 },
 });

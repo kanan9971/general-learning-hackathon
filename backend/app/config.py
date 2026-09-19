@@ -33,6 +33,10 @@ class Settings(BaseSettings):
     allowed_origins: str = "*"
     app_version: str = "0.0.1"
     dev_fixtures: bool = False  # serve /v1/dev/fixtures/* (local only)
+    # Local-only: requests without a token act as a fixed dev user (mobile app has no login yet).
+    # Ignored when running on Vercel (VERCEL env var is set there).
+    auth_dev_bypass: bool = False
+    vercel: str = ""
 
 
 @lru_cache
