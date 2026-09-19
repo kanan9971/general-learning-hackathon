@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from supabase import Client
 
 from ..db import knowledge
-from ..llm.embed import embed_texts
+from ..llm.embed import embed_query
 
 LEVEL_NUM = {"beginner": 1, "intermediate": 2, "advanced": 3}
 RRF_K = 60
@@ -73,13 +73,32 @@ def rank(chunks: list[RetrievedChunk], *, level: str, focus: set[str], k: int) -
         out.append(c)
         if len(out) == k:
             break
+    # After papers land, RRF can fill top-k with research and drop the lesson that
+    # actually teaches the concept. Keep one lesson in the window when one cleared the bar.
+    lesson_candidates = [c for c in sorted(chunks, key=lambda c: -c.score) if c.content_type == "lesson"]
+    if lesson_candidates and out and all(c.content_type != "lesson" for c in out):
+        lesson = lesson_candidates[0]
+        if per_doc.get(lesson.document_id, 0) < MAX_PER_DOC:
+            displaced = out[-1]
+            per_doc[displaced.document_id] = per_doc.get(displaced.document_id, 1) - 1
+            per_doc[lesson.document_id] = per_doc.get(lesson.document_id, 0) + 1
+            out[-1] = lesson
     return out
+
+
+def select_top(chunks: list[RetrievedChunk], *, level: str, focus: set[str], k: int) -> list[RetrievedChunk]:
+    """Filter by similarity first, then take k. Ranking-then-filter can starve top-k."""
+    strong = [c for c in chunks if c.similarity >= MIN_SIMILARITY]
+    return rank(strong, level=level, focus=focus, k=k)
 
 
 def retrieve(db: Client, query: str, *, layer: str | None = "foundation", concept_ids: list[str] | None = None,
              level: str = "beginner", focus_concepts: list[str] | None = None,
-             published_after: str | None = None, published_before: str | None = None, k: int = 5) -> Retrieval:
-    emb = embed_texts([query])[0]
+             published_after: str | None = None, published_before: str | None = None, k: int = 5,
+             query_hint: str | None = None) -> Retrieval:
+    # Documents were embedded as "{section_path}\\n{content}" (`Title > Section` then prose).
+    embed_text = f"{query_hint}\n{query}" if query_hint else query
+    emb = embed_query(embed_text)
     rows = knowledge.match_chunks(
         db, embedding=emb, text=query, layer=layer, concept_ids=concept_ids,
         max_difficulty=max_difficulty_for(level),
@@ -97,10 +116,9 @@ def retrieve(db: Client, query: str, *, layer: str | None = "foundation", concep
             title=d.get("title", r["document_id"]), publisher=d.get("publisher") or "",
             source_url=d.get("source_url"), content_type=d.get("content_type"),
         ))
-    top = rank(chunks, level=level, focus=set(focus_concepts or concept_ids or []), k=k)
-    strong = [c for c in top if c.similarity >= MIN_SIMILARITY]
+    top = select_top(chunks, level=level, focus=set(focus_concepts or concept_ids or []), k=k)
     return Retrieval(
-        chunks=strong, considered=len(rows),
+        chunks=top, considered=len(rows),
         top_similarity=max((c.similarity for c in chunks), default=None),
-        sufficient=len(strong) >= MIN_CHUNKS,
+        sufficient=len(top) >= MIN_CHUNKS,
     )

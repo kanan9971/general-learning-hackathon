@@ -85,6 +85,8 @@ def _assemble(meta: dict, text: str, chunks) -> tuple[dict, list[dict]]:
         }
         for c in chunks
     ]
+    for r in rows:
+        r["content"] = (r.get("content") or "").replace("\x00", "")
     return doc, rows
 
 
@@ -102,6 +104,9 @@ def main() -> None:
     else:
         built = [build_document(m, args.raw_dir) for m in load_manifest(args.source)]
     for doc, rows in built:
+        if not rows:
+            print(f"{doc['id']}: 0 chunks, skip")
+            continue
         flagged = sum(r["injection_flag"] for r in rows)
         toks = [r["token_count"] for r in rows]
         print(f"{doc['id']}: {len(rows)} chunks, tokens min/avg/max = "
@@ -111,14 +116,25 @@ def main() -> None:
         )
         if args.store:
             from ..db.client import service_client
-            from ..db.knowledge import upsert_document
+            from ..db.knowledge import (
+                document_checksum, document_chunk_count, supports_chunk_versioning, upsert_document,
+            )
             from ..llm.embed import embed_texts
 
+            db = service_client()
+            stored = document_checksum(db, doc["id"])
+            n_chunks = document_chunk_count(db, doc["id"]) if stored is not None else 0
+            if stored == doc["checksum"] and n_chunks:
+                print(f"  skipped {doc['id']} (checksum unchanged)")
+                continue
+            if stored is not None and n_chunks and not supports_chunk_versioning(db):
+                print(f"  skipped {doc['id']} (already in KB; apply 0007 to version)")
+                continue
             embs = embed_texts([f"{r['section_path']}\n{r['content']}" for r in rows])
             for r, e in zip(rows, embs):
                 r["embedding"] = e
-            upsert_document(service_client(), doc, rows)
-            print(f"  stored {doc['id']}")
+            action = upsert_document(db, doc, rows)
+            print(f"  {action} {doc['id']}")
 
 
 if __name__ == "__main__":

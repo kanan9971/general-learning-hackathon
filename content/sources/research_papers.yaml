@@ -2,6 +2,7 @@
 # (never committed: content/raw and content/processed are gitignored).
 # `source_url` is the canonical landing page shown to users in citations.
 # Show only short excerpts in the UI and always link out (copyright).
+# Papers are difficulty 3 / trust_level 2 so beginners never retrieve them (level+1 cap).
 defaults:
   layer: foundation
   content_type: research
@@ -38,7 +39,7 @@ documents:
     publisher: "NBER Working Paper 20984, 2015"
     published_at: "2015-01-01"
     source_url: "https://www.nber.org/papers/w20984"
-    pdf_url: "https://mysimon.rochester.edu/novy-marx/research/FMFM.pdf"
+    pdf_url: "https://www.nber.org/system/files/working_papers/w20984/w20984.pdf"
     local_file: novy_marx.pdf
     topics: [momentum, earnings momentum, earnings surprise, fundamentals]
     concept_ids: [momentum-strategy, earnings-momentum, earnings-vs-guidance]
@@ -62,3 +63,231 @@ documents:
     local_file: sadka.pdf
     topics: [momentum, liquidity risk, transaction costs, limits to arbitrage]
     concept_ids: [momentum-strategy, liquidity-risk, limits-to-arbitrage, transaction-costs]
+  - id: paper-bernanke-kuttner-2005
+    title: "What Explains the Stock Market's Reaction to Federal Reserve Policy?"
+    authors: "Ben S. Bernanke, Kenneth N. Kuttner"
+    publisher: "Federal Reserve Bank of New York Staff Report 174 / Journal of Finance 60(3), 2005"
+    published_at: "2005-03-01"
+    source_url: "https://www.newyorkfed.org/research/staff_reports/sr174"
+    pdf_url: "https://www.newyorkfed.org/medialibrary/media/research/staff_reports/sr174.pdf"
+    local_file: bernanke_kuttner.pdf
+    asset_class: equities
+    market: US equities
+    topics: [federal reserve, monetary policy, equity returns, priced-in]
+    concept_ids: [rate-expectations, priced-in, discount-rates-equities]
+  - id: paper-gurkaynak-sack-wright-2006
+    title: "The U.S. Treasury Yield Curve: 1961 to the Present"
+    authors: "Refet S. Gürkaynak, Brian Sack, Jonathan H. Wright"
+    publisher: "Federal Reserve Board FEDS 2006-28"
+    published_at: "2006-01-01"
+    source_url: "https://www.federalreserve.gov/pubs/feds/2006/200628/200628abs.html"
+    pdf_url: "https://www.federalreserve.gov/pubs/feds/2006/200628/200628pap.pdf"
+    local_file: gurkaynak_sack_wright_2006.pdf
+    asset_class: rates
+    market: US Treasuries
+    topics: [yield curve, treasury, duration]
+    concept_ids: [yield-curve, duration]
+  - id: paper-gurkaynak-sack-wright-2008
+    title: "The TIPS Yield Curve and Inflation Compensation"
+    authors: "Refet S. Gürkaynak, Brian Sack, Jonathan H. Wright"
+    publisher: "Federal Reserve Board FEDS 2008-05"
+    published_at: "2008-01-01"
+    source_url: "https://www.federalreserve.gov/pubs/feds/2008/200805/200805abs.html"
+    pdf_url: "https://www.federalreserve.gov/pubs/feds/2008/200805/200805pap.pdf"
+    local_file: gurkaynak_sack_wright_2008.pdf
+    asset_class: rates
+    market: US Treasuries
+    topics: [TIPS, real yields, breakeven inflation]
+    concept_ids: [real-yields, cpi-surprise, gold-real-yields]
+  - id: paper-adrian-crump-moench-2013
+    title: "Pricing the Term Structure with Linear Regressions"
+    authors: "Tobias Adrian, Richard K. Crump, Emanuel Moench"
+    publisher: "Federal Reserve Bank of New York Staff Report 340"
+    published_at: "2013-08-01"
+    source_url: "https://www.newyorkfed.org/research/staff_reports/sr340"
+    pdf_url: "https://www.newyorkfed.org/medialibrary/media/research/staff_reports/sr340.pdf"
+    local_file: adrian_crump_moench.pdf
+    asset_class: rates
+    market: US Treasuries
+    topics: [term premium, yield curve, affine models]
+    concept_ids: [yield-curve, priced-in]
+  - id: paper-estrella-mishkin-1996
+    title: "The Yield Curve as a Predictor of U.S. Recessions"
+    authors: "Arturo Estrella, Frederic S. Mishkin"
+    publisher: "Federal Reserve Bank of New York Current Issues in Economics and Finance 2(7), 1996"
+    published_at: "1996-06-01"
+    source_url: "https://www.newyorkfed.org/research/current_issues/ci2-7.html"
+    pdf_url: "https://www.newyorkfed.org/medialibrary/media/research/current_issues/ci2-7.pdf"
+    local_file: estrella_mishkin.pdf
+    asset_class: rates
+    market: US Treasuries
+    topics: [yield curve, recession, 2s10s]
+    concept_ids: [yield-curve, rate-expectations]
+  - id: paper-bauer-mertens-2018
+    title: "Economic Forecasts with the Yield Curve"
+    authors: "Michael D. Bauer, Thomas M. Mertens"
+    publisher: "Federal Reserve Bank of San Francisco Economic Letter 2018-07"
+    published_at: "2018-03-05"
+    source_url: "https://www.frbsf.org/research-and-insights/publications/economic-letter/2018/03/economic-forecasts-with-the-yield-curve/"
+    pdf_url: "https://www.frbsf.org/wp-content/uploads/el2018-07.pdf"
+    local_file: bauer_mertens.pdf
+    asset_class: rates
+    market: US Treasuries
+    topics: [yield curve, recession, forecasts]
+    concept_ids: [yield-curve]
+  - id: paper-nakamura-steinsson-2018
+    title: "High-Frequency Identification of Monetary Non-Neutrality: The Information Effect"
+    authors: "Emi Nakamura, Jón Steinsson"
+    publisher: "NBER Working Paper 19260 / Quarterly Journal of Economics 133(3), 2018"
+    published_at: "2018-08-01"
+    source_url: "https://www.nber.org/papers/w19260"
+    pdf_url: "https://www.nber.org/system/files/working_papers/w19260/w19260.pdf"
+    local_file: nakamura_steinsson.pdf
+    asset_class: rates
+    market: US rates
+    topics: [high-frequency identification, FOMC, information effect]
+    concept_ids: [rate-expectations, priced-in]
+  - id: paper-campbell-evans-fisher-justiniano-2012
+    title: "Macroeconomic Effects of FOMC Forward Guidance"
+    authors: "Jeffrey R. Campbell, Charles L. Evans, Jonas D.M. Fisher, Alejandro Justiniano"
+    publisher: "Federal Reserve Bank of Chicago Working Paper 2012-03"
+    published_at: "2012-01-01"
+    source_url: "https://www.chicagofed.org/publications/working-papers/2012/wp-03"
+    pdf_url: "https://www.chicagofed.org/~/media/publications/working-papers/2012/wp2012-03-pdf.pdf"
+    local_file: campbell_evans_fisher_justiniano.pdf
+    asset_class: rates
+    market: US rates
+    topics: [forward guidance, FOMC, monetary policy]
+    concept_ids: [rate-expectations]
+  - id: paper-fleming-remolona-1997
+    title: "What Moves the Bond Market?"
+    authors: "Michael J. Fleming, Eli M. Remolona"
+    publisher: "Federal Reserve Bank of New York Economic Policy Review 3(4), 1997"
+    published_at: "1997-12-01"
+    source_url: "https://www.newyorkfed.org/research/epr/97v03n4/9712flem.html"
+    pdf_url: "https://www.newyorkfed.org/medialibrary/media/research/epr/97v03n4/9712flem.pdf"
+    local_file: fleming_remolona.pdf
+    asset_class: rates
+    market: US Treasuries
+    topics: [announcements, bond market, liquidity]
+    concept_ids: [cpi-surprise, priced-in, market-liquidity]
+  - id: paper-andersen-bollerslev-diebold-vega-2003
+    title: "Micro Effects of Macro Announcements: Real-Time Price Discovery in Foreign Exchange"
+    authors: "Torben G. Andersen, Tim Bollerslev, Francis X. Diebold, Clara Vega"
+    publisher: "NBER Working Paper 8959 / American Economic Review 93(1), 2003"
+    published_at: "2003-03-01"
+    source_url: "https://www.nber.org/papers/w8959"
+    pdf_url: "https://www.nber.org/system/files/working_papers/w8959/w8959.pdf"
+    local_file: andersen_bollerslev_diebold_vega.pdf
+    asset_class: fx
+    market: G10 FX
+    topics: [macro announcements, FX, surprise]
+    concept_ids: [cpi-surprise, priced-in, usd-rate-differentials]
+  - id: paper-lustig-roussanov-verdelhan-2008
+    title: "Common Risk Factors in Currency Markets"
+    authors: "Hanno Lustig, Nikolai Roussanov, Adrien Verdelhan"
+    publisher: "NBER Working Paper 14082 / Review of Financial Studies 24(11), 2011"
+    published_at: "2008-06-01"
+    source_url: "https://www.nber.org/papers/w14082"
+    pdf_url: "https://www.nber.org/system/files/working_papers/w14082/w14082.pdf"
+    local_file: lustig_roussanov_verdelhan.pdf
+    asset_class: fx
+    market: G10 FX
+    topics: [currency risk, carry, dollar]
+    concept_ids: [usd-rate-differentials, risk-on-off]
+  - id: paper-burnside-eichenbaum-rebelo-2011
+    title: "Carry Trade and Momentum in Currency Markets"
+    authors: "Craig Burnside, Martin Eichenbaum, Sergio Rebelo"
+    publisher: "NBER Working Paper 16942 / Annual Review of Financial Economics 3, 2011"
+    published_at: "2011-04-01"
+    source_url: "https://www.nber.org/papers/w16942"
+    pdf_url: "https://www.nber.org/system/files/working_papers/w16942/w16942.pdf"
+    local_file: burnside_eichenbaum_rebelo.pdf
+    asset_class: fx
+    market: G10 FX
+    topics: [carry trade, currency momentum]
+    concept_ids: [usd-rate-differentials, momentum-strategy, risk-on-off]
+  - id: paper-engel-2013
+    title: "Exchange Rates and Interest Parity"
+    authors: "Charles Engel"
+    publisher: "NBER Working Paper 19336 / Handbook of International Economics vol. 4, 2014"
+    published_at: "2013-12-01"
+    source_url: "https://www.nber.org/papers/w19336"
+    pdf_url: "https://www.nber.org/system/files/working_papers/w19336/w19336.pdf"
+    local_file: engel.pdf
+    asset_class: fx
+    market: G10 FX
+    topics: [interest parity, exchange rates]
+    concept_ids: [usd-rate-differentials]
+  - id: paper-du-tepper-verdelhan-2017
+    title: "Deviations from Covered Interest Rate Parity"
+    authors: "Wenxin Du, Alexander Tepper, Adrien Verdelhan"
+    publisher: "NBER Working Paper 23170 / Journal of Finance 73(3), 2018"
+    published_at: "2017-02-01"
+    source_url: "https://www.nber.org/papers/w23170"
+    pdf_url: "https://www.nber.org/system/files/working_papers/w23170/w23170.pdf"
+    local_file: du_tepper_verdelhan.pdf
+    asset_class: fx
+    market: G10 FX
+    topics: [CIP, cross-currency basis, limits to arbitrage]
+    concept_ids: [usd-rate-differentials, limits-to-arbitrage]
+  - id: paper-bekaert-hoerova-2013
+    title: "The VIX, the Variance Premium and Stock Market Volatility"
+    authors: "Geert Bekaert, Marie Hoerova"
+    publisher: "NBER Working Paper 18995 / Journal of Econometrics 183(2), 2014"
+    published_at: "2013-04-01"
+    source_url: "https://www.nber.org/papers/w18995"
+    pdf_url: "https://www.nber.org/system/files/working_papers/w18995/w18995.pdf"
+    local_file: bekaert_hoerova.pdf
+    asset_class: equities
+    market: US equities
+    topics: [VIX, variance premium, volatility]
+    concept_ids: [vix, market-regime, risk-on-off]
+  - id: paper-adrian-shin-2008
+    title: "Liquidity and Leverage"
+    authors: "Tobias Adrian, Hyun Song Shin"
+    publisher: "Federal Reserve Bank of New York Staff Report 328"
+    published_at: "2008-05-01"
+    source_url: "https://www.newyorkfed.org/research/staff_reports/sr328"
+    pdf_url: "https://www.newyorkfed.org/medialibrary/media/research/staff_reports/sr328.pdf"
+    local_file: adrian_shin.pdf
+    asset_class: equities
+    market: US
+    topics: [liquidity, leverage, intermediaries]
+    concept_ids: [risk-on-off, market-liquidity, liquidity-risk]
+  - id: paper-erb-harvey-2013
+    title: "The Golden Dilemma"
+    authors: "Claude B. Erb, Campbell R. Harvey"
+    publisher: "NBER Working Paper 18706 / Financial Analysts Journal 69(4), 2013"
+    published_at: "2013-01-01"
+    source_url: "https://www.nber.org/papers/w18706"
+    pdf_url: "https://www.nber.org/system/files/working_papers/w18706/w18706.pdf"
+    local_file: erb_harvey.pdf
+    asset_class: commodities
+    market: gold
+    topics: [gold, real yields, inflation]
+    concept_ids: [gold-real-yields]
+  - id: paper-hamilton-2011
+    title: "Historical Oil Shocks"
+    authors: "James D. Hamilton"
+    publisher: "NBER Working Paper 16790 / Routledge Handbook of Major Events in Economic History, 2013"
+    published_at: "2011-02-01"
+    source_url: "https://www.nber.org/papers/w16790"
+    pdf_url: "https://www.nber.org/system/files/working_papers/w16790/w16790.pdf"
+    local_file: hamilton.pdf
+    asset_class: commodities
+    market: oil
+    topics: [oil shocks, supply, demand]
+    concept_ids: [oil-drivers]
+  - id: paper-cochrane-2011
+    title: "Discount Rates"
+    authors: "John H. Cochrane"
+    publisher: "NBER Working Paper 16972 / Journal of Finance 66(4), 2011"
+    published_at: "2011-04-01"
+    source_url: "https://www.nber.org/papers/w16972"
+    pdf_url: "https://www.nber.org/system/files/working_papers/w16972/w16972.pdf"
+    local_file: cochrane.pdf
+    asset_class: equities
+    market: US equities
+    topics: [discount rates, asset pricing, valuation]
+    concept_ids: [discount-rates-equities, long-duration-equities, market-regime]

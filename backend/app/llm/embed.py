@@ -1,5 +1,7 @@
 """Embeddings client: Alibaba Qwen qwen3.7-text-embedding via DashScope's OpenAI-compatible API.
 No DB, no retrieval logic. Provider is swappable via EMBEDDING_* env vars."""
+from functools import lru_cache
+
 from openai import OpenAI
 
 from ..config import get_settings
@@ -23,3 +25,9 @@ def embed_texts(texts: list[str]) -> list[list[float]]:
             raise ValueError(f"Embedding size != {s.embedding_dims}; check EMBEDDING_* settings")
         out.extend(vecs)
     return out
+
+
+@lru_cache(maxsize=256)
+def embed_query(text: str) -> list[float]:
+    """Single-query embed with an in-process cache. Key is the final string sent to the model."""
+    return embed_texts([text])[0]
