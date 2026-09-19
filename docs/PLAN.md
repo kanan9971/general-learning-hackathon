@@ -16,7 +16,7 @@ On approval, implementation starts by committing this plan to `docs/PLAN.md` and
 ### ✅ Done
 - Repo scaffold, `CLAUDE.md`, `docs/ARCHITECTURE.md`, env examples
 - FastAPI backend: config, typed errors, Supabase JWT auth (ES256/JWKS), local dev bypass, `/health`
-- Supabase: migrations 0001–0006 applied (21 tables, RLS on all), 29 concepts + 14 edges seeded
+- Supabase: migrations 0001–0007 applied (23 tables, RLS on all), 29 concepts + 14 edges seeded
 - RAG: ingest pipeline (PDF + Markdown), 5 momentum papers + 7 foundation lessons embedded (Qwen, 1536-d), hybrid retrieval (`match_chunks`), citation validation, injection-safe context
 - RAG tutor `POST /v1/tutor/lesson` + `/v1/kb/search` + `/v1/sources/{id}`, wired into the mobile Lesson screen
 - Adaptive quiz `/v1/quiz/*` + `/v1/learn/progress`: selection, generation with fallbacks, HMAC-sealed MCQs, grading, mastery + Leitner updates, persistence
