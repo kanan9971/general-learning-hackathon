@@ -1,7 +1,7 @@
 // Thin API client. Types will be generated from the backend OpenAPI (scripts/gen_types.sh).
 import Constants from 'expo-constants';
 
-import { getAccessToken } from '@/lib/auth';
+import { getAccessToken } from '../lib/auth';
 
 const API_URL =
   process.env.EXPO_PUBLIC_API_URL ??

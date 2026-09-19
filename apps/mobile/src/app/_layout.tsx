@@ -3,7 +3,7 @@ import { ActivityIndicator, View } from 'react-native';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 
-import { ensureAnonymousSession } from '@/lib/auth';
+import { ensureAnonymousSession } from '../lib/auth';
 import { isOnboarded } from '@/lib/learner';
 import { Palette } from '@/constants/theme';
 
