@@ -88,7 +88,7 @@ Allowed direction is **left → right** ("may import / call"). Anything not list
 `content/sources/research_papers.yaml` (manifest: id, title, authors, publisher, canonical `source_url`, `pdf_url`, concept_ids) →
 `rag/extract.py` (PDF→text; refuses scanned PDFs) → `rag/clean.py` (running headers/footers, references, equation/table debris, injection flag) →
 `rag/chunk.py` (section-aware, ≤350-token target / 500 max, 1-sentence overlap, `Title > Section` path) →
-`llm/embed.py` (Alibaba Qwen text-embedding-v4, 1536-d, batch ≤10) → `db/knowledge.py` (upsert `documents` + `chunks`, layer=`foundation`, content_type=`research`).
+`llm/embed.py` (Alibaba Qwen qwen3.7-text-embedding, 1536-d, batch ≤10) → `db/knowledge.py` (upsert `documents` + `chunks`, layer=`foundation`, content_type=`research`).
 Run: `python -m app.rag.ingest ../content/sources/research_papers.yaml` (dry run, writes `content/processed/*.jsonl`) or add `--store`.
 **Rules:** PDFs (`content/raw/`) and extracted text (`content/processed/`) are gitignored, not redistributed. The UI shows short excerpts and always links to `source_url`. Papers are difficulty 3 / trust_level 2 and are only retrieved for advanced learners or explicit momentum/strategy topics, never for beginner misconception lessons.
 
@@ -100,7 +100,7 @@ Run: `python -m app.rag.ingest ../content/sources/research_papers.yaml` (dry run
 | Pydantic API schemas + placeholder fixtures (`app/fixtures`, served at `/v1/dev/fixtures/*` when `DEV_FIXTURES=true`) | done (phase 0) |
 | Supabase migrations 0001–0004 (core, rag, rls, research type) | **applied** to project `apsojsuiginpuqljutyo` on 2026-09-19 via MCP; 17 tables, RLS on all. Known advisories: `llm_calls` has no policy (intentional, service-role only); `vector` extension sits in `public` (leave, moving it means recreating `chunks.embedding`). Seeded `concepts` (29) + `concept_edges` (14) via `supabase/seed/concepts.sql`. Live-verified 2026-09-19 (`scripts/check_supabase.py`, 12/12): signup/login, backend verifies ES256 tokens via JWKS, RLS isolation between users, reference tables read-only, KB store path (pgvector insert + re-ingest replace). |
 | Expo app: onboarding MCQ → plan → Today / case study / daily quiz / feedback / lesson / Portfolio / Learn (palette + AsyncStorage gate; auth skipped) | done (mobile loop UI) |
-| RAG ingest pipeline (extract, clean, chunk, embed, store) + 5 momentum papers (~300 chunks, dry-run verified; **not yet embedded/stored**: needs embedding key + Supabase) | done except store step |
+| RAG ingest pipeline + 5 momentum papers | **done and stored**: 377 chunks embedded (Qwen `qwen3.7-text-embedding`, 1536-d, layer=foundation, type=research) in Supabase. Smoke retrieval with real embeddings: hit@3 4/5. |
 | market / news / portfolio / learning / llm prompts | empty packages (later phases) |
 | retrieval (`rag/retrieve.py`, `match_chunks`), citations, context builder | not started (next) |
 | `match_chunks` SQL function | not started |

@@ -15,7 +15,7 @@ Feature freeze at H13. P0 = the "magic moment" loop in docs/PLAN.md §18.
 - backend — Python FastAPI deployed on Vercel serverless (entry: backend/api/index.py)
 - supabase — Postgres + pgvector + Auth (email/password) + RLS; SQL migrations in supabase/migrations
 - LLM: xAI Grok via `openai` SDK (base_url https://api.x.ai/v1); model IDs from env (`XAI_MODEL_FAST`, `XAI_MODEL_REASONING`)
-- Embeddings: Alibaba Qwen `text-embedding-v4` via DashScope OpenAI-compatible API, 1536-d (OpenAI is blocked in Hong Kong; provider is swappable via `EMBEDDING_*` env vars, but dims must match `vector(1536)`)
+- Embeddings: Alibaba Qwen `qwen3.7-text-embedding` via DashScope OpenAI-compatible API, 1536-d (OpenAI is blocked in Hong Kong; provider is swappable via `EMBEDDING_*` env vars, but dims must match `vector(1536)`)
 - Market data: Yahoo Finance chart endpoint via httpx (prices; no `yfinance` on Vercel) + FRED (2Y yield, curve, macro)
 - News: WSJ public RSS + Yahoo Finance ticker RSS — headline, summary, URL, timestamp only; never scrape WSJ article bodies
 - Fallback chain: live → cached snapshot → golden demo day
