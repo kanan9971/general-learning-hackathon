@@ -1,5 +1,9 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { StyleSheet, Text, View } from 'react-native';
 
+import { Card } from '@/components/Card';
+import { Chip } from '@/components/Chip';
+import { ThemedText } from '@/components/themed-text';
 import { Palette } from '@/constants/theme';
 
 export function EventCard({
@@ -14,41 +18,27 @@ export function EventCard({
   onPress: () => void;
 }) {
   return (
-    <Pressable onPress={onPress} style={styles.card} accessibilityRole="button">
+    <Card onPress={onPress} accessibilityLabel={`Open case study: ${title}`}>
       <View style={styles.top}>
-        <Text style={styles.kicker}>CASE STUDY</Text>
-        {confidence ? (
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>{confidence.toUpperCase()}</Text>
-          </View>
-        ) : null}
+        <ThemedText type="kicker" style={{ color: Palette.secondary }}>
+          Case study
+        </ThemedText>
+        {confidence ? <Chip label={`${confidence} confidence`} tone="accent" size="sm" /> : null}
       </View>
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.catalyst}>{catalyst}</Text>
-      <Text style={styles.cta}>Open case study →</Text>
-    </Pressable>
+      <View style={styles.cta}>
+        <Text style={styles.ctaText}>Open case study</Text>
+        <Ionicons name="chevron-forward" size={16} color={Palette.primary} />
+      </View>
+    </Card>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: Palette.surface,
-    borderColor: Palette.border,
-    borderWidth: 1,
-    borderRadius: 12,
-    padding: 14,
-    gap: 6,
-  },
   top: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  kicker: { color: Palette.secondary, fontSize: 11, fontWeight: '700', letterSpacing: 0.6 },
-  badge: {
-    backgroundColor: Palette.softAccent,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 6,
-  },
-  badgeText: { color: Palette.warning, fontSize: 11, fontWeight: '700' },
-  title: { color: Palette.text, fontSize: 17, fontWeight: '700', lineHeight: 24 },
+  title: { color: Palette.text, fontSize: 18, fontWeight: '700', lineHeight: 24 },
   catalyst: { color: Palette.muted, fontSize: 14, lineHeight: 20 },
-  cta: { color: Palette.primary, fontSize: 13, fontWeight: '600', marginTop: 4 },
+  cta: { flexDirection: 'row', alignItems: 'center', gap: 2, marginTop: 2 },
+  ctaText: { color: Palette.primary, fontSize: 14, fontWeight: '700' },
 });

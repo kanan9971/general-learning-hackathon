@@ -24,7 +24,7 @@ The product/scope plan lives in `PLAN.md`; this file is the structural contract.
 | Module | Responsibility | Owns |
 |---|---|---|
 | `apps/mobile/src/app` | Screens and navigation (Expo Router). No business logic, no numbers computed here. | routes |
-| `apps/mobile/src/components` | Presentational UI (badges, labelled sections, cards). | UI only |
+| `apps/mobile/src/components` | Presentational UI. Shared primitives every screen composes: `Screen` (title + gutters + pinned `footer` for the main CTA), `Card`, `Chip`, `SectionHeader`, `LabelledSection`, `PrimaryButton`, `OptionCard`. Sizing tokens live in `constants/theme.ts` (`Spacing`, `Radius`, `Layout`) and the type scale in `ThemedText`. Icons: `@expo/vector-icons` (Ionicons). | UI only |
 | `apps/mobile/src/api` | The **only** place the app talks to the backend. Types generated from OpenAPI. | HTTP client |
 | `backend/app/routers` | HTTP layer: parse/validate request, call services, shape response. Thin. | routes, auth deps |
 | `backend/app/schemas` | Pydantic models for API bodies **and** LLM outputs. The shared contract. | types |

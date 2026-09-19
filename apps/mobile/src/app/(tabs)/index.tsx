@@ -8,8 +8,9 @@ import { Disclaimer } from '@/components/Disclaimer';
 import { EventCard } from '@/components/EventCard';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { Screen } from '@/components/Screen';
+import { SectionHeader } from '@/components/SectionHeader';
 import { getPlan, type LearnerPlan } from '@/lib/learner';
-import { Palette } from '@/constants/theme';
+import { Layout, Palette, Radius } from '@/constants/theme';
 
 type Fact = { fact_id: string; label?: string; symbol: string; value: number; unit: string };
 type Event = {
@@ -74,21 +75,45 @@ export default function TodayScreen() {
     <Screen
       title="Today"
       subtitle={plan ? `Plan tone: ${plan.level}` : undefined}
+      footer={
+        <>
+          <PrimaryButton label="Start today's quiz" onPress={() => router.push('/quiz')} />
+          <Disclaimer />
+        </>
+      }
     >
-      <DataModeBadge mode={brief.data_mode} asOf={brief.as_of_date} />
-      {error ? <Text style={styles.warn}>{error}</Text> : null}
-      {health ? (
-        <Text style={styles.meta}>
-          API {health.status} · v{health.version}
-        </Text>
+      <View style={styles.statusRow}>
+        <DataModeBadge mode={brief.data_mode} asOf={brief.as_of_date} />
+        {health ? (
+          <Text style={styles.meta}>
+            API {health.status} · v{health.version}
+          </Text>
+        ) : null}
+      </View>
+      {error ? (
+        <View style={styles.warnBanner}>
+          <Text style={styles.warn}>{error}</Text>
+        </View>
       ) : null}
 
-      <Text style={styles.section}>Cross-asset strip</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.strip}>
+      <SectionHeader title="Cross-asset strip" meta="1-day change" />
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.strip}
+        style={styles.stripScroll}
+      >
         {brief.strip.map((f) => (
           <View key={f.fact_id} style={styles.stripCard}>
             <Text style={styles.stripLabel}>{f.label ?? f.symbol}</Text>
-            <Text style={styles.stripValue}>
+            <Text
+              style={[
+                styles.stripValue,
+                f.value > 0 && { color: Palette.success },
+                f.value < 0 && { color: Palette.error },
+              ]}
+            >
+              {f.value > 0 ? '+' : ''}
               {f.value}
               {f.unit}
             </Text>
@@ -96,7 +121,7 @@ export default function TodayScreen() {
         ))}
       </ScrollView>
 
-      <Text style={styles.section}>Case studies</Text>
+      <SectionHeader title="Case studies" meta={`${brief.events.length} today`} />
       {brief.events.map((e) => (
         <EventCard
           key={e.id}
@@ -106,36 +131,38 @@ export default function TodayScreen() {
           onPress={() => router.push(`/event/${e.id}`)}
         />
       ))}
-
-      <PrimaryButton
-        label="Start today's quiz"
-        onPress={() => router.push('/quiz')}
-        style={{ marginTop: 4 }}
-      />
-      <Disclaimer />
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  warn: { color: Palette.warning, fontSize: 13 },
-  meta: { color: Palette.muted, fontSize: 12 },
-  section: {
-    color: Palette.text,
-    fontSize: 15,
-    fontWeight: '700',
-    marginTop: 4,
+  statusRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 8,
   },
-  strip: { gap: 8, paddingVertical: 4 },
+  meta: { color: Palette.muted, fontSize: 12 },
+  warnBanner: {
+    backgroundColor: Palette.softAccent,
+    borderRadius: Radius.sm,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  warn: { color: Palette.warning, fontSize: 13, fontWeight: '600' },
+  // Bleed the strip to the screen edge so cards peek in and invite a swipe.
+  stripScroll: { marginHorizontal: -Layout.screenPadding },
+  strip: { gap: 8, paddingHorizontal: Layout.screenPadding },
   stripCard: {
     backgroundColor: Palette.surface,
     borderColor: Palette.border,
     borderWidth: 1,
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    minWidth: 96,
+    borderRadius: Radius.md,
+    paddingHorizontal: Layout.cardPadding,
+    paddingVertical: 12,
+    minWidth: 112,
+    gap: 4,
   },
-  stripLabel: { color: Palette.muted, fontSize: 11, fontWeight: '600' },
-  stripValue: { color: Palette.text, fontSize: 16, fontWeight: '700', marginTop: 4 },
+  stripLabel: { color: Palette.muted, fontSize: 12, fontWeight: '600' },
+  stripValue: { color: Palette.text, fontSize: 20, fontWeight: '700', fontVariant: ['tabular-nums'] },
 });

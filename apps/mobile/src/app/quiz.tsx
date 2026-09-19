@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 
@@ -26,7 +26,6 @@ export default function DailyQuizScreen() {
   const [answers, setAnswers] = useState<Record<string, string>>({});
 
   const q = questions[index];
-  const progress = useMemo(() => `${index + 1} / ${questions.length}`, [index, questions.length]);
 
   const finish = async (finalAnswers: Record<string, string>) => {
     const results = questions.map((question) => {
@@ -63,32 +62,39 @@ export default function DailyQuizScreen() {
     setSelected(null);
   };
 
+  const isLast = index >= questions.length - 1;
+
   return (
-    <Screen title={dailyQuiz.title} subtitle="Short MCQs grounded in today's case study.">
+    <Screen
+      title={dailyQuiz.title}
+      subtitle="Short MCQs grounded in today's case study."
+      safeEdges={['bottom']}
+      footer={
+        <PrimaryButton label={isLast ? 'Submit answers' : 'Next question'} onPress={onNext} disabled={!selected} />
+      }
+    >
       <ProgressDots total={questions.length} current={index} />
-      <Text style={styles.meta}>{progress}</Text>
       <Text style={styles.prompt}>{q.prompt}</Text>
+      <Text style={styles.hint} accessibilityLiveRegion="polite">
+        {selected ? 'Answer selected — tap Next to continue.' : 'Pick one answer.'}
+      </Text>
       <View style={styles.options}>
-        {q.options.map((o) => (
+        {q.options.map((o, i) => (
           <OptionCard
             key={o.id}
+            index={i}
             label={o.text}
             selected={selected === o.id}
             onPress={() => setSelected(o.id)}
           />
         ))}
       </View>
-      <PrimaryButton
-        label={index >= questions.length - 1 ? 'Submit' : 'Next'}
-        onPress={onNext}
-        disabled={!selected}
-      />
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  meta: { color: Palette.muted, fontSize: 13, fontWeight: '600' },
-  prompt: { color: Palette.text, fontSize: 18, fontWeight: '700', lineHeight: 26 },
+  prompt: { color: Palette.text, fontSize: 20, fontWeight: '700', lineHeight: 28 },
+  hint: { color: Palette.muted, fontSize: 13, marginTop: -8 },
   options: { gap: 10 },
 });

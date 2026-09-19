@@ -3,9 +3,12 @@ import { StyleSheet, Text, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 
 import { getFixture } from '@/api/client';
+import { Card } from '@/components/Card';
+import { Chip } from '@/components/Chip';
 import { LabelledSection } from '@/components/LabelledSection';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { Screen } from '@/components/Screen';
+import { SectionHeader } from '@/components/SectionHeader';
 import { ThemedText } from '@/components/themed-text';
 import { conceptLabel } from '@/lib/learner';
 import { Palette } from '@/constants/theme';
@@ -58,64 +61,82 @@ export default function LessonScreen() {
 
   if (!payload) {
     return (
-      <Screen title="Lesson">
-        <Text style={{ color: Palette.muted }}>Loading…</Text>
+      <Screen title="Lesson" safeEdges={['bottom']}>
+        <ThemedText type="small" themeColor="textSecondary">
+          Loading…
+        </ThemedText>
       </Screen>
     );
   }
 
   const conceptId = concept ?? payload.lesson.concept_id;
+  const sections = payload.lesson.sections;
 
   return (
-    <Screen title={conceptLabel(conceptId)} subtitle={`Level: ${payload.lesson.level}`}>
+    <Screen
+      title={conceptLabel(conceptId)}
+      subtitle={`Level: ${payload.lesson.level}`}
+      safeEdges={['bottom']}
+      footer={<PrimaryButton label="Done — go to Learn" onPress={() => router.replace('/(tabs)/learn')} />}
+    >
       <LabelledSection kind="teaching">
-        {payload.lesson.sections.map((s) => (
-          <View key={s.heading} style={styles.section}>
-            <ThemedText type="smallBold">
-              {s.heading} · {s.kind}
-            </ThemedText>
+        {sections.map((s, i) => (
+          <View key={s.heading} style={[styles.section, i > 0 && styles.sectionDivider]}>
+            <View style={styles.sectionHead}>
+              <ThemedText type="sectionTitle" style={{ flex: 1 }}>
+                {s.heading}
+              </ThemedText>
+              <Chip
+                label={s.kind}
+                tone={s.kind === 'supported' ? 'success' : 'neutral'}
+                size="sm"
+              />
+            </View>
             <ThemedText>{s.text}</ThemedText>
             {s.source_ids.length ? (
-              <ThemedText type="small" themeColor="textSecondary">
-                Sources: {s.source_ids.join(', ')}
-              </ThemedText>
+              <Text style={styles.sources}>Sources: {s.source_ids.join(', ')}</Text>
             ) : null}
           </View>
         ))}
       </LabelledSection>
 
-      <View style={styles.citeCard}>
-        <Text style={styles.citeTitle}>Citations</Text>
-        {payload.citations.map((c) => (
-          <Text key={c.source_id} style={styles.citeLine}>
-            [{c.source_id}] {c.title} — {c.publisher}
-          </Text>
+      <SectionHeader title="Citations" meta={`${payload.citations.length} sources`} />
+      <Card style={styles.citeCard}>
+        {payload.citations.map((c, i) => (
+          <View key={c.source_id} style={[styles.citeRow, i > 0 && styles.sectionDivider]}>
+            <Text style={styles.citeId}>{c.source_id}</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.citeTitle}>{c.title}</Text>
+              <Text style={styles.citePublisher}>{c.publisher}</Text>
+            </View>
+          </View>
         ))}
-      </View>
+      </Card>
 
-      <LabelledSection kind="you">
-        <ThemedText type="smallBold">Check question</ThemedText>
+      <LabelledSection kind="you" title="Check yourself">
         <ThemedText>{payload.lesson.check_question}</ThemedText>
         <ThemedText type="small" themeColor="textSecondary">
           Follow-up: {payload.follow_up}
         </ThemedText>
       </LabelledSection>
-
-      <PrimaryButton label="Done — go to Learn" onPress={() => router.replace('/(tabs)/learn')} />
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  section: { gap: 4, marginBottom: 8 },
-  citeCard: {
-    backgroundColor: Palette.surface,
-    borderWidth: 1,
-    borderColor: Palette.border,
-    borderRadius: 10,
-    padding: 12,
-    gap: 4,
+  section: { gap: 6, paddingVertical: 4 },
+  sectionDivider: { borderTopWidth: 1, borderTopColor: Palette.border, paddingTop: 12, marginTop: 6 },
+  sectionHead: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  sources: { color: Palette.muted, fontSize: 12, lineHeight: 16 },
+  citeCard: { paddingVertical: 4, gap: 0 },
+  citeRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 12, paddingVertical: 10 },
+  citeId: {
+    color: Palette.primary,
+    fontWeight: '700',
+    fontSize: 12,
+    minWidth: 28,
+    paddingTop: 2,
   },
-  citeTitle: { color: Palette.secondary, fontWeight: '700', fontSize: 12 },
-  citeLine: { color: Palette.muted, fontSize: 13, lineHeight: 18 },
+  citeTitle: { color: Palette.text, fontSize: 14, fontWeight: '600', lineHeight: 20 },
+  citePublisher: { color: Palette.muted, fontSize: 12, lineHeight: 16 },
 });

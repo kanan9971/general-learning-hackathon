@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 
+import { Card } from '@/components/Card';
+import { Chip, ChipRow } from '@/components/Chip';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { Screen } from '@/components/Screen';
+import { ThemedText } from '@/components/themed-text';
 import { conceptLabel, getPlan, type LearnerPlan } from '@/lib/learner';
 import { Palette } from '@/constants/theme';
 
@@ -26,62 +29,59 @@ export default function OnboardingPlan() {
 
   if (!plan) {
     return (
-      <Screen title="Your plan">
-        <Text style={styles.muted}>Building your plan…</Text>
+      <Screen title="Your plan" safeEdges={['top', 'bottom']}>
+        <ThemedText type="small" themeColor="textSecondary">
+          Building your plan…
+        </ThemedText>
       </Screen>
     );
   }
 
   return (
-    <Screen title="Your custom plan" subtitle="Seeded from your diagnostic. Daily quizzes will keep updating mastery.">
-      <View style={styles.card}>
-        <Text style={styles.label}>Inferred level</Text>
+    <Screen
+      title="Your custom plan"
+      subtitle="Seeded from your diagnostic. Daily quizzes will keep updating mastery."
+      safeEdges={['top', 'bottom']}
+      footer={
+        <PrimaryButton
+          label={retake === '1' ? 'Back to Learn' : 'Continue to Today'}
+          onPress={continueNext}
+        />
+      }
+    >
+      <Card tone="info">
+        <ThemedText type="kicker" style={{ color: Palette.secondary }}>
+          Inferred level
+        </ThemedText>
         <Text style={styles.level}>{plan.level}</Text>
-        <Text style={styles.muted}>{plan.percentCorrect}% correct on the diagnostic</Text>
-      </View>
+        <ThemedText type="small" themeColor="textSecondary">
+          {plan.percentCorrect}% correct on the diagnostic
+        </ThemedText>
+      </Card>
 
-      <View style={styles.card}>
-        <Text style={styles.label}>Focus concepts</Text>
-        <View style={styles.chips}>
+      <Card>
+        <ThemedText type="kicker" style={{ color: Palette.secondary }}>
+          Focus concepts
+        </ThemedText>
+        <ChipRow>
           {plan.focusConceptIds.map((id) => (
-            <View key={id} style={styles.chip}>
-              <Text style={styles.chipText}>{conceptLabel(id)}</Text>
-            </View>
+            <Chip key={id} label={conceptLabel(id)} tone="info" outlined />
           ))}
-        </View>
-        <Text style={styles.muted}>
+        </ChipRow>
+        <ThemedText type="small" themeColor="textSecondary">
           These show up first on Learn. Today’s case studies and quizzes will refine them.
-        </Text>
-      </View>
-
-      <PrimaryButton
-        label={retake === '1' ? 'Back to Learn' : 'Continue to Today'}
-        onPress={continueNext}
-      />
+        </ThemedText>
+      </Card>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: Palette.surface,
-    borderColor: Palette.border,
-    borderWidth: 1,
-    borderRadius: 12,
-    padding: 16,
-    gap: 8,
+  level: {
+    color: Palette.primary,
+    fontSize: 32,
+    lineHeight: 38,
+    fontWeight: '800',
+    textTransform: 'capitalize',
   },
-  label: { color: Palette.secondary, fontSize: 12, fontWeight: '700', letterSpacing: 0.5 },
-  level: { color: Palette.primary, fontSize: 28, fontWeight: '800', textTransform: 'capitalize' },
-  muted: { color: Palette.muted, fontSize: 14, lineHeight: 20 },
-  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  chip: {
-    backgroundColor: Palette.softInfo,
-    borderColor: Palette.primary,
-    borderWidth: 1,
-    borderRadius: 999,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-  },
-  chipText: { color: Palette.primary, fontWeight: '600', fontSize: 13 },
 });

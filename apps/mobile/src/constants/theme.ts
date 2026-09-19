@@ -22,6 +22,7 @@ export const Palette = {
   softInfo: '#EAF3FF',
   softSuccess: '#EAF7EF',
   softAccent: '#FFF5D8',
+  softError: '#FDECEC',
   white: '#FFFFFF',
 } as const;
 
@@ -89,6 +90,23 @@ export const Spacing = {
   four: 24,
   five: 32,
   six: 64,
+} as const;
+
+/** One radius scale for every card, chip and button so surfaces line up. */
+export const Radius = {
+  sm: 8,
+  md: 12,
+  lg: 16,
+  pill: 999,
+} as const;
+
+/** Shared layout constants: every card/section uses these so edges align across screens. */
+export const Layout = {
+  screenPadding: Spacing.three,
+  cardPadding: Spacing.three,
+  cardGap: Spacing.two,
+  sectionGap: Spacing.three,
+  controlHeight: 52,
 } as const;
 
 export const BottomTabInset = Platform.select({ ios: 50, android: 80 }) ?? 0;

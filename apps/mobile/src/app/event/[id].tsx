@@ -3,11 +3,15 @@ import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 
 import { getFixture } from '@/api/client';
+import { Card } from '@/components/Card';
+import { Chip, ChipRow } from '@/components/Chip';
 import { Disclaimer } from '@/components/Disclaimer';
 import { LabelledSection } from '@/components/LabelledSection';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { Screen } from '@/components/Screen';
+import { SectionHeader } from '@/components/SectionHeader';
 import { ThemedText } from '@/components/themed-text';
+import { conceptLabel } from '@/lib/learner';
 import { Palette } from '@/constants/theme';
 
 type ChainStep = { from_?: string; from?: string; to: string; explanation: string };
@@ -81,127 +85,151 @@ export default function EventDetailScreen() {
 
   if (!event) {
     return (
-      <Screen title="Case study">
+      <Screen title="Case study" safeEdges={['bottom']}>
         <ActivityIndicator color={Palette.primary} />
       </Screen>
     );
   }
 
   const relatedFacts = facts.filter((f) => event.fact_ids?.includes(f.fact_id));
+  const chain = event.mechanism_chain;
 
   return (
-    <Screen title={event.title}>
+    <Screen
+      title={event.title}
+      safeEdges={['bottom']}
+      footer={
+        <>
+          <PrimaryButton label="Start today's quiz" onPress={() => router.push('/quiz')} />
+          <Disclaimer />
+        </>
+      }
+    >
       <LabelledSection kind="fact">
         {relatedFacts.length ? (
-          relatedFacts.map((f) => (
-            <ThemedText key={f.fact_id}>
-              {f.label ?? f.fact_id}: {f.value}
-              {f.unit}
-            </ThemedText>
-          ))
+          <View style={styles.factRow}>
+            {relatedFacts.map((f) => (
+              <View key={f.fact_id} style={styles.fact}>
+                <Text style={styles.factLabel}>{f.label ?? f.fact_id}</Text>
+                <Text
+                  style={[
+                    styles.factValue,
+                    f.value > 0 && { color: Palette.success },
+                    f.value < 0 && { color: Palette.error },
+                  ]}
+                >
+                  {f.value > 0 ? '+' : ''}
+                  {f.value}
+                  {f.unit}
+                </Text>
+              </View>
+            ))}
+          </View>
         ) : (
           <ThemedText>Numbers come from the daily snapshot (fixture).</ThemedText>
         )}
       </LabelledSection>
 
-      <LabelledSection kind="interpretation">
-        <ThemedText type="smallBold">Catalyst</ThemedText>
+      <LabelledSection kind="interpretation" title="Catalyst">
         <ThemedText>{event.catalyst}</ThemedText>
-        <ThemedText type="small" themeColor="textSecondary">
-          Confidence: {event.confidence} — {event.confidence_reason}
-        </ThemedText>
+        <View style={styles.confidenceRow}>
+          <Chip label={`${event.confidence} confidence`} tone="accent" size="sm" />
+          <ThemedText type="caption" themeColor="textSecondary" style={{ flex: 1 }}>
+            {event.confidence_reason}
+          </ThemedText>
+        </View>
       </LabelledSection>
 
-      <Text style={styles.section}>Causal chain</Text>
-      {event.mechanism_chain.map((step, i) => (
-        <View key={i} style={styles.step}>
-          <Text style={styles.stepIndex}>{i + 1}</Text>
-          <View style={{ flex: 1, gap: 2 }}>
-            <Text style={styles.stepTitle}>
-              {step.from_ ?? step.from} → {step.to}
-            </Text>
-            <Text style={styles.stepBody}>{step.explanation}</Text>
+      <SectionHeader title="Causal chain" meta={`${chain.length} steps`} />
+      <Card style={styles.chain}>
+        {chain.map((step, i) => (
+          <View key={i} style={styles.step}>
+            <View style={styles.stepRail}>
+              <View style={styles.stepIndex}>
+                <Text style={styles.stepIndexText}>{i + 1}</Text>
+              </View>
+              {i < chain.length - 1 ? <View style={styles.stepLine} /> : null}
+            </View>
+            <View style={[styles.stepBodyWrap, i < chain.length - 1 && styles.stepSpacing]}>
+              <Text style={styles.stepFrom}>{step.from_ ?? step.from}</Text>
+              <Text style={styles.stepTo}>→ {step.to}</Text>
+              <Text style={styles.stepBody}>{step.explanation}</Text>
+            </View>
           </View>
-        </View>
-      ))}
+        ))}
+      </Card>
 
-      <LabelledSection kind="interpretation">
-        <ThemedText type="smallBold">Alternatives</ThemedText>
+      <LabelledSection kind="interpretation" title="Alternative explanations">
         {event.alternatives.map((a, i) => (
-          <ThemedText key={i}>
-            {a.explanation} — confirm with: {a.evidence_that_would_confirm}
-          </ThemedText>
+          <View key={i} style={{ gap: 2 }}>
+            <ThemedText>{a.explanation}</ThemedText>
+            <ThemedText type="small" themeColor="textSecondary">
+              Confirm with: {a.evidence_that_would_confirm}
+            </ThemedText>
+          </View>
         ))}
       </LabelledSection>
 
-      <View style={styles.row}>
-        <View style={styles.chipCol}>
-          <Text style={styles.chipLabel}>+ Affected</Text>
+      <SectionHeader title="Who it affects" />
+      <View style={styles.affectedRow}>
+        <Card tone="success" style={styles.affectedCol}>
+          <ThemedText type="kicker" style={{ color: Palette.success }}>
+            Helped
+          </ThemedText>
           {event.positively_affected.map((x) => (
             <Text key={x} style={styles.pos}>
               {x}
             </Text>
           ))}
-        </View>
-        <View style={styles.chipCol}>
-          <Text style={styles.chipLabel}>− Affected</Text>
+        </Card>
+        <Card tone="error" style={styles.affectedCol}>
+          <ThemedText type="kicker" style={{ color: Palette.error }}>
+            Pressured
+          </ThemedText>
           {event.negatively_affected.map((x) => (
             <Text key={x} style={styles.neg}>
               {x}
             </Text>
           ))}
-        </View>
+        </Card>
       </View>
 
-      <View style={styles.concepts}>
+      <SectionHeader title="Concepts in play" />
+      <ChipRow>
         {event.concept_ids.map((c) => (
-          <View key={c} style={styles.conceptChip}>
-            <Text style={styles.conceptText}>{c}</Text>
-          </View>
+          <Chip key={c} label={conceptLabel(c)} tone="accent" />
         ))}
-      </View>
-
-      <PrimaryButton label="Start today's quiz" onPress={() => router.push('/quiz')} />
-      <Disclaimer />
+      </ChipRow>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  section: { color: Palette.text, fontWeight: '700', fontSize: 15 },
-  step: {
-    flexDirection: 'row',
-    gap: 10,
-    backgroundColor: Palette.surface,
-    borderWidth: 1,
-    borderColor: Palette.border,
-    borderRadius: 10,
-    padding: 12,
-  },
+  factRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 16 },
+  fact: { gap: 2, minWidth: 96 },
+  factLabel: { color: Palette.muted, fontSize: 12, fontWeight: '600' },
+  factValue: { color: Palette.text, fontSize: 22, fontWeight: '700', fontVariant: ['tabular-nums'] },
+  confidenceRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 2 },
+  chain: { gap: 0 },
+  step: { flexDirection: 'row', gap: 12 },
+  stepRail: { alignItems: 'center', width: 28 },
   stepIndex: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    textAlign: 'center',
-    lineHeight: 24,
-    backgroundColor: Palette.softInfo,
-    color: Palette.primary,
-    fontWeight: '700',
-    overflow: 'hidden',
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: Palette.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  stepTitle: { color: Palette.text, fontWeight: '700', fontSize: 14 },
-  stepBody: { color: Palette.muted, fontSize: 13, lineHeight: 18 },
-  row: { flexDirection: 'row', gap: 12 },
-  chipCol: { flex: 1, gap: 4 },
-  chipLabel: { color: Palette.muted, fontSize: 12, fontWeight: '700' },
-  pos: { color: Palette.success, fontWeight: '600' },
-  neg: { color: Palette.error, fontWeight: '600' },
-  concepts: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  conceptChip: {
-    backgroundColor: Palette.softAccent,
-    borderRadius: 999,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-  },
-  conceptText: { color: Palette.warning, fontSize: 12, fontWeight: '600' },
+  stepIndexText: { color: Palette.white, fontWeight: '700', fontSize: 13 },
+  stepLine: { flex: 1, width: 2, backgroundColor: Palette.border, marginVertical: 4 },
+  stepBodyWrap: { flex: 1, gap: 2 },
+  stepSpacing: { paddingBottom: 16 },
+  stepFrom: { color: Palette.muted, fontSize: 13, fontWeight: '600' },
+  stepTo: { color: Palette.text, fontSize: 15, fontWeight: '700', lineHeight: 21 },
+  stepBody: { color: Palette.muted, fontSize: 13, lineHeight: 18, marginTop: 2 },
+  affectedRow: { flexDirection: 'row', gap: 12 },
+  affectedCol: { flex: 1, gap: 4 },
+  pos: { color: Palette.success, fontWeight: '600', fontSize: 14, lineHeight: 20 },
+  neg: { color: Palette.error, fontWeight: '600', fontSize: 14, lineHeight: 20 },
 });

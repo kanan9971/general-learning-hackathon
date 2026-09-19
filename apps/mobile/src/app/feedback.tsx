@@ -1,9 +1,10 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 
-import { LabelledSection } from '@/components/LabelledSection';
+import { Card } from '@/components/Card';
 import { PrimaryButton } from '@/components/PrimaryButton';
 import { Screen } from '@/components/Screen';
+import { SectionHeader } from '@/components/SectionHeader';
 import { ThemedText } from '@/components/themed-text';
 import { conceptLabel } from '@/lib/learner';
 import { Palette } from '@/constants/theme';
@@ -32,67 +33,85 @@ export default function FeedbackScreen() {
   const hits = results.filter((r) => r.correct);
   const misses = results.filter((r) => !r.correct);
   const teachConcept = misses[0]?.conceptId ?? hits[0]?.conceptId ?? 'real-yields';
+  const scoreTone = percent >= 75 ? 'success' : percent >= 40 ? 'accent' : 'error';
+  const scoreColor =
+    scoreTone === 'success' ? Palette.success : scoreTone === 'accent' ? Palette.warning : Palette.error;
 
   return (
-    <Screen title="Feedback" subtitle="Mastery on Learn was updated from this quiz.">
-      <View style={styles.scoreCard}>
-        <Text style={styles.score}>{percent}%</Text>
+    <Screen
+      title="Feedback"
+      subtitle="Mastery on Learn was updated from this quiz."
+      safeEdges={['bottom']}
+      footer={
+        <>
+          <PrimaryButton
+            label={`Teach me: ${conceptLabel(teachConcept)}`}
+            onPress={() => router.push({ pathname: '/lesson', params: { concept: teachConcept } })}
+          />
+          <PrimaryButton
+            label="Back to Learn"
+            variant="ghost"
+            onPress={() => router.replace('/(tabs)/learn')}
+          />
+        </>
+      }
+    >
+      <Card tone={scoreTone} style={styles.scoreCard}>
+        <Text style={[styles.score, { color: scoreColor }]}>{percent}%</Text>
         <Text style={styles.scoreSub}>
           {correct} of {total} correct
         </Text>
-      </View>
+      </Card>
 
-      <LabelledSection kind="you">
-        <ThemedText type="smallBold">Hits</ThemedText>
-        {hits.length ? (
-          hits.map((r) => (
-            <ThemedText key={r.questionId} style={{ color: Palette.success }}>
-              ✓ {conceptLabel(r.conceptId)}
-            </ThemedText>
-          ))
+      <SectionHeader title="By concept" meta={`${results.length} questions`} />
+      <Card style={styles.list}>
+        {results.length === 0 ? (
+          <ThemedText type="small" themeColor="textSecondary">
+            No answers recorded.
+          </ThemedText>
         ) : (
-          <ThemedText themeColor="textSecondary">None this round</ThemedText>
-        )}
-      </LabelledSection>
-
-      <LabelledSection kind="teaching">
-        <ThemedText type="smallBold">Needs work</ThemedText>
-        {misses.length ? (
-          misses.map((r) => (
-            <ThemedText key={r.questionId} style={{ color: Palette.error }}>
-              ✕ {conceptLabel(r.conceptId)}
-            </ThemedText>
+          results.map((r, i) => (
+            <View key={r.questionId} style={[styles.row, i > 0 && styles.rowDivider]}>
+              <View
+                style={[
+                  styles.mark,
+                  { backgroundColor: r.correct ? Palette.success : Palette.error },
+                ]}
+              >
+                <Text style={styles.markText}>{r.correct ? '✓' : '✕'}</Text>
+              </View>
+              <Text style={styles.rowLabel}>{conceptLabel(r.conceptId)}</Text>
+              <Text style={[styles.rowStatus, { color: r.correct ? Palette.success : Palette.error }]}>
+                {r.correct ? 'Correct' : 'Needs work'}
+              </Text>
+            </View>
           ))
-        ) : (
-          <ThemedText themeColor="textSecondary">Nice — no misses</ThemedText>
         )}
-      </LabelledSection>
+      </Card>
 
-      <PrimaryButton
-        label={`Teach me: ${conceptLabel(teachConcept)}`}
-        onPress={() =>
-          router.push({ pathname: '/lesson', params: { concept: teachConcept } })
-        }
-      />
-      <PrimaryButton
-        label="Back to Learn"
-        variant="secondary"
-        onPress={() => router.replace('/(tabs)/learn')}
-      />
+      {misses.length === 0 && results.length > 0 ? (
+        <Card tone="success">
+          <ThemedText type="sectionTitle" style={{ color: Palette.success }}>
+            Nice — no misses
+          </ThemedText>
+          <ThemedText type="small" themeColor="textSecondary">
+            Review a concept below to keep it sharp.
+          </ThemedText>
+        </Card>
+      ) : null}
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  scoreCard: {
-    alignItems: 'center',
-    backgroundColor: Palette.softSuccess,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: Palette.border,
-    padding: 20,
-    gap: 4,
-  },
-  score: { color: Palette.success, fontSize: 48, fontWeight: '800' },
+  scoreCard: { alignItems: 'center', paddingVertical: 24, gap: 2 },
+  score: { fontSize: 56, lineHeight: 60, fontWeight: '800', fontVariant: ['tabular-nums'] },
   scoreSub: { color: Palette.muted, fontSize: 14, fontWeight: '600' },
+  list: { paddingVertical: 4, gap: 0 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12 },
+  rowDivider: { borderTopWidth: 1, borderTopColor: Palette.border },
+  mark: { width: 24, height: 24, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+  markText: { color: Palette.white, fontSize: 12, fontWeight: '700', lineHeight: 14 },
+  rowLabel: { flex: 1, color: Palette.text, fontSize: 15, fontWeight: '600' },
+  rowStatus: { fontSize: 13, fontWeight: '700' },
 });

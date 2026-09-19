@@ -1,44 +1,68 @@
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, type Edge } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/themed-text';
-import { MaxContentWidth, Palette } from '@/constants/theme';
+import { Layout, MaxContentWidth, Palette, Spacing } from '@/constants/theme';
 
+/**
+ * Page shell. Every screen uses it so titles, gutters and the primary action line up.
+ *
+ * - `footer`: the screen's main action(s). Rendered in a pinned bar so the CTA is always in
+ *   the same place and never scrolls out of view.
+ * - `safeEdges`: tab screens (default) inset the top only — the tab bar covers the bottom.
+ *   Stack screens with a native header pass `['bottom']`; header-less full screens pass
+ *   `['top', 'bottom']`.
+ */
 export function Screen({
   title,
   subtitle,
   children,
+  footer,
   scroll = true,
+  safeEdges = ['top'],
 }: {
   title?: string;
   subtitle?: string;
   children: React.ReactNode;
+  footer?: React.ReactNode;
   scroll?: boolean;
+  safeEdges?: Edge[];
 }) {
   const body = (
     <View style={styles.content}>
-      {title ? <ThemedText type="title" style={styles.title}>{title}</ThemedText> : null}
-      {subtitle ? (
-        <ThemedText type="small" themeColor="textSecondary">
-          {subtitle}
-        </ThemedText>
+      {title || subtitle ? (
+        <View style={styles.header}>
+          {title ? <ThemedText type="title">{title}</ThemedText> : null}
+          {subtitle ? (
+            <ThemedText type="small" themeColor="textSecondary">
+              {subtitle}
+            </ThemedText>
+          ) : null}
+        </View>
       ) : null}
       {children}
     </View>
   );
 
   return (
-    <View style={styles.root}>
-      <SafeAreaView style={styles.root} edges={['top']}>
-        {scroll ? (
-          <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
-            {body}
-          </ScrollView>
-        ) : (
-          body
-        )}
-      </SafeAreaView>
-    </View>
+    <SafeAreaView style={styles.root} edges={safeEdges}>
+      {scroll ? (
+        <ScrollView
+          style={styles.root}
+          contentContainerStyle={styles.scroll}
+          keyboardShouldPersistTaps="handled"
+        >
+          {body}
+        </ScrollView>
+      ) : (
+        <View style={styles.root}>{body}</View>
+      )}
+      {footer ? (
+        <View style={styles.footer}>
+          <View style={styles.footerInner}>{footer}</View>
+        </View>
+      ) : null}
+    </SafeAreaView>
   );
 }
 
@@ -46,12 +70,24 @@ const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: Palette.pageBackground },
   scroll: { flexGrow: 1 },
   content: {
-    padding: 16,
-    gap: 12,
+    padding: Layout.screenPadding,
+    paddingBottom: Spacing.five,
+    gap: Spacing.three,
     width: '100%',
     maxWidth: MaxContentWidth,
     alignSelf: 'center',
-    paddingBottom: 32,
   },
-  title: { fontSize: 28, lineHeight: 34, fontWeight: '700', color: Palette.text },
+  header: { gap: Spacing.one, marginBottom: Spacing.one },
+  footer: {
+    borderTopWidth: 1,
+    borderTopColor: Palette.border,
+    backgroundColor: Palette.surface,
+  },
+  footerInner: {
+    width: '100%',
+    maxWidth: MaxContentWidth,
+    alignSelf: 'center',
+    padding: Layout.screenPadding,
+    gap: Spacing.two,
+  },
 });

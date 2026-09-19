@@ -51,13 +51,24 @@ export default function RootLayout() {
   return (
     <>
       <StatusBar style="dark" />
-      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: Palette.pageBackground } }}>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: Palette.pageBackground },
+          // Shared look for every pushed screen: flat header on the page colour, bold title.
+          headerStyle: { backgroundColor: Palette.pageBackground },
+          headerShadowVisible: false,
+          headerTintColor: Palette.primary,
+          headerTitleStyle: { color: Palette.text, fontWeight: '700', fontSize: 17 },
+          headerBackButtonDisplayMode: 'minimal',
+        }}
+      >
         <Stack.Screen name="onboarding" />
         <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="event/[id]" options={{ headerShown: true, title: 'Case study', headerTintColor: Palette.primary }} />
-        <Stack.Screen name="quiz" options={{ headerShown: true, title: "Today's quiz", headerTintColor: Palette.primary }} />
-        <Stack.Screen name="feedback" options={{ headerShown: true, title: 'Feedback', headerTintColor: Palette.primary }} />
-        <Stack.Screen name="lesson" options={{ headerShown: true, title: 'Lesson', headerTintColor: Palette.primary }} />
+        <Stack.Screen name="event/[id]" options={{ headerShown: true, title: 'Case study' }} />
+        <Stack.Screen name="quiz" options={{ headerShown: true, title: "Today's quiz" }} />
+        <Stack.Screen name="feedback" options={{ headerShown: true, title: 'Feedback' }} />
+        <Stack.Screen name="lesson" options={{ headerShown: true, title: 'Lesson' }} />
       </Stack>
     </>
   );
