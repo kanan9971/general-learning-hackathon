@@ -24,7 +24,7 @@ Feature freeze at H13. P0 = the "magic moment" loop in docs/PLAN.md §18.
 - Backend setup: `cd backend && python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt` (copy `.env.example` → `backend/.env`, set `DEV_FIXTURES=true` for local fixture routes)
 - Backend dev: `cd backend && .venv/bin/uvicorn app.main:app --reload --port 8000`
 - Backend tests: `cd backend && .venv/bin/pytest` (markers `-m rag`, `-m prompts` hit live APIs; default run is offline)
-- Ingest KB: `cd backend && python -m app.rag.ingest ../content`
+- Ingest KB (dry run): `cd backend && .venv/bin/python -m app.rag.ingest ../content/sources/research_papers.yaml` (add `--store` to embed + write to Supabase; PDFs go in `content/raw/`, gitignored)
 - Generate daily brief locally: `scripts/run_cron_local.sh --date YYYY-MM-DD`
 - Mobile: `cd apps/mobile && npm install && npx expo start` (press `w` for web on localhost:8081; `--tunnel` for phones). Routes live in `apps/mobile/src/app`
 - Regenerate API types after changing backend schemas: `scripts/gen_types.sh`

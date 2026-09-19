@@ -36,7 +36,7 @@ The product/scope plan lives in `PLAN.md`; this file is the structural contract.
 | `backend/app/learning` | Rubric scoring (overall score), mastery updates, Leitner scheduling. Pure functions. | learner math |
 | `backend/app/llm` | Grok client, prompts, structured-output parsing, audit log. No DB reads of its own. | AI calls |
 | `backend/app/rag` | Ingest (CLI), chunk, embed, hybrid retrieve, boost, build untrusted context, validate citations. | retrieval |
-| `backend/app/db` *(later)* | Supabase client factories and queries. The only code that runs SQL/PostgREST. | data access |
+| `backend/app/db` | Supabase client factories (`client.py`) and writes/queries (`knowledge.py`). The only code that talks to Supabase for data. | data access |
 | `supabase/migrations` | Schema and RLS. Additive only. | schema |
 | `content/` | Lessons, concepts, golden-day data. Data, not code. | knowledge |
 
@@ -48,7 +48,7 @@ Allowed direction is **left → right** ("may import / call"). Anything not list
 |---|---|---|
 | `routers` | schemas, deps, services (`market`, `portfolio`, `learning`, `llm`, `rag`, `db`) | other routers |
 | `llm` | schemas, config | `db`, `rag`, `market`, `routers` (callers pass data in) |
-| `rag` | schemas, config, `db` (retrieval SQL), `llm.embed` only | `routers`, `learning` |
+| `rag` | schemas, config, `db`, `llm.embed` only (embedding call lives in `llm/embed.py`; `rag` never imports other `llm` modules) | `routers`, `learning` |
 | `market`, `news` | schemas, config, httpx | `llm`, `rag`, `db` writes except via cron entrypoint |
 | `portfolio`, `learning` | schemas only (pure functions) | network, DB, `llm` |
 | `db` | schemas, config | everything else |
@@ -82,6 +82,15 @@ Allowed direction is **left → right** ("may import / call"). Anything not list
 - **New LLM task:** add prompt module in `llm/prompts/` + output model in `schemas/` + call from a router. No new dependency edges.
 - **New content:** drop Markdown into `content/lessons/`, run ingest.
 
+## 6b. Research-paper ingestion (RAG owner's pipeline)
+
+`content/sources/research_papers.yaml` (manifest: id, title, authors, publisher, canonical `source_url`, `pdf_url`, concept_ids) →
+`rag/extract.py` (PDF→text; refuses scanned PDFs) → `rag/clean.py` (running headers/footers, references, equation/table debris, injection flag) →
+`rag/chunk.py` (section-aware, ≤350-token target / 500 max, 1-sentence overlap, `Title > Section` path) →
+`llm/embed.py` (OpenAI embeddings) → `db/knowledge.py` (upsert `documents` + `chunks`, layer=`foundation`, content_type=`research`).
+Run: `python -m app.rag.ingest ../content/sources/research_papers.yaml` (dry run, writes `content/processed/*.jsonl`) or add `--store`.
+**Rules:** PDFs (`content/raw/`) and extracted text (`content/processed/`) are gitignored, not redistributed. The UI shows short excerpts and always links to `source_url`. Papers are difficulty 3 / trust_level 2 and are only retrieved for advanced learners or explicit momentum/strategy topics, never for beginner misconception lessons.
+
 ## 7. Current status (update as phases land)
 
 | Area | State |
@@ -90,5 +99,8 @@ Allowed direction is **left → right** ("may import / call"). Anything not list
 | Pydantic API schemas + placeholder fixtures (`app/fixtures`, served at `/v1/dev/fixtures/*` when `DEV_FIXTURES=true`) | done (phase 0) |
 | Supabase migrations 0001–0003 (core, rag, rls) | written, **not yet applied/tested against a real DB** |
 | Expo app: 4 tabs, API client, Today reads fixtures | done (phase 0) |
-| market / news / portfolio / learning / llm / rag / db modules | empty packages (later phases) |
+| RAG ingest pipeline (extract, clean, chunk, embed, store) + 5 momentum papers (~300 chunks, dry-run verified; **not yet embedded/stored**: needs OPENAI_API_KEY + Supabase) | done except store step |
+| Migration 0004 (`research` content type) | written, not applied |
+| market / news / portfolio / learning / llm prompts | empty packages (later phases) |
+| retrieval (`rag/retrieve.py`, `match_chunks`), citations, context builder | not started (next) |
 | `match_chunks` SQL function (migration 0004) | not started |

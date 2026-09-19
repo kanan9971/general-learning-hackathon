@@ -10,3 +10,5 @@ dist/
 .vercel/
 .DS_Store
 .pytest_cache/
+content/raw/
+content/processed/
