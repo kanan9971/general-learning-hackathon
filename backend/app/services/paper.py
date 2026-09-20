@@ -152,7 +152,7 @@ def _save_book(user_id: str, token: str | None, s: Settings, row: dict, insert: 
     try:
         db = user_client(token)  # type: ignore[arg-type]
         saved = paper_db.insert_book(db, row) if insert else paper_db.update_book(
-            db, row["id"], {"cash_usd": row["cash_usd"]}
+            db, row["id"], {"cash_usd": row["cash_usd"], "level": row.get("level")}
         )
         return saved
     except Exception:
@@ -236,9 +236,15 @@ def _update_fill(user_id: str, token: str | None, s: Settings, fill_id: str, fie
 def _ensure_book(user_id: str, token: str | None, level_hint: str | None) -> dict:
     s = get_settings()
     existing = _get_book(user_id, token, s)
-    if existing:
-        return existing
     level = _level(user_id, level_hint)
+    if existing:
+        stored = existing.get("level") or "beginner"
+        # Placement can land after the book was first opened. Gates follow the new
+        # level; cash stays put (PLAN: retaking placement does not top up).
+        if level_hint and stored != level:
+            existing = {**existing, "level": level}
+            return _save_book(user_id, token, s, existing, insert=False)
+        return existing
     cash = starting_cash(level)
     row = {
         "id": nid(),

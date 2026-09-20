@@ -15,7 +15,7 @@ from ..schemas.portfolio import (
 from ..services import paper as paper_svc
 
 router = APIRouter(prefix="/v1/portfolio", tags=["portfolio"])
-LevelQ = Annotated[Level | None, Query(description="Placement level; used only when the book is first created")]
+LevelQ = Annotated[Level | None, Query(description="Placement level; sets gates on create or when the saved level changes. Does not top up cash.")]
 
 
 @router.get("/", response_model=PaperBookResponse)

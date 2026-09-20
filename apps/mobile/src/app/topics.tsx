@@ -14,6 +14,7 @@ import { SectionHeader } from '@/components/SectionHeader';
 import { SelectableChip } from '@/components/SelectableChip';
 import { ThemedText } from '@/components/themed-text';
 import { Palette, Radius } from '@/constants/theme';
+import { getPlan } from '@/lib/learner';
 
 export default function TopicsScreen() {
   const router = useRouter();
@@ -30,11 +31,12 @@ export default function TopicsScreen() {
 
   useEffect(() => {
     getQuizPreferences()
-      .then((data) => {
+      .then(async (data) => {
+        const plan = await getPlan();
         setTopics(data.available_topics);
         setSelected(data.preferences.preferred_concept_ids);
         setCustoms(data.preferences.custom_topics);
-        setLevel(data.preferences.level);
+        setLevel(plan?.level || data.preferences.level);
         setFormats(data.preferences.preferred_formats);
       })
       .catch((e) => setError(e instanceof Error ? e.message : 'Failed to load topics'))

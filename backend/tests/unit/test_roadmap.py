@@ -87,8 +87,10 @@ def client(monkeypatch):
     monkeypatch.setattr(quiz_service, "get_settings", lambda: Settings(data_mode="demo", auth_dev_bypass=True, quiz_use_memory=True))
     from app.db.memory_quiz import STORE
     STORE.mastery.clear()
+    STORE.preferences.clear()
     yield TestClient(app)
     STORE.mastery.clear()
+    STORE.preferences.clear()
     get_settings.cache_clear()
 
 
@@ -124,11 +126,16 @@ def test_placement_end_to_end_reshapes_the_roadmap(client):
     assert not road["needs_placement"] and road["mastered_count"] >= 6
     assert road["next_id"] in ("companies", "risk", "portfolio", "interview", "crossasset")
     assert any(n["collapsed"] for n in road["nodes"])
+    progress = client.get("/v1/learn/progress").json()
+    assert progress["level"] == "advanced"
+    prefs = client.get("/v1/quiz/preferences").json()
+    assert prefs["preferences"]["level"] == "advanced"
 
 
 def test_weak_placement_makes_priorities_and_focus_concepts(client):
     weak = _run_placement(client, right=False)
     assert weak["level"] == "beginner" and weak["percent"] == 0 and weak["focus_concept_ids"]
+    assert client.get("/v1/learn/progress").json()["level"] == "beginner"
     road = client.get("/v1/roadmap", params={"level": "beginner"}).json()
     assert road["mastered_count"] == 0 and any(n["state"] == "priority" for n in road["nodes"])
     assert [n for n in road["nodes"] if n["recommended"]][0]["state"] == "priority"

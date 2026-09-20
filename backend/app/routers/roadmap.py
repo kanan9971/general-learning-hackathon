@@ -20,6 +20,6 @@ def get_roadmap(
 
 
 @router.post("/roadmap/placement/next", response_model=PlacementStep)
-def placement_next(req: PlacementRequest, user_id: CurrentUser) -> PlacementStep:
+def placement_next(req: PlacementRequest, user_id: CurrentUser, token: BearerToken) -> PlacementStep:
     """Next placement question (or the result). Answers go through /v1/markets/lab/answer with placement=true."""
-    return roadmap_service.placement_next(req)
+    return roadmap_service.placement_next(user_id, token, req)

@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Stack, useRouter } from 'expo-router';
+import { useCallback, useState } from 'react';
+import { Stack, useFocusEffect, useRouter } from 'expo-router';
 
 import { Card } from '@/components/Card';
 import { Chip } from '@/components/Chip';
@@ -15,9 +15,11 @@ import { getPlan, type LearnerPlan } from '@/lib/learner';
 export default function ProfileScreen() {
   const router = useRouter();
   const [plan, setPlan] = useState<LearnerPlan | null>(null);
-  useEffect(() => {
-    getPlan().then(setPlan);
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      getPlan().then(setPlan);
+    }, []),
+  );
 
   return (
     <Screen safeEdges={['bottom']} footer={<Disclaimer />}>

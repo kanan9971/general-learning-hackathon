@@ -40,7 +40,7 @@ export default function QuizSetupScreen() {
           setPrefs(data);
           const saved = data.preferences.preferred_formats;
           setFormats(saved.length ? saved : []);
-          setLevel(data.preferences.level || plan?.level || 'beginner');
+          setLevel(plan?.level || data.preferences.level || 'beginner');
         } catch (e) {
           if (!cancelled) {
             setError(e instanceof Error ? e.message : 'Could not load quiz preferences');

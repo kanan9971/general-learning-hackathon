@@ -111,6 +111,28 @@ def update_preferences(user_id: str, token: str | None, req: UpdatePreferencesRe
     return get_preferences_response(user_id, token)
 
 
+def set_level(user_id: str, token: str | None, level: str) -> None:
+    """Persist the placement (or retake) level without wiping quiz topic prefs."""
+    if level not in ("beginner", "intermediate", "advanced"):
+        return
+    s = get_settings()
+    current = _get_prefs(user_id, token, s) or {
+        "preferred_formats": [],
+        "preferred_concept_ids": [],
+        "custom_topics": [],
+        "level": "beginner",
+    }
+    if current.get("level") == level:
+        return
+    _save_prefs(user_id, token, s, {
+        "preferred_formats": list(current.get("preferred_formats") or []),
+        "preferred_concept_ids": list(current.get("preferred_concept_ids") or []),
+        "custom_topics": list(current.get("custom_topics") or []),
+        "level": level,
+        "updated_at": datetime.now(timezone.utc).isoformat(),
+    })
+
+
 def _clean_topics(topics: list[str]) -> list[str]:
     out: list[str] = []
     for t in topics:

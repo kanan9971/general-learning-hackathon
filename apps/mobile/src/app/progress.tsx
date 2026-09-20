@@ -59,7 +59,7 @@ export default function ProgressScreen() {
     ]);
   };
 
-  const level = progress?.level ?? plan?.level ?? 'beginner';
+  const level = plan?.level ?? progress?.level ?? 'beginner';
   const concepts = progress?.concepts ?? [];
   const recommended = progress?.recommended_concept_ids ?? plan?.focusConceptIds ?? [];
 

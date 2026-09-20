@@ -11,6 +11,7 @@ import {
   completeDailyTask,
   getPlacementNext,
   restartDailyCycle,
+  updateQuizPreferences,
   type LabKind,
   type Level,
   type LabFeedback,
@@ -201,18 +202,21 @@ export function MarketLab({
 
   const skipPlacement = async () => {
     await savePlan({ level: 'beginner', focusConceptIds: [], percentCorrect: 0, answeredAt: new Date().toISOString() });
+    await updateQuizPreferences({ level: 'beginner' }).catch(() => null);
     router.replace(onboarding ? '/(tabs)' : '/(tabs)/learn');
   };
 
   const finishPlacement = async () => {
     if (!placementResult) return;
+    const level = placementResult.level ?? 'beginner';
     await savePlan({
-      level: placementResult.level ?? 'beginner',
+      level,
       focusConceptIds: placementResult.focus_concept_ids,
       percentCorrect: placementResult.percent ?? 0,
       answeredAt: new Date().toISOString(),
     });
-    if (!onboarding) await restartDailyCycle(placementResult.level ?? undefined, localToday()).catch(() => null);
+    await updateQuizPreferences({ level }).catch(() => null);
+    await restartDailyCycle(level, localToday()).catch(() => null);
     router.replace(onboarding ? '/onboarding/plan' : '/(tabs)/learn');
   };
 

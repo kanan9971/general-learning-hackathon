@@ -12,8 +12,9 @@ def get_roadmap(user_id: str, token: str | None, level: str | None) -> Roadmap:
     return rm.build_roadmap(load_guide(), quiz_service.mastery_map(user_id, token), lvl)
 
 
-def placement_next(req: PlacementRequest) -> PlacementStep:
-    """Stateless staircase: the next question depends only on the answers so far (replayed from history)."""
+def placement_next(user_id: str, token: str | None, req: PlacementRequest) -> PlacementStep:
+    """Stateless staircase: the next question depends only on the answers so far (replayed from history).
+    The final step writes the inferred level to quiz preferences so Progress / paper gates match placement."""
     guide = load_guide()
     items = markets_lab.placement_pool()
     by_id = {it.public.id: it for it in items}
@@ -34,7 +35,9 @@ def placement_next(req: PlacementRequest) -> PlacementStep:
         pts = sum({"correct": 1.0, "partial": 0.5}.get(t.observed, 0.0) for t in topics)
         pct = round(100 * pts / max(len(topics), 1))
         concepts = {s.id: s.concept_ids for s in guide.sections}
-        return PlacementStep(done=True, index=total, total=total, level=rm.placement_level(pct), percent=pct,  # type: ignore[arg-type]
+        level = rm.placement_level(pct)
+        quiz_service.set_level(user_id, token, level)
+        return PlacementStep(done=True, index=total, total=total, level=level, percent=pct,  # type: ignore[arg-type]
                              topics=topics, focus_concept_ids=rm.focus_concepts(topics, concepts))
 
     idx = len(req.history)

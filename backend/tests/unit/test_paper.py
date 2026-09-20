@@ -85,9 +85,9 @@ def test_get_book_creates_cash_from_level(client):
     assert "market" in body["allowed_ticket_kinds"] and "limit" not in body["allowed_ticket_kinds"]
     assert not body["options_allowed"]
     assert not body["custom_tickers_allowed"]
-    # Creating again does not top up cash.
+    # A later placement level unlocks gates but does not top up cash.
     r2 = client.get("/v1/portfolio", params={"level": "advanced"}).json()
-    assert r2["cash_usd"] == 10000 and r2["level"] == "beginner"
+    assert r2["cash_usd"] == 10000 and r2["level"] == "advanced" and r2["options_allowed"]
 
 
 def test_market_buy_then_sell_updates_cash_and_lots(client, monkeypatch):
